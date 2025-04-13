@@ -41,24 +41,22 @@
         "back": "Back",
         "pagesize": "Page size",
         "pagesizeplaceholder": "Select page size",
-        "page" : "Page",
-        "all" : "All",
-        "of" : "of",
-        "total" : "Total",
-        "selected" : "Selected",
+        "page": "Page",
+        "all": "All",
+        "of": "of",
+        "total": "Total",
+        "selected": "Selected",
         "user": "User",
         "users": "Users",
         "anonymous": "Anonymous",
         "posting": "Posting",
-        
         "image": "Image",
-        "video" : "Video",
-        "file" : "File",
-        "text" : "Text",
-        "document" : "Document",
-        "audio" : "Audio",
-        "other" : "Other",
-        
+        "video": "Video",
+        "file": "File",
+        "text": "Text",
+        "document": "Document",
+        "audio": "Audio",
+        "other": "Other",
         "number": "Number",
         "date": "Date",
         "time": "Time",
@@ -75,7 +73,6 @@
         "email": "Email",
         "phone": "Phone number",
         "url": "URL",
-
         "export": "Export",
         "exportall": "Export all",
         "exportselected": "Export selected",
@@ -84,9 +81,7 @@
         "exportPDF": "Export PDF",
         "exportHTML": "Export HTML",
         "exportHTML5": "Export HTML5",
-
         "mustrefreshtoseedata": "Please refresh the page to see the new data.",
-
         "confermationdelete": "Are you absolutely sure?",
         "confermationdeletemessage": "This action cannot be undone. This will permanently delete your data and remove your data from our servers."
     },
@@ -103,6 +98,10 @@
         "files": "Files",
         "files_upload": "Upload files",
         "blog": "Blog",
+        "parks": "Stations",
+        "addpark": "Add Station",
+        "vehicles": "Vehicles",
+        "devices": "Devices",
         "logout": "Logout",
         "footer": "© 2025 All rights reserved"
     },
@@ -207,11 +206,10 @@
         "avatarinvalid": "Avatar is invalid",
         "imagerequired": "Image is required",
         "onlyimagesallowed": "Only images are allowed",
-
         "selectusers": "Select users",
         "deleteusers": "Delete users",
-        "confermationdelete" : "Are you absolutely sure?",
-        "confermationdeletemessage" : "This action cannot be undone. This will permanently delete your users and remove your data from our servers."
+        "confermationdelete": "Are you absolutely sure?",
+        "confermationdeletemessage": "This action cannot be undone. This will permanently delete your users and remove your data from our servers."
     },
     "Permissions": {
         "title": "Permissions",
@@ -231,9 +229,21 @@
         "blogs_view": "Blogs View",
         "blogs_create": "Blogs Create",
         "blogs_update": "Blogs Update",
-        "blogs_delete": "Blogs Delete"
+        "blogs_delete": "Blogs Delete",
+        "park_view": "Station View",
+        "park_create": "Station Create",
+        "park_update": "Station Update",
+        "park_delete": "Station Delete",
+        "devices_view": "Devices View",
+        "devices_create": "Devices Create",
+        "devices_update": "Devices Update",
+        "devices_delete": "Devices Delete",
+        "vehicles_view": "Vehicles View",
+        "vehicles_create": "Vehicles Create",
+        "vehicles_update": "Vehicles Update",
+        "vehicles_delete": "Vehicles Delete"
     },
-   "Files": {
+    "Files": {
         "title": "Files",
         "uploadfile": "Upload File",
         "deletefile": "Delete File",
@@ -255,20 +265,18 @@
         "selectoneormorefiles": "Select one or more files to upload.",
         "selectonefile": "Select one file to upload.",
         "selectfilesheet": "Select file sheet",
-
         "filespermission": "Files Permission",
         "public": "Public",
         "allusers": "All Users",
-        "viewpermissions" : "Who can view files",
-        "downloadpermissions" : "Who can download files",
-        "deletepermissions" : "Who can delete files",
+        "viewpermissions": "Who can view files",
+        "downloadpermissions": "Who can download files",
+        "deletepermissions": "Who can delete files",
         "havepermission": "Who have permission",
         "users": "Users",
         "justme": "Just me",
-
         "confermationdeletemessage": "This action cannot be undone. This will permanently delete your file and remove your data from our servers."
     },
-    "Blogs":{
+    "Blogs": {
         "title": "Blogs",
         "addblog": "Add Blog",
         "updateblog": "Update Blog",
@@ -280,10 +288,10 @@
         "draft": "Draft",
         "blognotfound": "Blog not found"
     },
-    "TextEditor":{
+    "TextEditor": {
         "placeholder": "Write something..."
     },
-    "sheet":{
+    "sheet": {
         "title": "Sheet",
         "addsheet": "Add Sheet",
         "updatesheet": "Update Sheet",
@@ -294,7 +302,6 @@
         "publish": "Publish",
         "draft": "Draft",
         "sheetnotfound": "Sheet not found",
-
         "required": "This field is required",
         "invalidemail": "This field must be an email",
         "invalidphone": "This field must be a phone number",
@@ -312,5 +319,24 @@
         "invalidpdf": "This field must be a PDF",
         "invalidhtml": "This field must be an HTML",
         "invalidhtml5": "This field must be an HTML5"
+    },
+    "Park": {
+        "title": "Station",
+        "addpark": "Add Station",
+        "updatepark": "Update Station",
+        "deletepark": "Delete Station",
+        "parknotfound": "Station not found",
+        "namerequired": "Please enter a name",
+        "nameexists": "Name already exists",
+        "required": "This field is required",
+
+        "selectparks": "Select stations",
+        "deleteparks": "Delete stations",
+        "confermationdelete": "Are you absolutely sure?",
+        "confermationdeletemessage": "This action cannot be undone. This will permanently delete your stations and remove your data from our servers.",
+
+        "name": "Name",
+        "description": "Description",
+        "address": "Address"
     }
 }

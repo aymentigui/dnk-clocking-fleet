@@ -163,4 +163,13 @@ model files {
     admin_delete_only   Boolean @default(false)
 }
 
+model park{
+  id         String    @id @default(cuid())
+  name       String @unique
+  description String?
+  address     String?
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  added_from String?
+}
 

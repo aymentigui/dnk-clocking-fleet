@@ -103,6 +103,10 @@
         "pdfutil": "Utilitaire PDF",
         "blog": "Blog",
         "logout": "Se deconnecter",
+        "parks": "Parks",
+        "addpark": "Ajouter un park",
+        "vehicles": "Véhicules",
+        "devices": "Dispositifs",
         "footer": "© 2025 Tous droits réservés"
     },
     "Error": {
@@ -230,7 +234,19 @@
         "blogs_view": "Vue des blogs",
         "blogs_create": "Créer des blogs",
         "blogs_update": "Mettre à jour les blogs",
-        "blogs_delete": "Supprimer les blogs"
+        "blogs_delete": "Supprimer les blogs",
+        "park_view": "Vue du parc",
+        "park_create": "Créer un parc",
+        "park_update": "Mettre à jour le parc",
+        "park_delete": "Supprimer le parc",
+        "vehicles_view": "Vue des véhicules",
+        "vehicles_create": "Créer des véhicules",
+        "vehicles_update": "Mettre à jour les véhicules",
+        "vehicles_delete": "Supprimer les véhicules",
+        "devices_view": "Vue des dispositifs",
+        "devices_create": "Créer des dispositifs",
+        "devices_update": "Mettre à jour les dispositifs",
+        "devices_delete": "Supprimer les dispositifs"
     },
     "Files": {
         "title": "Fichiers",
@@ -305,5 +321,24 @@
         "invalidpdf": "Ce champ doit être un PDF",
         "invalidhtml": "Ce champ doit être un HTML",
         "invalidhtml5": "Ce champ doit être un HTML5"
+    },
+    "Park": {
+        "title": "Parc",
+        "addpark": "Ajouter un parc",
+        "updatepark": "Mettre à jour le parc",
+        "deletepark": "Supprimer le parc",
+        "parknotfound": "Parc introuvable",
+        "namerequired": "Veuillez saisir un nom",
+        "nameexists": "Le nom existe déjà",
+        "required": "Ce champ est obligatoire",
+        
+        "selectparks": "Sélectionner des parcs",
+        "deleteparks": "Supprimer les parcs",
+        "confermationdelete": "Etes-vous sûr de vouloir supprimer?",
+        "confermationdeletemessage": "Cette action ne peut pas être annulée. Cela supprimera définitivement vos parcs et supprimera vos données de nos serveurs.",
+
+        "name": "Nom",
+        "description": "Description",
+        "address": "Adresse"
     }
 }

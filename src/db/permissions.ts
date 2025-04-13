@@ -19,4 +19,19 @@ export const permissions = [
     { name: "files_create" },
     { name: "files_update" },
     { name: "files_delete" },
+
+    { name: "park_view" },
+    { name: "park_create" },
+    { name: "park_update" },
+    { name: "park_delete" },
+
+    { name: "vehicles_view" },
+    { name: "vehicles_create" },
+    { name: "vehicles_update" },
+    { name: "vehicles_delete" },
+
+    { name: "devices_view" },
+    { name: "devices_create" },
+    { name: "devices_update" },
+    { name: "devices_delete" },
   ];

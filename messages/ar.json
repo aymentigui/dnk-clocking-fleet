@@ -102,6 +102,10 @@
         "files_upload": "رفع الملفات",
         "pdfutil": "أداة PDF",
         "blog": "المدونة",
+        "parks": "الحظائر",
+        "addpark": "إضافة حظيرة",
+        "vehicles": "المركبات",
+        "devices": "الأجهزة",
         "logout": "تسجيل الخروج",
         "footer": "© 2025 جميع الحقوق محفوظة"
     },
@@ -230,7 +234,19 @@
         "blogs_view": "عرض المدونات",
         "blogs_create": "اضافة مدونة",
         "blogs_update": "تحديث مدونة",
-        "blogs_delete": "حذف مدونة"
+        "blogs_delete": "حذف مدونة",
+        "park_view": "عرض الحظيرة",
+        "park_create": "اضافة الحظيرة",
+        "park_update": "تحديث الحظيرة",
+        "park_delete": "حذف الحظيرة",
+        "vehicles_view": "عرض المركبات",
+        "vehicles_create": "اضافة مركبة",
+        "vehicles_update": "تحديث مركبة",
+        "vehicles_delete": "حذف مركبة",
+        "devices_view": "عرض الاجهزة",
+        "devices_create": "اضافة اجهزة",
+        "devices_update": "تحديث اجهزة",
+        "devices_delete": "حذف اجهزة"
     },
     "Files": {
         "title": "الملفات",
@@ -305,5 +321,24 @@
         "invalidpdf": "يجب أن يكون هذا الحقل PDF",
         "invalidhtml": "يجب أن يكون هذا الحقل HTML",
         "invalidhtml5": "يجب أن يكون هذا الحقل HTML5"
+    },
+    "Park": {
+        "title": "الحظيرة",
+        "addpark": "إضافة حظيرة",
+        "updatepark": "تحديث الحظيرة",
+        "deletepark": "حذف الحظيرة",
+        "parknotfound": "لم يتم العثور على الحظيرة",
+        "namerequired": "يرجى إدخال اسم",
+        "nameexists": "الاسم موجود بالفعل",
+        "required": "هذا الحقل مطلوب",
+        
+        "selectparks": "اختر حظيرة واحدة او اكثر",
+        "deleteparks": "حذف الحظائر",
+        "confermationdelete": "هل أنت متأكد تماماً؟",
+        "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
+
+        "name": "إسم",
+        "description": "الوصف",
+        "address": "العنوان"
     }
 }

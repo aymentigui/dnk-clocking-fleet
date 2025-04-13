@@ -38,7 +38,7 @@ const ConfirmDialogDelete = ({ open, setOpen, selectedIds, textToastSelect, trig
           setOpen(false)
           window.location.reload()
         } else {
-          toast.success(translateSystem("deletefail"))
+          toast.error(translateSystem("deletefail"))
         }
       }
 

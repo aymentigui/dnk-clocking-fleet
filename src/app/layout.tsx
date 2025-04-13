@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { init } from "@/actions/init/init";
 
 const cairo = Cairo({
   subsets: ['latin'], // Sous-ensembles pour les caractères spécifiques
@@ -24,6 +25,8 @@ export default async function RootLayout({
 
   const locale = await getLocale();
   const messages = await getMessages();
+
+  await init();
 
   return (
     <html suppressHydrationWarning lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>

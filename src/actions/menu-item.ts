@@ -1,10 +1,10 @@
 "use server"
-import { CircleEllipsis, Download, File, FileSpreadsheet, Home, Newspaper, Settings, UserRoundCog, Users } from "lucide-react";
+import { BusFront, CircleEllipsis, Download, File, FileSpreadsheet, Home, Newspaper, Plus, ScanQrCode, Settings, UserRoundCog, Users, Warehouse } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { getUserPermissions, verifySession} from "./permissions";
+import { getUserPermissions, verifySession } from "./permissions";
 
 
-const itemsMenu = async () =>{
+const itemsMenu = async () => {
     const Menu = await getTranslations('Menu');
     const items = [
         {
@@ -89,11 +89,25 @@ const itemsMenu = async () =>{
             ],
         },
         {
-            title: Menu("blog"),
-            url: "/admin/blogs",
-            icon: Newspaper,
+            title: Menu("parks"),
+            url: "/admin/parks",
+            icon: Warehouse,
             admin: false,
-            permissions: [],
+            permissions: ["park_view"],
+        },
+        {
+            title: Menu("vehicles"),
+            url: "/admin/vehicles",
+            icon: BusFront,
+            admin: false,
+            permissions: ["vehicles_view"],
+        },
+        {
+            title: Menu("devices"),
+            url: "/admin/devices",
+            icon: ScanQrCode,
+            admin: false,
+            permissions: ["devices_view"],
         },
     ]
     return items
@@ -103,12 +117,12 @@ export async function getMenuItems() {
     const items = await itemsMenu()
 
     const session = await verifySession();
-    if(!session || !session.data || !session.data.user) return []
-    
-    if(session.data.user.is_admin) return items
-        
+    if (!session || !session.data || !session.data.user) return []
+
+    if (session.data.user.is_admin) return items
+
     const permissions = await getUserPermissions(session.data.user.id)
-    if(!permissions || permissions.status !== 200 || !permissions.data) return []
+    if (!permissions || permissions.status !== 200 || !permissions.data) return []
 
     const userPermissions = permissions.data
 
@@ -116,7 +130,7 @@ export async function getMenuItems() {
         return items.filter((item: any) => {
             if (item.admin) return false;
 
-            if(!item.permissions.every((permission:string) => userPermissions.includes(permission))) return false;
+            if (!item.permissions.every((permission: string) => userPermissions.includes(permission))) return false;
             if (item.subItems) {
                 item.subItems = filteredItems(item.subItems); // Filtre récursif des sous-menus
                 // Si après filtrage, il n'y a plus de sous-menus valides, on filtre l'élément parent
@@ -124,7 +138,7 @@ export async function getMenuItems() {
             }
 
             // On vérifie que l'utilisateur a toutes les permissions requises pour cet élément
-            return item.permissions.every((permission:string) => userPermissions.includes(permission));
+            return item.permissions.every((permission: string) => userPermissions.includes(permission));
         });
     };
 
