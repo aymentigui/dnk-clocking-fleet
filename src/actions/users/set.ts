@@ -156,7 +156,6 @@ const addUser = async (data: any, userSchema: any, session: any, u:any) => {
         
 
         if (!result.success) {
-            console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors }, user : data };
         }
         

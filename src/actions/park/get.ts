@@ -35,13 +35,13 @@ export async function getPark(id: string): Promise<{ status: number, data: any }
         if (!session?.data?.user) {
             return { status: 401, data: { message: e("unauthorized") } };
         }
-        const hasPermissionAdd = await withAuthorizationPermission(['park_update'],session.data.user.id);
+        const hasPermissionAdd = await withAuthorizationPermission(['park_view'],session.data.user.id);
         
         if(hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
             return { status: 403, data: { message: e('forbidden') } };
         }
-        const role = await prisma.park.findUnique({ where: { id } });
-        return { status: 200, data: role };
+        const device = await prisma.park.findUnique({ where: { id } });
+        return { status: 200, data: device };
     } catch (error) {
         console.error("An error occurred in getPark");
         return { status: 500, data: { message: e("error") } };
@@ -76,3 +76,21 @@ export async function getParksWithIds(parkIds: string[]): Promise<{ status: numb
         return { status: 500, data: null };
     }
 }
+
+
+export async function getParksAdmin(): Promise<{ status: number, data: any }> {
+    const e = await getTranslations('Error');
+    try {
+        const session = await verifySession()
+        if (!session || session.status != 200) {
+            return { status: 401, data: { message: e('unauthorized') } }
+        }
+
+        const parks = await prisma.park.findMany();
+        return { status: 200, data: parks };
+    } catch (error) {
+        console.error("An error occurred in getParksPublic");
+        return { status: 500, data: { message: e("error") } };
+    }
+}
+

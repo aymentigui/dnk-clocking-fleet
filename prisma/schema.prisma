@@ -38,6 +38,7 @@ model user {
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  device     device[]
 }
 
 // model Account {
@@ -80,45 +81,43 @@ model user {
 // }
 
 model session {
-  id           String   @id @default(cuid())
+  id            String   @id @default(cuid())
   session_token String
   user_id       String
-  expires      DateTime
-  user         user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  expires       DateTime
+  user          user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   device_name   String?
   device_type   String?
-  browser      String?
-  os           String?
-  active       Boolean  @default(true)
+  browser       String?
+  os            String?
+  active        Boolean  @default(true)
   created_at    DateTime @default(now())
 }
 
 model verificationtoken {
-  id        String   @id @default(cuid())
-  email     String
-  token     String
+  id         String   @id @default(cuid())
+  email      String
+  token      String
   expired_at DateTime
 }
 
 model twofactorconfermation {
-  id        String   @id @default(cuid())
+  id         String   @id @default(cuid())
   user_id    String
   expired_at DateTime
-  user      user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id])
 }
 
 model resetpasswordconfermation {
-  id        String   @id @default(cuid())
+  id         String   @id @default(cuid())
   user_id    String
   expired_at DateTime
-  user      user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id])
 }
-
-
 
 model role {
   id          String     @id @default(cuid())
@@ -136,40 +135,56 @@ model userrole {
   role_id String
 }
 
-
 model files {
-    id         String    @id @default(cuid())
-    name       String
-    mime_type  String
-    extention  String
-    size       Int
-    path       String
-    created_at DateTime  @default(now())
-    deleted_at DateTime?
-    added_from String?
-
-    can_view_permissions     String?
-    can_download_permissions String?
-    can_delete_permissions   String?
-
-    // Définition des permissions spécifiques aux utilisateurs
-    can_view_users     String?
-    can_download_users String?
-    can_delete_users   String?
-
-    // Indicateur si seul l'admin a le contrôle total
-    admin_view_only     Boolean @default(false)
-    admin_download_only Boolean @default(false)
-    admin_delete_only   Boolean @default(false)
-}
-
-model park{
   id         String    @id @default(cuid())
-  name       String @unique
-  description String?
-  address     String?
+  name       String
+  mime_type  String
+  extention  String
+  size       Int
+  path       String
   created_at DateTime  @default(now())
   deleted_at DateTime?
   added_from String?
+
+  can_view_permissions     String?
+  can_download_permissions String?
+  can_delete_permissions   String?
+
+  // Définition des permissions spécifiques aux utilisateurs
+  can_view_users     String?
+  can_download_users String?
+  can_delete_users   String?
+
+  // Indicateur si seul l'admin a le contrôle total
+  admin_view_only     Boolean @default(false)
+  admin_download_only Boolean @default(false)
+  admin_delete_only   Boolean @default(false)
 }
 
+model park {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  address     String?
+  created_at  DateTime  @default(now())
+  deleted_at  DateTime?
+  added_from  String?
+  device      device[]
+}
+
+model device {
+  id      String  @id @default(cuid())
+  code    String?
+  park_id String?
+  username String?
+  password String?
+  park    park?   @relation(fields: [park_id], references: [id])
+  user_id String
+  user    user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  created_at  DateTime  @default(now())
+  deleted_at  DateTime?
+  added_from  String?
+
+  @@index([park_id])
+}

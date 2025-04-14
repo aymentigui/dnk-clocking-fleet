@@ -91,7 +91,7 @@ export const AddUpdateDialogPark = () => {
           toast.error(err.message);
         })
       } else {
-        toast.error(message??t("createfail"));
+        toast.error(message ?? (isAdd?t("createfail"):t("updatefail")));
       }
     }
   };

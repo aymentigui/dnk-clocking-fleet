@@ -338,5 +338,28 @@
         "name": "Name",
         "description": "Description",
         "address": "Address"
+    },
+    "Device": {
+        "title": "Device",
+        "adddevice": "Add Device",
+        "updatedevice": "Update Device",
+        "deletedevice": "Delete Device",
+        "devicenotfound": "Device not found",
+
+        "coderequired": "Please enter a code",
+        "codeexists": "Code already exists",
+        "required": "This field is required",
+        "park": "Station",
+        "code": "Code",
+        "username":"Username",
+        "usernamerequired": "Please enter a username",
+        "usernameexists": "Username already exists",
+        "password": "Password",
+        "passwordrequired": "Please enter a password",
+        "parknotexist": "Station not exist",
+        "password6": "Password must contain at least 6 characters",
+        "emailinvalid": "Email is invalid",
+        "usernamecontainspace": "Username cannot contain spaces",
+        "selectpark": "Select station"
     }
 }

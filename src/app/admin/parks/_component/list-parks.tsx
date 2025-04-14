@@ -63,7 +63,6 @@ export default function ListParks() {
         if (res.status === 200) {
           if (res.data.parks) {
             res.data.parks.forEach((park) => {
-              console.log("park", park)
               if (park.status !== 200) {
                 setParkSheetNotCreated((prev: any) => [...prev, park.data])
               } else {

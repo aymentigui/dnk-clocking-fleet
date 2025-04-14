@@ -340,5 +340,28 @@
         "name": "Nom",
         "description": "Description",
         "address": "Adresse"
+    },
+    "Device": {
+        "title": "Appareil",
+        "adddevice": "Ajouter un appareil",
+        "updatedevice": "Mettre à jour l'appareil",
+        "deletedevice": "Supprimer l'appareil",
+        "devicenotfound": "Appareil introuvable",
+
+        "coderequired": "Veuillez saisir un code",
+        "codeexists": "Le code existe déjà",
+        "required": "Ce champ est obligatoire",
+        "park": "Station",
+        "code": "Code",
+        "username":"Nom d'utilisateur",
+        "usernamerequired": "Veuillez saisir un nom d'utilisateur",
+        "usernameexists": "Le nom d'utilisateur existe déjà",
+        "password": "Mot de passe",
+        "passwordrequired": "Veuillez saisir un mot de passe",
+        "parknotexist": "La station n'existe pas",
+        "password6": "Le mot de passe doit contenir au moins 6 caractères",
+        "emailinvalid": "L'email est invalide",
+        "usernamecontainspace": "Le nom d'utilisateur ne peut pas contenir d'espaces",
+        "selectpark": "Sélectionner une station"
     }
 }

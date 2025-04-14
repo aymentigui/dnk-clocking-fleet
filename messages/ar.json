@@ -340,5 +340,28 @@
         "name": "إسم",
         "description": "الوصف",
         "address": "العنوان"
+    },
+    "Device": {
+        "title": "الجهاز",
+        "adddevice": "إضافة جهاز",
+        "updatedevice": "تحديث جهاز",
+        "deletedevice": "حذف جهاز",
+        "devicenotfound": "لم يتم العثور على الجهاز",
+
+        "coderequired": "يرجى إدخال الشفرة",
+        "codeexists": "الرمز موجود بالفعل",
+        "required": "هذا الحقل مطلوب",
+        "park": "الحظيرة",
+        "code": "الرمز",
+        "username":"اسم المستخدم",
+        "usernamerequired": "يرجى إدخال اسم المستخدم",
+        "usernameexists": "اسم المستخدم موجود بالفعل",
+        "password": "كلمة السر",
+        "passwordrequired": "يرجى إدخال كلمة السر",
+        "parknotexist": "الحظيرة غير موجودة",
+        "password6": "يجب أن تحتوي كلمة السر على 6 أحرف على الأقل",
+        "emailinvalid": "البريد الالكتروني غير صالح",
+        "usernamecontainspace": "اسم المستخدم لا يمكن أن يحتوي على فراغات",
+        "selectpark": "اختر حظيرة"
     }
 }
