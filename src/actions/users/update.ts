@@ -48,6 +48,14 @@ export async function updateUser(id: string, data: any): Promise<{ status: numbe
 
         if (id == "" || id == undefined) return { status: 400, data: { message: u("usernotfound") } }
 
+        const userExisting = await prisma.user.findUnique({
+            where: { id },
+        });
+
+        if (!userExisting) {
+            return { status: 404, data: { message: u("usernotfound") } };
+        }
+
         const result = userSchema.safeParse(data);
         if (!result.success) {
             console.log(result.error.errors);

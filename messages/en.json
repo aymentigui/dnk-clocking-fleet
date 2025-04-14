@@ -103,7 +103,7 @@
         "vehicles": "Vehicles",
         "devices": "Devices",
         "logout": "Logout",
-        "footer": "© 2025 All rights reserved"
+        "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
         "title": "Error",
@@ -318,7 +318,10 @@
         "invalidxlsx": "This field must be an XLSX",
         "invalidpdf": "This field must be a PDF",
         "invalidhtml": "This field must be an HTML",
-        "invalidhtml5": "This field must be an HTML5"
+        "invalidhtml5": "This field must be an HTML5",
+        "nospacesallowed": "This field must not contain spaces",
+        "invalidyear": "This field must be a year",
+        "invalidvin": "This field must be a VIN"
     },
     "Park": {
         "title": "Station",
@@ -360,6 +363,35 @@
         "password6": "Password must contain at least 6 characters",
         "emailinvalid": "Email is invalid",
         "usernamecontainspace": "Username cannot contain spaces",
-        "selectpark": "Select station"
+        "selectpark": "Select station",
+
+        "selectdevices": "Select devices",
+        "deletedevices": "Delete stations",
+        "confermationdelete": "Are you absolutely sure?",
+        "confermationdeletemessage": "This action cannot be undone. This will permanently delete your devices and remove your data from our servers."
+    },
+    "Vehicle": {
+        "title": "Vehicle",
+        "addvehicle": "Add Vehicle",
+        "updatevehicle": "Update Vehicle",
+        "deletevehicle": "Delete Vehicle",
+        "vehiclenotfound": "Vehicle not found",
+        "matriculerequired": "Please enter a matricule",
+        "matriculeexists": "Matricule already exists",
+        "vinexists": "VIN already exists",
+        "required": "This field is required",
+        "matricule": "Matricule",
+        "park": "Station",
+        "model": "Model",
+        "year": "Year",
+        "brand": "Brand",
+        "yearinvalid": "Year is invalid",
+        "vin": "VIN",
+        "vininvalid": "VIN is invalid",
+        "selectpark": "Select station",
+        "selectvehicles": "Select vehicles",
+        "deletevehicles": "Delete vehicles",
+        "confermationdelete": "Are you absolutely sure?",
+        "confermationdeletemessage": "This action cannot be undone. This will permanently delete your vehicles and remove your data from our servers."
     }
 }

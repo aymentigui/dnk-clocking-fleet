@@ -63,7 +63,7 @@ export function DataTable({
     //-------------------------------------------------------------
     // modifier 
     // --------------------------------------------------------------
-    const hasPermissionAction = (session?.user?.permissions.find((permission: string) => permission === "devices_update" || permission === "devices_delete") ?? false) ||
+    const hasPermissionAction = (session?.user?.permissions.find((permission: string) => permission === "vehicles_update" || permission === "vehicles_delete") ?? false) ||
         session?.user?.is_admin;
 
     const s = useTranslations('System')

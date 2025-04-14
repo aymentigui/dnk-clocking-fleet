@@ -36,36 +36,6 @@ const itemsMenu = async () => {
             permissions: [],
         },
         {
-            title: Menu("more"),
-            url: null,
-            icon: CircleEllipsis,
-            admin: false,
-            permissions: [],
-            subItems: [
-                {
-                    title: Menu("testimportsheet"),
-                    url: "/admin/more/import-sheet",
-                    icon: FileSpreadsheet,
-                    admin: false,
-                    permissions: [],
-                },
-                {
-                    title: Menu("fileslocalstorage"),
-                    url: "/admin/more/upload-files",
-                    icon: FileSpreadsheet,
-                    admin: false,
-                    permissions: [],
-                },
-                {
-                    title: Menu("pdfutil"),
-                    url: "/admin/more/pdf-util",
-                    icon: FileSpreadsheet,
-                    admin: false,
-                    permissions: [],
-                },
-            ],
-        },
-        {
             title: Menu("files"),
             url: "/admin/files",
             icon: File,

@@ -5,33 +5,32 @@ import Loading from "@/components/myui/loading";
 import { useEffect, useState } from "react";
 import { useOrigin } from "@/hooks/use-origin";
 import { useSearchParams } from "next/navigation";
-import axios from "axios";
 import SelectFetch from "@/components/myui/select-fetch";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useImportSheetsStore } from "@/hooks/use-import-csv";
 import toast from "react-hot-toast";
 import { useSession } from "@/hooks/use-session";
-import { deleteDevices } from "@/actions/device/delete";
 import ConfirmDialogDelete from "@/components/myui/shadcn-dialog-confirm";
 import { generateFileClient } from "@/actions/util/export-data/export-client";
 import ExportButton from "@/components/my/export-button";
-import { createDevices } from "@/actions/device/set";
-import { getCountDevices, getDevices, getDevicesWithIds } from "@/actions/device/get";
 import SelectSearchFetch from "@/components/myui/select-search-fetch";
 import { getParksAdmin } from "@/actions/park/get";
-import { getColumns } from "@/actions/util/sheet-columns/device";
+import { createVehicles } from "@/actions/vehicle/set";
+import { getCountVehicles, getVehicles, getVehiclesAll, getVehiclesWithIds } from "@/actions/vehicle/get";
+import { deleteVehicles } from "@/actions/vehicle/delete";
+import { getColumns } from "@/actions/util/sheet-columns/vehicle";
 
 const selectors = [
-  { title: "id", selector: "id" },
-  { title: "code", selector: "code" },
-  { title: "username", selector: "username" },
-  { title: "password", selector: "password" },
-  { title: "park", selector: "park" },
+  { title: "matricule", selector: "matricule" },
+  { title: "vin", selector: "vin" },
+  { title: "brand", selector: "brand" },
+  { title: "model", selector: "model" },
+  { title: "year", selector: "year" },
 ];
 
-export default function ListDevices() {
-  const translate = useTranslations("Device")
+export default function ListVehicles() {
+  const translate = useTranslations("Vehicle")
 
   const translateSystem = useTranslations("System");
   const translateErrors = useTranslations("Error")
@@ -72,12 +71,12 @@ export default function ListDevices() {
   // pour la creation depuis les sheet
   useEffect(() => {
     if (sheetData && sheetData.length > 0) {
-      createDevices(sheetData).then((res) => {
+      createVehicles(sheetData).then((res) => {
         if (res.status === 200) {
-          if (res.data.devices) {
-            res.data.devices.forEach((device) => {
-              if (device.status !== 200) {
-                setUserSheetNotCreated((prev: any) => [...prev, device.data])
+          if (res.data.vehicles) {
+            res.data.vehicles.forEach((vehicle) => {
+              if (vehicle.status !== 200) {
+                setUserSheetNotCreated((prev: any) => [...prev, vehicle.data])
               } else {
                 setUserSheetCreated(true)
               }
@@ -105,12 +104,12 @@ export default function ListDevices() {
     try {
       if (!origin) return
       setIsLoading(true);
-      const response = await getDevices(page, pageSize, debouncedSearchQuery, searchPark);
+      const response = await getVehicles(page, pageSize, debouncedSearchQuery, searchPark);
       if (response.status === 200) {
         setData(response.data);
       }
 
-      const countResponse = await getCountDevices(debouncedSearchQuery, searchPark);
+      const countResponse = await getCountVehicles(debouncedSearchQuery, searchPark);
       if (countResponse.status === 200) {
         setCount(countResponse.data);
       }
@@ -124,7 +123,7 @@ export default function ListDevices() {
 
   const exportSelected = async (type: number = 1) => {
 
-    const res = await getDevicesWithIds(selectedIds)
+    const res = await getVehiclesWithIds(selectedIds)
 
     if (res.status !== 200) {
       toast.error(translateErrors("badrequest"))
@@ -138,7 +137,7 @@ export default function ListDevices() {
 
   const exportAll = async (type: number = 1) => {
 
-    const res = await getDevices()
+    const res = await getVehiclesAll()
 
     if (res.status !== 200) {
       toast.error(translateErrors("badrequest"))
@@ -174,7 +173,7 @@ export default function ListDevices() {
               <ul className="list-disc pl-5">
                 <li>
                   {
-                    (data.message ? data.message + " : " : "") + " " + (data.device.code ?? "") + " " + (data.device.username ?? "") + " " + (data.device.password ?? "") + " " + (data.device.park ?? "") 
+                    (data.message ? data.message + " : " : "") + " " + (data.vehicle.matricule ?? "") + " " + (data.vehicle.vin ?? "") + " " + (data.vehicle.model ?? "") + " " + (data.vehicle.year ?? "") 
                   }
                 </li>
               </ul>
@@ -189,7 +188,7 @@ export default function ListDevices() {
           </Link>
           <ExportButton all={true} handleExportCSV={() => exportAll(1)} handleExportXLSX={() => exportAll(2)} />
           {selectedIds.length > 0 && <ExportButton all={false} handleExportCSV={() => exportSelected(1)} handleExportXLSX={() => exportSelected(2)} />}
-          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_delete") ?? false) || session?.user?.is_admin
+          {(session?.user?.permissions.find((permission: string) => permission === "vehicle_delete") ?? false) || session?.user?.is_admin
             &&
             selectedIds.length > 0
             &&
@@ -197,11 +196,11 @@ export default function ListDevices() {
               open={open}
               setOpen={setOpen}
               selectedIds={selectedIds}
-              textToastSelect={translate("selectdevices")}
-              triggerText={translate("deletedevices")}
+              textToastSelect={translate("selectvehicles")}
+              triggerText={translate("deletevehicles")}
               titleText={translate("confermationdelete")}
               descriptionText={translate("confermationdeletemessage")}
-              deleteAction={deleteDevices}
+              deleteAction={deleteVehicles}
             />
           }
         </div>

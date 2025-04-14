@@ -107,7 +107,7 @@
         "addpark": "Ajouter un park",
         "vehicles": "Véhicules",
         "devices": "Dispositifs",
-        "footer": "© 2025 Tous droits réservés"
+        "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
         "title": "Erreur",
@@ -320,7 +320,10 @@
         "invalidxlsx": "Ce champ doit être un XLSX",
         "invalidpdf": "Ce champ doit être un PDF",
         "invalidhtml": "Ce champ doit être un HTML",
-        "invalidhtml5": "Ce champ doit être un HTML5"
+        "invalidhtml5": "Ce champ doit être un HTML5",
+        "nospacesallowed": "Ce champ ne doit pas contenir d'espaces",
+        "invalidyear": "Ce champ doit être une année valide",
+        "invalidvin": "Ce champ doit être un VIN valide"
     },
     "Park": {
         "title": "Parc",
@@ -362,6 +365,12 @@
         "password6": "Le mot de passe doit contenir au moins 6 caractères",
         "emailinvalid": "L'email est invalide",
         "usernamecontainspace": "Le nom d'utilisateur ne peut pas contenir d'espaces",
-        "selectpark": "Sélectionner une station"
+        "selectpark": "Sélectionner une station",
+
+        
+        "selectdevices": "Sélectionner des appareils",
+        "deletedevices": "Supprimer des appareils",
+        "confermationdelete": "Etes-vous sûr de vouloir supprimer?",
+        "confermationdeletemessage": "Cette action ne peut pas être annulée. Cela supprimera définitivement vos appareils et supprimera vos données de nos serveurs."
     }
 }

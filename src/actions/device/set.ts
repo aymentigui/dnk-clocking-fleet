@@ -32,7 +32,6 @@ export async function createDevice(data: any) {
         const result = schema.safeParse(data);
 
         if (!result.success) {
-            console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { code, username, password, park } = result.data;
@@ -141,7 +140,7 @@ export async function createDevices(data: any) {
         }
 
         const devices = data.map(async (userData: any) => {
-            return await addDevice(userData, schema, session, u);
+            return await addDevice(userData, schema, session, u,s);
         })
 
         const devicesResuls = await Promise.all(devices);
@@ -154,7 +153,7 @@ export async function createDevices(data: any) {
     }
 }
 
-const addDevice = async (data: any, userSchema: any, session: any, u: any) => {
+const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any) => {
     try {
 
         const result = userSchema.safeParse({
@@ -176,32 +175,33 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any) => {
 
         const codeExists = await prisma.device.findFirst({ where: { code } });
         if (codeExists) {
-            return { status: 400, data: { message: u("codeexists") } };
+            return { status: 400, data: { device: data, message: u("codeexists") } };
         }
 
         const usernameExists = await prisma.device.findFirst({ where: { username } });
 
         if (usernameExists) {
-            return { status: 400, data: { message: u("usernameexists") } };
+            return { status: 400, data: { device: data, message: u("usernameexists") } };
         }
 
         const usernameExistsUser = await prisma.user.findFirst({ where: { username } });
 
         if (usernameExistsUser) {
-            return { status: 400, data: { message: u("usernameexists") } };
+            return { status: 400, data: { device: data, message: u("usernameexists") } };
         }
 
         const emailExists = await prisma.user.findFirst({ where: { email: username + "@email.com" } });
 
         if (emailExists) {
-            return { status: 400, data: { message: u("usernameexists") } };
+            return { status: 400, data: { device: data, message: u("usernameexists") } };
         }
-
-        if (park) {
-            const parkExists = await prisma.park.findFirst({ where: { id: park } });
+        console.log("park", park)
+        
+        if (park && park!=null && park!="null" && park != "" && park.trim() != "") {
+            const parkExists = await prisma.park.findFirst({ where: { name: park } });
 
             if (!parkExists) {
-                return { status: 400, data: { message: u("parknotexist") } };
+                return { status: 400, data: { device: data, message: u("parknotexist") } };
             }
         }
 
@@ -232,8 +232,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any) => {
                 },
             },
         });
-
-        if(park && device){
+        if(park && device && park.trim() != "" && park!=="null" ){
             await prisma.device.update({
                 where: {
                     id: device.id
@@ -241,7 +240,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any) => {
                 data: {
                     park: {
                         connect: {
-                            id: park
+                            name: park
                         }
                     }
                 }
@@ -253,6 +252,6 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any) => {
     } catch (error) {
         // @ts-ignore
         console.error("An error occurred in addPDevice" + error.message);
-        return { status: 500, data: { message: u("createfail"), device: data } }
+        return { status: 500, data: { message: s("createfail"), device: data } }
     };
 }

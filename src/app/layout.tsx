@@ -26,7 +26,7 @@ export default async function RootLayout({
   const locale = await getLocale();
   const messages = await getMessages();
 
-  await init();
+  init();
 
   return (
     <html suppressHydrationWarning lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>

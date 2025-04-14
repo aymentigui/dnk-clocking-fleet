@@ -39,7 +39,6 @@ export async function createUser(data: any) {
         const result = userSchema.safeParse(data);
 
         if (!result.success) {
-            console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { firstname, lastname, username, email, password, is_admin, roles, image } = result.data;
@@ -133,7 +132,7 @@ export async function createUsers(data: any) {
         }
 
         const users =data.map(async (userData: any) => {
-            return await addUser(userData, userSchema, session, u);
+            return await addUser(userData, userSchema, session, u,s);
         })
 
         const usersResuls = await Promise.all(users);
@@ -146,7 +145,7 @@ export async function createUsers(data: any) {
     }
 }
 
-const addUser = async (data: any, userSchema: any, session: any, u:any) => {
+const addUser = async (data: any, userSchema: any, session: any, u:any, s:any) => {
     try {
 
         if (data.roles) {
@@ -200,6 +199,6 @@ const addUser = async (data: any, userSchema: any, session: any, u:any) => {
     } catch (error) {
         // @ts-ignore
         console.error("An error occurred in addUser" + error.message);
-        return { status: 500, data: { message: u("createfail") , user : data} }
+        return { status: 500, data: { message: s("createfail") , user : data} }
     };
 }

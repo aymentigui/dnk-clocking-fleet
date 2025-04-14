@@ -75,7 +75,7 @@ export async function createParks(data: any) {
         }
 
         const parks =data.map(async (userData: any) => {
-            return await addPark(userData, schema, session, u);
+            return await addPark(userData, schema, session, u, s);
         })
 
         const parksResuls = await Promise.all(parks);
@@ -88,7 +88,7 @@ export async function createParks(data: any) {
     }
 }
 
-const addPark = async (data: any, userSchema: any, session: any, u:any) => {
+const addPark = async (data: any, userSchema: any, session: any, u:any, s:any) => {
     try {
 
         const result = userSchema.safeParse({
@@ -99,7 +99,6 @@ const addPark = async (data: any, userSchema: any, session: any, u:any) => {
         
 
         if (!result.success) {
-            console.log(result.error.errors);
             const message= result.error.errors.map((error: any) => {
                 return error.message;
             }).join(', ')
@@ -126,6 +125,6 @@ const addPark = async (data: any, userSchema: any, session: any, u:any) => {
     } catch (error) {
         // @ts-ignore
         console.error("An error occurred in addPark" + error.message);
-        return { status: 500, data: { message: u("createfail") , park : data} }
+        return { status: 500, data: { message: s("createfail") , park : data} }
     };
 }

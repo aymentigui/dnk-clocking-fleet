@@ -173,18 +173,31 @@ model park {
 }
 
 model device {
-  id      String  @id @default(cuid())
-  code    String?
-  park_id String?
+  id       String  @id @default(cuid())
+  code     String?
+  park_id  String?
   username String?
   password String?
-  park    park?   @relation(fields: [park_id], references: [id])
-  user_id String
-  user    user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  park     park?   @relation(fields: [park_id], references: [id])
+  user_id  String
+  user     user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  created_at  DateTime  @default(now())
-  deleted_at  DateTime?
-  added_from  String?
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  added_from String?
 
   @@index([park_id])
+}
+
+model vehicle {
+  id        String  @id @default(cuid())
+  matricule String?
+  vin       String?
+  model     String?
+  year      Int?
+  brand     String?
+
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  added_from String?
 }

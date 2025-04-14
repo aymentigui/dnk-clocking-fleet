@@ -8,7 +8,7 @@ import { z } from "zod";
 export async function UpdatePark(id:string, data: any) {
     const e = await getTranslations('Error');
     const s = await getTranslations('System');
-    const p = await getTranslations('Parks');
+    const p = await getTranslations('Park');
 
     try {
         const schema = z.object({
@@ -27,6 +27,13 @@ export async function UpdatePark(id:string, data: any) {
             return { status: 403, data: { message: e('forbidden') } };
         }
 
+        const park = await prisma.park.findUnique({
+            where: { id },
+        });
+        if (!park) {
+            return { status: 404, data: { message: p("parknotfound") } };
+        }
+
         const result = schema.safeParse(data);
 
         if (!result.success) {
@@ -34,6 +41,11 @@ export async function UpdatePark(id:string, data: any) {
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { name, description, address } = result.data;
+
+        const existingPark = await prisma.park.findUnique({ where: { NOT: { id }, name } });
+        if (existingPark) {
+            return { status: 404, data: { message: p("nameexists") } };
+        }
 
         await prisma.park.update({
             where: { id },

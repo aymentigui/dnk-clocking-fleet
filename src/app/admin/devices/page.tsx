@@ -3,8 +3,8 @@ import { accessPage, withAuthorizationPermission, verifySession } from '@/action
 import AddModalButton from '@/components/my/button/add-modal-button'
 import { Card } from '@/components/ui/card'
 import React from 'react'
-import ListParks from './_component/list-devices';
 import { useAddUpdateDeviceDialog } from '@/context/add-update-dialog-context-device';
+import ListDevices from './_component/list-devices';
 
 const Page = async () => {
 
@@ -13,7 +13,7 @@ const Page = async () => {
   if (!session || session.status !== 200 || !session.data.user || !session.data.user.id) {
     return null;
   }
-  await accessPage(['park_view'],session.data.user.id);
+  await accessPage(['devices_view'],session.data.user.id);
   const hasPermissionView = await withAuthorizationPermission(['devices_view'],session.data.user.id);
   const hasPermissionAdd = await withAuthorizationPermission(['devices_create'],session.data.user.id);
 
@@ -22,7 +22,7 @@ const Page = async () => {
       <div className='flex flex-col gap-2'>
         {hasPermissionAdd.data.hasPermission && <AddModalButton translationName="Device" translationButton="adddevice" useModal={useAddUpdateDeviceDialog} />}
         {/* <ListUsers /> */}
-        {hasPermissionView.data.hasPermission && <ListParks />}
+        {hasPermissionView.data.hasPermission && <ListDevices />}
       </div>
     </Card>
   )
