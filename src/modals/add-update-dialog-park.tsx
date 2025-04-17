@@ -104,12 +104,12 @@ export const AddUpdateDialogPark = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[70%] max-w-[70%] gb-r h-[50%] overflow-y-auto">
+       <DialogContent className="w-[70%] max-w-[70%] flex flex-col h-[50%] ">
         <DialogHeader>
           <DialogTitle className="text-center">{isAdd ? u("addpark") : u("updatepark")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} style={{ paddingInline: "1px" }} className="space-y-4 overflow-auto h-fit">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Name */}
               <FormField
@@ -173,7 +173,7 @@ export const AddUpdateDialogPark = () => {
               {isAdd ? u("addpark") : u("updatepark")}
             </Button>
           </form>
-          <div className="w-full h-20"></div>
+          {/* <div className="w-full h-20"></div> */}
         </Form>
       </DialogContent>
     </Dialog>

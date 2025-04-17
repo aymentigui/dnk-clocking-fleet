@@ -145,7 +145,7 @@ export const AddUpdateDialogVehicle = () => {
           <DialogTitle className="text-center">{isAdd ? v("addvehicle") : v("updatevehicle")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 overflow-auto h-fit">
+          <form onSubmit={form.handleSubmit(onSubmit)} style={{ paddingInline: "1px" }} className="space-y-4 overflow-auto h-fit">
             <div className="px-2">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* matricule */}

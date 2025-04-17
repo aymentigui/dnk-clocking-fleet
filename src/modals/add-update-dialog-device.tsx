@@ -39,7 +39,7 @@ export const AddUpdateDeviceDialog = () => {
 
   const types = [
     { id: 0, name: u("devicesortie") },
-    { id: 1, name: u("deviceentree")},
+    { id: 1, name: u("deviceentree") },
     { id: 2, name: u("devicesortieentree") },
     { id: 3, name: u("devicecontroller") },
   ];
@@ -132,12 +132,12 @@ export const AddUpdateDeviceDialog = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[70%] max-w-[70%] gb-r h-[50%] overflow-y-auto">
+      <DialogContent className="w-[70%] max-w-[70%] flex flex-col h-[50%] lg:h-[70%]">
         <DialogHeader>
           <DialogTitle className="text-center">{isAdd ? u("adddevice") : u("updatedevice")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} style={{ paddingInline: "1px" }} className="space-y-4 overflow-auto h-fit px-1">
             <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
               {/* First Name */}
               <FormField
@@ -225,7 +225,7 @@ export const AddUpdateDeviceDialog = () => {
                   </FormItem>
                 )}
               />
-               <FormField
+              <FormField
                 control={form.control}
                 name="type"
                 render={({ field }) => (
@@ -265,7 +265,7 @@ export const AddUpdateDeviceDialog = () => {
               {isAdd ? u("adddevice") : u("updatedevice")}
             </Button>
           </form>
-          <div className="w-full h-20"></div>
+          {/* <div className="w-full h-20"></div> */}
         </Form>
       </DialogContent>
     </Dialog>
