@@ -39,7 +39,12 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
                     vehicle_park: {
                         every: {
                             park: {
-                                id: "cm9jwfte50000v8qgzycks5lm",
+                                id: searchPark,
+                            }
+                        },
+                        some: {
+                            park: {
+                                id: searchPark,
                             }
                         }
                     }
@@ -49,15 +54,7 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
         const vehicles = await prisma.vehicle.findMany({
             skip: skip, // Nombre d'éléments à sauter
             take: pageSize === 0 ? undefined : pageSize, // Nombre d'éléments à prendre
-            where: {
-                vehicle_park: {
-                    some: {
-                        park: {
-                            id: searchPark,
-                        }
-                    }
-                }
-            },
+            where: searchConditions,
             include: {
                 vehicle_park: {
                     orderBy: {

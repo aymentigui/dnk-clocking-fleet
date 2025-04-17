@@ -24,6 +24,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/components/myui/loading";
 import { getVehicleParks } from "@/actions/vehicle/get";
 import TablePagination from "@/components/myui/table/table-pagination";
+import { getClockingsVehicle } from "@/actions/clocking/get";
 
 interface DataTableProps {
     id: string;
@@ -66,7 +67,7 @@ export function DataTable({
         try {
             if (!origin) return
 
-            const response = await getVehicleParks(id, page, pageSize);
+            const response = await getClockingsVehicle(id, page, pageSize);
 
             if (response.status === 200) {
                 setData(response.data);
@@ -74,7 +75,7 @@ export function DataTable({
             }
 
         } catch (error) {
-            console.error("Error fetching vehcile parks:", error);
+            console.error("Error fetching vehcile clocking:", error);
         } finally {
             setIsLoading(false);
         }
