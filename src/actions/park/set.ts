@@ -92,7 +92,7 @@ const addPark = async (data: any, userSchema: any, session: any, u:any, s:any) =
     try {
 
         const result = userSchema.safeParse({
-            name: String(data.name),
+            name: String(data.name).trim(),
             description: String(data.description),
             address: String(data.address),
         });
