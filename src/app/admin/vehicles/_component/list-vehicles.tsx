@@ -204,7 +204,7 @@ export default function ListVehicles() {
         </div>
       )}
       <div className="flex gap-2 flex-wrap justify-between items-center">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link href="/admin/sheetimport">
             <Button>{translateSystem('import')}</Button>
           </Link>
