@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     } else {
         return NextResponse.json({ message: "login failed" }, {
             status: 401,
-            headers:headersGet
+            headers:headersPost
         }
         );
     }
