@@ -10,6 +10,9 @@ const headersPost = {
 
 export async function POST(request: NextRequest) {
 
+    const data = await request.json();
+    const { email, password } = data;
+
     const token = await loginUser({ email: "admin@admin.com", password: "test123" });
     // console.log(token)
 
