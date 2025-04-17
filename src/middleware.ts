@@ -25,16 +25,17 @@ export default auth(async (req) => {
     return response;
   }
 
+  const url = nextUrl.protocol + '://' + nextUrl.hostname + nextUrl.pathname + nextUrl.search;
+
   if (isAuthRoutes) {
     if (isLogging) {
       const domainUrl = process.env.DOMAIN_URL;
-      console.log(domainUrl)
 
       if (!domainUrl) {
         console.log('DOMAIN_URL is not defined in the environment variables');
         throw new Error('DOMAIN_URL is not defined in the environment variables');
       }
-      const response = NextResponse.redirect(`${domainUrl}/admin`);
+      const response = NextResponse.redirect(`${url}/admin`);
       response.cookies.set('lang', lang);
       return response;
     }
@@ -47,7 +48,7 @@ export default auth(async (req) => {
     if (!domainUrl) {
       throw new Error('DOMAIN_URL is not defined in the environment variables');
     }
-    const response = NextResponse.redirect(`${domainUrl}/auth/login`);
+    const response = NextResponse.redirect(`${url}/auth/login`);
     response.cookies.set('lang', lang);
     return response;
   }
