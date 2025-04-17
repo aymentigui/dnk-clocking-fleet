@@ -403,5 +403,27 @@
         "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
         "updatepark": "تحديث الحظيرة",
         "clocking": "ضبط الوقت"
+    },
+    "Clocking": {
+        "title": "ضبط الوقت",
+        "addclocking": "إضافة ضبط الوقت",
+        "updateclocking": "تحديث ضبط الوقت",
+        "deleteclocking": "حذف ضبط الوقت",
+        "clockingnotfound": "لم يتم العثور على ضبط الوقت",
+        "required": "هذا الحقل مطلوب",
+        "user": "المستخدم",
+        "park": "الحظيرة",
+        "device": "الجهاز",
+        "vehicle": "المركبة",
+        "clockin": "وقت الدخول",
+        "clockout": "وقت الخروج",
+        "clockingdate": "تاريخ ضبط الوقت",
+        "clockingtime": "وقت ضبط الوقت",
+        "clockingdateinvalid": "تاريخ ضبط الوقت غير صالح",
+        "clockingtimeinvalid": "وقت ضبط الوقت غير صالح",
+        "usernotfound": "لم يتم العثور على المستخدم",
+        "devicenotfound": "لم يتم العثور على الجهاز",
+        "vehiclenotfound": "لم يتم العثور على المركبة",
+        "parknotfound": "لم يتم العثور على الحظيرة"
     }
 }

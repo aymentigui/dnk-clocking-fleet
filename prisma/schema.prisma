@@ -229,6 +229,7 @@ model clocking {
   device     device   @relation(fields: [device_id], references: [id], onDelete: Cascade)
   created_at DateTime @default(now())
   type      Int?
+  status    Int?
 
   @@unique([vehicle_id, device_id])
 }

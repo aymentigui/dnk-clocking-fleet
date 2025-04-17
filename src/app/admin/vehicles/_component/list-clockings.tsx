@@ -1,11 +1,11 @@
 "use client"
 import { useTranslations } from "next-intl";
 import { useSession } from "@/hooks/use-session";
-import { DataTable } from "./data-table/data-table-parks";
+import { DataTable } from "./data-table/data-table-clocking";
 
 
 
-export default function PakrsList({ id }: { id: string }) {
+export default function ClockingList({ id }: { id: string }) {
   const translate = useTranslations("Vehicle")
   const systemTranslate = useTranslations("System")
 

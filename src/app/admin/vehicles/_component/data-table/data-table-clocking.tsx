@@ -14,15 +14,14 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { columns } from "./columns-table-parks"; // Importez les colonnes
-import { Columns } from "./columns-table-parks";
+import { columns } from "./columns-table-clocking"; // Importez les colonnes
+import { Columns } from "./columns-table-clocking";
 import { useEffect, useState } from "react";
 import Cookies from 'js-cookie';
 import { useTranslations } from "next-intl";
 import { useOrigin } from "@/hooks/use-origin";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/components/myui/loading";
-import { getVehicleParks } from "@/actions/vehicle/get";
 import TablePagination from "@/components/myui/table/table-pagination";
 import { getClockingsVehicle } from "@/actions/clocking/get";
 

@@ -412,5 +412,27 @@
         "confermationdeletemessage": "Cette action ne peut pas être annulée. Cela supprimera définitivement vos véhicules et supprimera vos données de nos serveurs.",
         "updatepark": "Mettre à jour la station",
         "clocking": "Pointage"
+    },
+    "Clocking": {
+        "title": "Pointage",
+        "addclocking": "Ajouter un pointage",
+        "updateclocking": "Mettre à jour le pointage",
+        "deleteclocking": "Supprimer le pointage",
+        "clockingnotfound": "Le pointage n'a pas été trouvé",
+        "required": "Ce champ est obligatoire",
+        "user": "Utilisateur",
+        "park": "Station",
+        "device": "Appareil",
+        "vehicle": "Véhicule",
+        "clockin": "Heure d'arrivée",
+        "clockout": "Heure de départ",
+        "clockingdate": "Date du pointage",
+        "clockingtime": "Heure du pointage",
+        "clockingdateinvalid": "La date du pointage est invalide",
+        "clockingtimeinvalid": "L'heure du pointage est invalide",
+        "usernotfound": "L'utilisateur n'a pas été trouvé",
+        "devicenotfound": "L'appareil n'a pas été trouvé",
+        "vehiclenotfound": "Le véhicule n'a pas été trouvé",
+        "parknotfound": "La station n'a pas été trouvée"
     }
 }

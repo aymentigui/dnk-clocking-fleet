@@ -1,4 +1,5 @@
 import { loginUser } from "@/actions/auth/auth";
+import { prisma } from "@/lib/db";
 import { NextResponse, NextRequest } from "next/server";
 
 const headersPost = {
@@ -16,18 +17,30 @@ export async function POST(request: NextRequest) {
     const token = await loginUser({ email: "admin@admin.com", password: "test123" });
     // console.log(token)
 
-    if (token.status === 200) {
-        const response = NextResponse.json({ message: "login success", userId: token.data.id, }, {
-            headers:headersPost
-        });
-        return response;
-    } else {
+    if (!token || token.status !== 200) {
         return NextResponse.json({ message: "login failed" }, {
             status: 401,
-            headers:headersPost
+            headers: headersPost
         }
         );
     }
+
+    const device = await prisma.device.findFirst({
+        where: { user_id: token.data.id },
+    });
+
+    if (!device) {
+        return NextResponse.json({ message: "login failed" }, {
+            status: 401,
+            headers: headersPost
+        });
+    }
+
+    const response = NextResponse.json({ message: "login success", userId: token.data.id, type: device.type }, {
+        headers: headersPost
+    });
+    return response;
+
 }
 
 

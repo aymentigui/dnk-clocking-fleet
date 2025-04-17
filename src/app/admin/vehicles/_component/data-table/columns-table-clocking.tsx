@@ -1,14 +1,30 @@
 "use client"
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import {  ArrowUpDown } from "lucide-react";
+import { ArrowLeftToLine, ArrowRightFromLine, ArrowUpDown, CircleAlert } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export type Columns = {
   id: string;
   added_at?: string;
   park: string;
-  remarque : string;
+  remarque: string;
+  vehicle: {
+    id: string;
+    name: string;
+    vehicle_park: {
+      id: string;
+      park: {
+        id: string;
+        name: string;
+      };
+    }[];
+  };
+  device: {
+    id: string;
+    name: string;
+    type: number;
+  };
 };
 
 const parkHeader = (column: any) => {
@@ -43,40 +59,55 @@ const addedAtHeader = (column: any) => {
   );
 }
 
-const addedFromHeader = (column: any) => {
+const remarqueHeader = (column: any) => {
 
   const t = useTranslations("Vehicle");
 
   return (
-    <Button
-      variant="ghost"
-      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      className="w-3/6 flex justify-between"
-    >
-      {t("addedfrom")}
-      <ArrowUpDown className="ml-2 h-4 w-4" />
-    </Button>
+    <CircleAlert className="text-red-500" />
+  );
+}
+const remarqueCell = (column: any) => {
+
+  const t = useTranslations("Vehicle");
+
+  const type = column.original.deviceType;
+  const status = column.original.status;
+
+  return (
+    type === 0 ?
+      (status === 1 ?
+        <ArrowRightFromLine className="text-green-500" />
+        :
+        <ArrowRightFromLine className="text-red-500" />)
+      :
+      (status === 1 ?
+        <ArrowLeftToLine className="text-green-500" />
+        :
+        <ArrowLeftToLine className="text-red-500" />)
+
+
   );
 }
 
 
 export const columns: ColumnDef<Columns>[] = [
   {
+    accessorKey: "remarque",
+    header: ({ column }) => remarqueHeader(column),
+    cell: ({ row }) => remarqueCell(row),
+    enableSorting: true,
+  },
+  {
+    accessorKey: "created_at",
+    header: ({ column }) => addedAtHeader(column),
+    cell: ({ row }) => (row.getValue("created_at")),
+    enableSorting: true,
+  },
+  {
     accessorKey: "park",
     header: ({ column }) => parkHeader(column),
     cell: ({ row }) => (row.getValue("park")),
-    enableSorting: true,
-  },
-  {
-    accessorKey: "added_at",
-    header: ({ column }) => addedFromHeader(column),
-    cell: ({ row }) => (row.getValue("added_at")),
-    enableSorting: true,
-  },
-  {
-    accessorKey: "added_from",
-    header: ({ column }) => addedFromHeader(column),
-    cell: ({ row }) => (row.getValue("added_from")),
     enableSorting: true,
   },
 ];

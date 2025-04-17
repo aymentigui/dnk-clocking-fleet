@@ -75,7 +75,7 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
         }
 
         const clockings = await prisma.clocking.findMany({
-            skip: page * pageSize,
+            skip: (page - 1) * pageSize,
             take: pageSize,
             include: {
                 vehicle: {
@@ -112,12 +112,15 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
         const clockingFormatted = clockings.map((clocking) => {
             return {
                 id: clocking.id,
-                created_at: clocking.created_at,
+                created_at: clocking.created_at.getDate() + "/" + (clocking.created_at.getMonth() + 1) + "/" + clocking.created_at.getFullYear(),
                 vehicle: clocking.vehicle,
-                vehicle_park: clocking.vehicle.vehicle_park[0] ? clocking.vehicle.vehicle_park[0].park : null,
+                park: clocking.vehicle.vehicle_park[0] ? clocking.vehicle.vehicle_park[0].park?.name : null,
                 device: clocking.device,
+                deviceType: clocking.type,
+                status: clocking.status,
             };
         });
+
 
         return { status: 200, data: clockingFormatted , count: vehicleClockingsCount};
     } catch (error) {

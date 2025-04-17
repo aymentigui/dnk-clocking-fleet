@@ -1,6 +1,7 @@
 "use server"
 import { prisma } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
+import { verifySession } from "../permissions";
 
 export async function createClocking(data: any) {
     const u = await getTranslations("Clocking");
@@ -8,14 +9,14 @@ export async function createClocking(data: any) {
     const e = await getTranslations('Error');
 
     try {
-        const existingUser = await prisma.user.findFirst({
-            where: { username: data.user_id },
-        });
 
-        if (!existingUser) return { status: 404, data: { message: u("usernotfound") } };
+        const session = await verifySession()
+        if (!session || session.status != 200) {
+            return { status: 401, data: { message: e('unauthorized') } }
+        }
 
         const existingDevice = await prisma.device.findFirst({
-            where: { user_id: existingUser.id },
+            where: { user_id: session.data.user.id},
         });
 
         if (!existingDevice) return { status: 404, data: { message: u("devicenotfound") } };
@@ -36,12 +37,23 @@ export async function createClocking(data: any) {
 
         if (!existingVehicle) return { status: 404, data: { message: u("vehiclenotfound") } };
 
+        const existingVehiclePark = await prisma.vehicle_park.findFirst({
+            where: {
+                vehicle_id: existingVehicle.id,
+            },
+            orderBy: {
+                added_at: "desc",
+            },
+            take: 1,
+        });
+
 
         await prisma.clocking.create({
             data: {
                 vehicle_id: existingVehicle.id,
                 device_id: existingDevice.id,
                 type: data.type?? existingDevice.type,
+                status: existingVehiclePark && existingVehiclePark.park_id == existingDevice.park_id ? 1 : 0,
             },
         });
 

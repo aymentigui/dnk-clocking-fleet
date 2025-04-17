@@ -69,7 +69,7 @@ export const columns: ColumnDef<Columns>[] = [
   },
   {
     accessorKey: "added_at",
-    header: ({ column }) => addedFromHeader(column),
+    header: ({ column }) => addedAtHeader(column),
     cell: ({ row }) => (row.getValue("added_at")),
     enableSorting: true,
   },
