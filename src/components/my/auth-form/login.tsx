@@ -19,10 +19,12 @@ import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { getConfirmationCodePasswordChange } from '@/actions/auth/password-change'
 import { useTranslations } from 'next-intl'
+import { Eye, EyeOff } from 'lucide-react'  // Assurez-vous d'installer react-feather
 
 const LoginForm = () => {
     const [loading, setLoading] = useState(false)
     const [twoFactorConfermation, setTwoFactorConfermation] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)  // Pour gérer l'affichage du mot de passe
     const router = useRouter()
 
     const t = useTranslations("Settings")
@@ -42,6 +44,7 @@ const LoginForm = () => {
             password: "",
         },
     })
+    
     function onSubmit(values: z.infer<typeof LoginSchema>) {
         setLoading(true)
         loginUser(values).then((res) => {
@@ -96,7 +99,21 @@ const LoginForm = () => {
                             <FormItem>
                                 <FormLabel>{t("password")}</FormLabel>
                                 <FormControl>
-                                    <Input className='border-gray-200 focus:border-black' placeholder={t("password")} {...field} />
+                                    <div className="relative">
+                                        <Input
+                                            type={showPassword ? "text" : "password"}  // Toggle du type du champ de mot de passe
+                                            className='border-gray-200 focus:border-black'
+                                            placeholder={t("password")}
+                                            {...field}
+                                        />
+                                        <Button
+                                            type="button"
+                                            className="absolute p-3 bg-background hover:bg-border border right-0 top-0"
+                                            onClick={() => setShowPassword(!showPassword)}  // Toggle pour l'icône
+                                        >
+                                            {showPassword ? <EyeOff className='text-foreground' size={20} /> : <Eye className='text-foreground' size={20} />}
+                                        </Button>
+                                    </div>
                                 </FormControl>
                                 <FormMessage className='font-bold' />
                             </FormItem>
@@ -127,4 +144,5 @@ const LoginForm = () => {
         </Form>
     )
 }
+
 export default LoginForm
