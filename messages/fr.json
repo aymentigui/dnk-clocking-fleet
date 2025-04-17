@@ -87,7 +87,8 @@
         "mustrefreshtoseedata": "Veuillez actualiser la page pour voir les nouvelles données.",
 
         "confermationdelete": "Etes-vous absolument sur?",
-        "confermationdeletemessage": "Cette action ne peut pas etre annulee. Cela supprimera definitivement vos donnees et supprimera vos donnees de nos serveurs."
+        "confermationdeletemessage": "Cette action ne peut pas etre annulee. Cela supprimera definitivement vos donnees et supprimera vos donnees de nos serveurs.",
+        "downloadjustselected": "Télécharger juste la selection"
     },
     "Menu": {
         "title": "Menu",
@@ -246,7 +247,13 @@
         "devices_view": "Vue des dispositifs",
         "devices_create": "Créer des dispositifs",
         "devices_update": "Mettre à jour les dispositifs",
-        "devices_delete": "Supprimer les dispositifs"
+        "devices_delete": "Supprimer les dispositifs",
+        "vehicles_park_create": "Créer des véhicules pour la station",
+        "vehicles_park_update": "Mettre à jour les véhicules pour la station",
+        "vehicles_park_delete": "Supprimer les véhicules pour la station",
+        "vehicles_park_view": "Vue des véhicules pour la station",
+        "clocking_view": "Vue des horaires",
+        "clocking_create": "Créer un horaire"
     },
     "Files": {
         "title": "Fichiers",
@@ -367,10 +374,43 @@
         "usernamecontainspace": "Le nom d'utilisateur ne peut pas contenir d'espaces",
         "selectpark": "Sélectionner une station",
 
-        
         "selectdevices": "Sélectionner des appareils",
         "deletedevices": "Supprimer des appareils",
         "confermationdelete": "Etes-vous sûr de vouloir supprimer?",
-        "confermationdeletemessage": "Cette action ne peut pas être annulée. Cela supprimera définitivement vos appareils et supprimera vos données de nos serveurs."
+        "confermationdeletemessage": "Cette action ne peut pas être annulée. Cela supprimera définitivement vos appareils et supprimera vos données de nos serveurs.",
+        "type": "Type",
+        "selecttype": "Sélectionner un type",
+        "devicesortie": "L'appareil de sortie",
+        "deviceentree": "L'appareil d'entrée",
+        "devicesortieentree": "L'appareil d'entrée/sortie",
+        "devicecontroller": "L'appareil de contrôle"
+    },
+    "Vehicle": {
+        "title": "Véhicule",
+        "addvehicle": "Ajouter un véhicule",
+        "updatevehicle": "Mettre à jour le véhicule",
+        "deletevehicle": "Supprimer le véhicule",
+        "vehiclenotfound": "Le véhicule n'a pas été trouvé",
+        "matriculerequired": "Veuillez saisir un matricule",
+        "matriculeexists": "Le matricule existe déjà",
+        "vinexists": "Le VIN existe déjà",
+        "required": "Ce champ est obligatoire",
+        "matricule": "Matricule",
+        "park": "Station",
+        "model": "Modèle",
+        "year": "Année",
+        "brand": "Marque",
+        "yearinvalid": "L'année est invalide",
+        "vin": "VIN",
+        "addedat": "Ajouté le",
+        "addedfrom": "Ajouté par",
+        "vininvalid": "Le VIN est invalide",
+        "selectpark": "Sélectionner une station",
+        "selectvehicles": "Sélectionner des véhicules",
+        "deletevehicles": "Supprimer des véhicules",
+        "confermationdelete": "Etes-vous sûr de vouloir supprimer?",
+        "confermationdeletemessage": "Cette action ne peut pas être annulée. Cela supprimera définitivement vos véhicules et supprimera vos données de nos serveurs.",
+        "updatepark": "Mettre à jour la station",
+        "clocking": "Pointage"
     }
 }

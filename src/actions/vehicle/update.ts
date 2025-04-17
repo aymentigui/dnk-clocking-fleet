@@ -14,14 +14,13 @@ export async function UpdateVehicle(id: string, data: any) {
         const schema = z.object({
             matricule: z.string().min(1, v("matriculerequired")),
             model: z.string().optional(),
-            year: z.string().optional().refine((value) =>  value === null || value === '' || value === undefined || (Number(value) >= 1886 && Number(value) <= new Date().getFullYear()), { 
+            year: z.string().optional().refine((value) => value === null || value === '' || value === undefined || (Number(value) >= 1886 && Number(value) <= new Date().getFullYear()), {
                 message: v("yearinvalid"),
             }),
             brand: z.string().optional(),
-            vin: z.string().optional().refine((value) => value === null ||  value === '' || value === undefined || value.length === 17, {
-              message: v("vininvalid"),
-            }),
-          });
+            vin: z.string().optional(),
+            park: z.string().optional(),
+        });
 
         const session = await verifySession();
         if (!session?.data?.user) {
@@ -39,7 +38,7 @@ export async function UpdateVehicle(id: string, data: any) {
             console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { matricule, model, year, brand, vin } = result.data;
+        const { matricule, model, year, brand, vin, park } = result.data;
 
         const vehicle = await prisma.vehicle.findUnique({
             where: { id },
@@ -52,12 +51,12 @@ export async function UpdateVehicle(id: string, data: any) {
         const matriculeExisting = await prisma.vehicle.findFirst({
             where: { matricule, id: { not: id } },
         });
-        
+
         if (matriculeExisting) {
             return { status: 400, data: { message: v("matriculeexists") } };
         }
 
-        if(vin) {
+        if (vin) {
             const vinExisting = await prisma.vehicle.findFirst({
                 where: { vin, id: { not: id } },
             });
@@ -66,7 +65,7 @@ export async function UpdateVehicle(id: string, data: any) {
             }
         }
 
-        await prisma.vehicle.update({
+        const vehicleUpdated = await prisma.vehicle.update({
             where: { id },
             data: {
                 matricule,
@@ -77,9 +76,79 @@ export async function UpdateVehicle(id: string, data: any) {
             },
         })
 
+        if (vehicleUpdated) {
+            const parc_vehicle = await prisma.vehicle_park.findFirst({
+                where: {
+                    vehicle_id: id,
+                },
+                orderBy: {
+                    added_at: 'desc',
+                },
+            });
+
+
+            if ((parc_vehicle && parc_vehicle.park_id !== park) || (!parc_vehicle && park)) {
+
+                const hasPermission = await withAuthorizationPermission(['vehicles_park_update']);
+                if (hasPermission.status === 200 && hasPermission.data.hasPermission) {
+                    const parkExists = await prisma.park.findFirst({ where: { id: park } });
+                    await prisma.vehicle_park.create({
+                        data: {
+                            vehicle_id: id,
+                            park_id: parkExists ? parkExists.id : null,
+                            added_from: session.data.user.id,
+                        },
+                    });
+                }
+            }
+        }
+
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
         console.error("An error occurred in UpdateVehicle:", error);
         return { status: 500, data: { message: e("error") } };
     }
 }
+
+
+
+export async function UpdateVehiclesParc(vehicleIds: string[], parcId: string) {
+    const e = await getTranslations('Error');
+    const s = await getTranslations('System');
+    const v = await getTranslations('Vehicle');
+
+    try {
+
+        const session = await verifySession();
+        if (!session?.data?.user) {
+            return { status: 401, data: { message: e("unauthorized") } };
+        }
+        const hasPermissionAdd = await withAuthorizationPermission(['vehicles_park_update']);
+
+        if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
+            return { status: 403, data: { message: e('forbidden') } };
+        }
+
+        if (parcId && parcId !== "null") {
+            const parkExists = await prisma.park.findFirst({ where: { id: parcId } });
+            if (!parkExists) {
+                return { status: 404, data: { message: v("parknotfound") } };
+            }
+        }
+
+        await prisma.vehicle_park.createMany({
+            data: vehicleIds.map((id) => ({
+                vehicle_id: id,
+                park_id: parcId==="null"?null:parcId,
+                added_from: session.data.user.id,
+            })),
+        });
+
+        return { status: 200, data: { message: s("updatesuccess") } };
+    } catch (error) {
+        console.error("An error occurred in UpdateVehiclesParc:", error);
+        return { status: 500, data: { message: e("error") } };
+    }
+}
+
+

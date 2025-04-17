@@ -17,6 +17,7 @@ export async function createDevice(data: any) {
         }),
         password: z.string().min(6, u("password6")),
         park: z.string().optional(),
+        type: z.number().optional(),
     });
 
     try {
@@ -34,7 +35,7 @@ export async function createDevice(data: any) {
         if (!result.success) {
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { code, username, password, park } = result.data;
+        const { code, username, password, park , type} = result.data;
 
         const codeExists = await prisma.device.findFirst({ where: { code } });
         if (codeExists) {
@@ -85,6 +86,7 @@ export async function createDevice(data: any) {
                 code,
                 username,
                 password,
+                type: type ? type : 0,
                 added_from: session.data.user.id,
                 user: {
                     connect: {
@@ -127,6 +129,7 @@ export async function createDevices(data: any) {
             message: u("usernamecontainspace")
         }),        password: z.string().min(6, u("password6")),
         park: z.string().optional(),
+        type: z.number().optional(),
     });
     try {
         const session = await verifySession()
@@ -161,6 +164,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
             username: String(data.username),
             password: String(data.password),
             park: String(data.park),
+            type: parseInt(String(data.type)) || 0,
         });
 
 
@@ -171,7 +175,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
             return { status: 400, data: { message: message, device: data } };
         }
 
-        const { code, username, password, park } = result.data;
+        const { code, username, password, park, type } = result.data;
 
         const codeExists = await prisma.device.findFirst({ where: { code } });
         if (codeExists) {
@@ -224,6 +228,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
                 code,
                 username,
                 password,
+                type,
                 added_from: session.data.user.id,
                 user: {
                     connect: {

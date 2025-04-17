@@ -19,30 +19,35 @@ import {
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useOrigin } from "@/hooks/use-origin";
-import { Textarea } from "@/components/ui/textarea";
 import { useAddUpdateVehicleDialog } from "@/context/add-update-dialog-context-vehicle";
 import { createVehicle } from "@/actions/vehicle/set";
 import { UpdateVehicle } from "@/actions/vehicle/update";
-
+import Select from "react-select";
+import { getParksAdmin } from "@/actions/park/get";
+import { useSession } from "@/hooks/use-session";
 
 export const AddUpdateDialogVehicle = () => {
   const v = useTranslations("Vehicle");
   const t = useTranslations("System");
   const { isOpen, closeDialog, isAdd, vehicle } = useAddUpdateVehicleDialog();
   const [loading, setLoading] = useState(false);
+  const [parks, setParks] = useState<any[]>([{ name: "----", id: "" }]);
+  const [hasPermissionAffectation, setHasPermissionAffectation] = useState(false);
   const origin = useOrigin()
+  const {session} = useSession()
+
+
 
 
   const schema = z.object({
     matricule: z.string().min(1, v("matriculerequired")),
     model: z.string().optional(),
-    year: z.string().optional().refine((value) =>  value === null || value === '' || value === undefined || (Number(value) >= 1886 && Number(value) <= new Date().getFullYear()), { 
+    year: z.string().optional().refine((value) => value === null || value === '' || value === undefined || (Number(value) >= 1886 && Number(value) <= new Date().getFullYear()), {
       message: v("yearinvalid"),
     }),
     brand: z.string().optional(),
-    vin: z.string().optional().refine((value) => value === null ||  value === '' || value === undefined || value.length === 17, {
-      message: v("vininvalid"),
-    }),
+    vin: z.string().optional(),
+    park: z.string().optional(),
   });
 
   type formValues = z.infer<typeof schema>;
@@ -55,18 +60,37 @@ export const AddUpdateDialogVehicle = () => {
       year: "",
       brand: "",
       vin: "",
+      park: "",
     },
   });
 
   useEffect(() => {
+    getParksAdmin().then((res) => {
+      if (res && res.status === 200) {
+        setParks([...parks,...res.data])
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     if (vehicle) {
-      form.setValue("matricule", vehicle.matricule?? "");
-      form.setValue("model", vehicle.model?? "");
-      form.setValue("year", String(vehicle.year) ?? "");
-      form.setValue("brand", vehicle.brand?? "");
+      form.setValue("matricule", vehicle.matricule ?? "");
+      form.setValue("model", vehicle.model ?? "");
+      form.setValue("year", vehicle.year?String(vehicle.year):"");
+      form.setValue("brand", vehicle.brand ?? "");
       form.setValue("vin", vehicle.vin ?? "");
+      form.setValue("park", vehicle.parkId);
     }
   }, [vehicle])
+
+  useEffect(() => {
+    if (session) {
+      setHasPermissionAffectation(isAdd?
+        (session?.user?.permissions.find((permission: string) => permission === "vehicles_park_create") ?? false) || session?.user?.is_admin
+        :(session?.user?.permissions.find((permission: string) => permission === "vehicles_park_update") ?? false) || session?.user?.is_admin
+      )
+    }
+  }, [session])
 
   const onSubmit = async (data: formValues) => {
     if (!origin) return
@@ -215,6 +239,38 @@ export const AddUpdateDialogVehicle = () => {
                   </FormItem>
                 )}
               />
+             { hasPermissionAffectation && <FormField
+                control={form.control}
+                name="park"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{v("park")}</FormLabel>
+                    <FormControl>
+                      <Select
+                        options={
+                          parks?.map((p) => ({
+                            value: p.id,
+                            label: p.name,
+                          }))
+                        }
+                        value={
+                          {
+                            value: field.value,
+                            label: parks?.find((p) => p.id === field.value)?.name,
+                          }
+                        }
+                        onChange={(selectedOptions) => {
+                          field.onChange(
+                            selectedOptions ? selectedOptions.value : ""
+                          );
+                        }}
+                        placeholder={v("selectpark")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />}
             </div>
 
             {/* Submit Button */}

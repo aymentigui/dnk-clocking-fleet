@@ -34,4 +34,12 @@ export const permissions = [
     { name: "devices_create" },
     { name: "devices_update" },
     { name: "devices_delete" },
+
+    { name: "vehicles_park_view" },
+    { name: "vehicles_park_create" },
+    { name: "vehicles_park_update" },
+    { name: "vehicles_park_delete" },
+
+    { name: "clocking_view" },
+    { name: "clocking_create" },
   ];

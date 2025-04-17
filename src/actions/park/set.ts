@@ -114,7 +114,7 @@ const addPark = async (data: any, userSchema: any, session: any, u:any, s:any) =
 
         const park = await prisma.park.create({
             data: {
-                name,
+                name:name.trim(),
                 description,
                 address,
                 added_from: session.data.user.id,

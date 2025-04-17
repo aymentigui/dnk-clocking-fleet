@@ -8,18 +8,16 @@ export async function createVehicle(data: any) {
     const u = await getTranslations("Vehicle");
     const s = await getTranslations("System");
     const e = await getTranslations('Error');
-    console.log("createVehicle", data)
 
     const schema = z.object({
         matricule: z.string().min(1, u("matriculerequired")),
         model: z.string().optional(),
-        year: z.string().optional().refine((value) =>  value === null || value === '' || value === undefined || (Number(value) >= 1886 && Number(value) <= new Date().getFullYear()), { 
+        year: z.string().optional().refine((value) => value === null || value === '' || value === undefined || (Number(value) >= 1886 && Number(value) <= new Date().getFullYear()), {
             message: u("yearinvalid"),
         }),
         brand: z.string().optional(),
-        vin: z.string().optional().refine((value) => value === null || value === '' || value === undefined || value.length === 17, {
-            message: u("vininvalid"),
-        }),
+        vin: z.string().optional(),
+        park: z.string().optional(),
     });
 
     try {
@@ -38,7 +36,7 @@ export async function createVehicle(data: any) {
             console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { matricule, model, year, vin } = result.data;
+        const { matricule, model, year, vin, park, brand } = result.data;
 
         const matriculeExists = await prisma.vehicle.findFirst({
             where: {
@@ -61,15 +59,32 @@ export async function createVehicle(data: any) {
         }
 
 
-        await prisma.vehicle.create({
+        const vehicle = await prisma.vehicle.create({
             data: {
                 matricule,
                 model,
+                brand,
                 year: year === "" ? null : Number(year),
                 vin,
                 added_from: session.data.user.id,
             },
         });
+
+        if (park) {
+            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_park_create'])
+            if (hasPermissionAdd.status === 200 && hasPermissionAdd.data.hasPermission) {
+                const parkExists = await prisma.park.findFirst({ where: { id: park } });
+                if (parkExists) {
+                    await prisma.vehicle_park.create({
+                        data: {
+                            vehicle_id: vehicle.id,
+                            park_id: park,
+                            added_from: session.data.user.id,
+                        },
+                    });
+                }
+            }
+        }
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
@@ -86,13 +101,12 @@ export async function createVehicles(data: any) {
     const schema = z.object({
         matricule: z.string().min(1, u("matriculerequired")),
         model: z.string().optional(),
-        year: z.string().optional().refine((value) => !value || value === "null"  || value === '' || value === undefined || (Number(value) >= 1886 && Number(value) <= new Date().getFullYear()), {
+        year: z.string().optional().refine((value) => !value || value === "null" || value === '' || value === undefined || (Number(value) >= 1886 && Number(value) <= new Date().getFullYear()), {
             message: u("yearinvalid"),
         }),
         brand: z.string().optional(),
-        vin: z.string().optional().refine((value) => !value  || value === undefined || value.length === 17, {
-            message: u("vininvalid"),
-        }),
+        park: z.string().optional(),
+        vin: z.string().optional(),
     });
 
 
@@ -123,13 +137,13 @@ export async function createVehicles(data: any) {
 
 const addVehicle = async (data: any, schema: any, session: any, u: any, s: any) => {
     try {
-        console.log("addVehicle", data)
         const result = schema.safeParse({
-            matricule: data.matricule===null?undefined:data.matricule,
-            model: data.model===null?undefined:data.model,
+            matricule: data.matricule === null ? undefined : data.matricule,
+            model: data.model === null ? undefined : data.model,
             year: String(data.year),
-            brand: data.brand===null?undefined:data.brand,
-            vin: data.vin===null?undefined:data.vin,
+            brand: data.brand === null ? undefined : data.brand,
+            vin: data.vin === null ? undefined : data.vin,
+            park: data.park === null ? undefined : data.park,
         });
 
 
@@ -140,7 +154,7 @@ const addVehicle = async (data: any, schema: any, session: any, u: any, s: any) 
             return { status: 400, data: { message: message, vehicle: data } };
         }
 
-        const { matricule, model, year, vin , brand} = result.data;
+        const { matricule, model, year, vin, brand, park } = result.data;
 
         const matriculeExists = await prisma.vehicle.findFirst({ where: { matricule } });
         if (matriculeExists) {
@@ -165,6 +179,22 @@ const addVehicle = async (data: any, schema: any, session: any, u: any, s: any) 
             },
         });
 
+
+        if (park) {
+            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_park_create'])
+            if (hasPermissionAdd.status === 200 && hasPermissionAdd.data.hasPermission) {
+                const parkExists = await prisma.park.findFirst({ where: { name: park } });
+                if (parkExists) {
+                    await prisma.vehicle_park.create({
+                        data: {
+                            vehicle_id: vehicle.id,
+                            park_id: parkExists.id,
+                            added_from: session.data.user.id,
+                        },
+                    });
+                }
+            }
+        }
         return { status: 200, data: data };
     } catch (error) {
         // @ts-ignore

@@ -8,7 +8,6 @@ import { withAuthorizationPermission, verifySession } from "../permissions";
 export async function getDevices(page: number = 1, pageSize: number = 10, searchQuery?: string, searchPark?: string): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
     try {
-        console.log(searchPark)
         const session = await verifySession()
         if (!session || session.status != 200) {
             return { status: 401, data: { message: e('unauthorized') } }
@@ -41,6 +40,7 @@ export async function getDevices(page: number = 1, pageSize: number = 10, search
             where: searchConditions,
             select: {
                 id: true,
+                type: true,
                 username: true,
                 code: true,
                 password: true,
@@ -57,6 +57,7 @@ export async function getDevices(page: number = 1, pageSize: number = 10, search
             id: device.id,
             username: device.username,
             code: device.code,
+            type: device.type,
             password: device.password,
             park: device.park ? device.park.name : "",
             parkId: device.park ? device.park.id : ""

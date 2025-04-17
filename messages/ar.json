@@ -57,7 +57,6 @@
         "document": "مستند",
         "audio": "صوت",
         "other": "اخرى",
-
         "number": "عدد",
         "date": "تاريخ",
         "time": "وقت",
@@ -74,7 +73,6 @@
         "email": "بريد إلكتروني",
         "phone": "رقم الهاتف",
         "url": "رابط",
-
         "export": "استخراج",
         "exportall": "استخراج كل شيء",
         "exportselected": "استخراج المحدد",
@@ -83,11 +81,10 @@
         "exportPDF": "استخراج PDF",
         "exportHTML": "استخراج HTML",
         "exportHTML5": "استخراج HTML5",
-
         "mustrefreshtoseedata": "يرجى تحديث الصفحة لرؤية البيانات.",
-
         "confermationdelete": "  هل انت متأكد تماما؟",
-        "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا."
+        "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
+        "downloadjustselected": "تحميل المحدد"
     },
     "Menu": {
         "title": "القائمة",
@@ -210,11 +207,10 @@
         "avatarinvalid": "الصورة غير صالحة",
         "imagerequired": "الصورة مطلوبة",
         "onlyimagesallowed": "الصورة يجب ان تكون صورة",
-
         "selectusers": "اختر مستخدم واحد او اكثر",
         "deleteusers": "حذف المستخدمين",
-        "confermationdelete" : "هل انت متاكد؟",
-        "confermationdeletemessage" : "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا."
+        "confermationdelete": "هل انت متاكد؟",
+        "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا."
     },
     "Permissions": {
         "title": "الصلاحيات",
@@ -246,7 +242,13 @@
         "devices_view": "عرض الاجهزة",
         "devices_create": "اضافة اجهزة",
         "devices_update": "تحديث اجهزة",
-        "devices_delete": "حذف اجهزة"
+        "devices_delete": "حذف اجهزة",
+        "vehicles_park_create": "إضافة مركبة للحظيرة",
+        "vehicles_park_update": "تحديث مركبة للحظيرة",
+        "vehicles_park_delete": "حذف مركبة للحظيرة",
+        "vehicles_park_view": "عرض مركبة للحظيرة",
+        "clocking_view": "عرض ساعات العمل",
+        "clocking_create": "انشاء ساعات العمل"
     },
     "Files": {
         "title": "الملفات",
@@ -334,12 +336,10 @@
         "namerequired": "يرجى إدخال اسم",
         "nameexists": "الاسم موجود بالفعل",
         "required": "هذا الحقل مطلوب",
-        
         "selectparks": "اختر حظيرة واحدة او اكثر",
         "deleteparks": "حذف الحظائر",
         "confermationdelete": "هل أنت متأكد تماماً؟",
         "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
-
         "name": "إسم",
         "description": "الوصف",
         "address": "العنوان"
@@ -350,13 +350,12 @@
         "updatedevice": "تحديث جهاز",
         "deletedevice": "حذف جهاز",
         "devicenotfound": "لم يتم العثور على الجهاز",
-
         "coderequired": "يرجى إدخال الشفرة",
         "codeexists": "الرمز موجود بالفعل",
         "required": "هذا الحقل مطلوب",
         "park": "الحظيرة",
         "code": "الرمز",
-        "username":"اسم المستخدم",
+        "username": "اسم المستخدم",
         "usernamerequired": "يرجى إدخال اسم المستخدم",
         "usernameexists": "اسم المستخدم موجود بالفعل",
         "password": "كلمة السر",
@@ -366,11 +365,43 @@
         "emailinvalid": "البريد الالكتروني غير صالح",
         "usernamecontainspace": "اسم المستخدم لا يمكن أن يحتوي على فراغات",
         "selectpark": "اختر حظيرة",
-
-        
         "selectdevices": "اختر جهاز واحد او اكثر",
         "deletedevices": "حذف الاجهزة",
         "confermationdelete": "هل أنت متأكد تماماً؟",
-        "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا."
+        "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
+        "type": "النوع",
+        "selecttype": "اختر نوع الجهاز",
+        "devicesortie": "جهاز الخروج",
+        "deviceentree": "جهاز الدخول",
+        "devicesortieentree": "جهاز الدخول والخروج",
+        "devicecontroller": "جهاز التحكم"
+    },
+    "Vehicle": {
+        "title": "المركبة",
+        "addvehicle": "إضافة مركبة",
+        "updatevehicle": "تحديث مركبة",
+        "deletevehicle": "حذف مركبة",
+        "vehiclenotfound": "لم يتم العثور على المركبة",
+        "matriculerequired": "يرجى إدخال رقم التسجيل",
+        "matriculeexists": "رقم التسجيل موجود بالفعل",
+        "vinexists": "رقم تعريف المركبة موجود بالفعل",
+        "required": "هذا الحقل مطلوب",
+        "matricule": "رقم التسجيل",
+        "park": "الحظيرة",
+        "model": "النموذج",
+        "year": "السنة",
+        "brand": "العلامة التجارية",
+        "yearinvalid": "السنة غير صالحة",
+        "vin": "رقم تعريف المركبة",
+        "addedat": "أضيف في",
+        "addedfrom": "أضيف من",
+        "vininvalid": "رقم تعريف المركبة غير صالح",
+        "selectpark": "اختر حظيرة",
+        "selectvehicles": "اختر مركبات",
+        "deletevehicles": "حذف المركبات",
+        "confermationdelete": "هل أنت متأكد تماماً؟",
+        "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
+        "updatepark": "تحديث الحظيرة",
+        "clocking": "ضبط الوقت"
     }
 }

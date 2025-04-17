@@ -9,7 +9,7 @@ import bcrypt from "bcrypt";
 export async function UpdateDevice(id: string, data: any) {
     const e = await getTranslations('Error');
     const s = await getTranslations('System');
-    const u = await getTranslations('Parks');
+    const u = await getTranslations('Device');
 
     try {
         const schema = z.object({
@@ -18,6 +18,7 @@ export async function UpdateDevice(id: string, data: any) {
                 message: u("usernamecontainspace")
             }),            password: z.string().min(6, u("password6")),
             park: z.string().optional(),
+            type: z.number().optional(),
         });
 
         const session = await verifySession();
@@ -36,7 +37,7 @@ export async function UpdateDevice(id: string, data: any) {
             console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { code, username, password, park } = result.data;
+        const { code, username, password, park, type } = result.data;
 
         const deviceExists = await prisma.device.findFirst({ where: { id } });
 
@@ -104,6 +105,7 @@ export async function UpdateDevice(id: string, data: any) {
                 code,
                 username,
                 password,
+                type,
                 added_from: session.data.user.id,
                 user: {
                     connect: {
@@ -113,7 +115,7 @@ export async function UpdateDevice(id: string, data: any) {
             },
         });
 
-        if (!park) {
+        if (!park && park!=="") {
             await prisma.device.update({
                 where: {
                     id
@@ -141,7 +143,8 @@ export async function UpdateDevice(id: string, data: any) {
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.error("An error occurred in UpdatePark");
+        // @ts-ignore
+        console.error("An error occurred in UpdatePark"+error.message);
         return { status: 500, data: { message: e("error") } };
     }
 }

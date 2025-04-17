@@ -1,13 +1,14 @@
 "use client"
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Trash, ArrowUpDown, Settings2 } from "lucide-react";
+import { Trash, ArrowUpDown, Settings2, Eye } from "lucide-react";
 import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import { useSession } from "@/hooks/use-session";
 import { Checkbox } from "@/components/ui/checkbox";
 import { deleteVehicles } from "@/actions/vehicle/delete";
 import { useAddUpdateVehicleDialog } from "@/context/add-update-dialog-context-vehicle";
+import { usePathname, useRouter } from "next/navigation";
 
 export type Columns = {
   id: string;
@@ -118,12 +119,14 @@ const parkHeader = (column: any) => {
 }
 
 const actionsCell = (row: any) => {
-  const user = row.original;
+  const vehicle = row.original;
   const { openDialog } = useAddUpdateVehicleDialog();
   const { session } = useSession()
+  const router = useRouter()
+  const pathname = usePathname();
   const hasPermissionDelete = (session?.user?.permissions.find((permission: string) => permission === "vehicles_delete") ?? false) || session?.user?.is_admin;
   const hasPermissionUpdate = (session?.user?.permissions.find((permission: string) => permission === "vehicles_update") ?? false) || session?.user?.is_admin;
-  
+
   const handleOpenDialogWithTitle = () => {
     openDialog(false, row.original)
   };
@@ -131,7 +134,7 @@ const actionsCell = (row: any) => {
   return (
     <div className="w-1/6 flex gap-2">
       {hasPermissionDelete && <Button
-        onClick={() => deleteHandler(user.id)}
+        onClick={() => deleteHandler(vehicle.id)}
         variant="destructive"
       >
         <Trash />
@@ -139,6 +142,9 @@ const actionsCell = (row: any) => {
       {hasPermissionUpdate && <Button variant={"outline"} onClick={handleOpenDialogWithTitle}>
         <Settings2 />
       </Button>}
+      <Button variant={"outline"} onClick={()=> router.push(`${pathname}/${vehicle.id}`) }>
+        <Eye />
+      </Button>
     </div>
   );
 };
@@ -169,38 +175,38 @@ export const columns: ColumnDef<Columns>[] = [
   },
   {
     accessorKey: "matricule",
-    header: ({column}) => matriculeHeader(column),
-    cell: ({ row }) => ( row.getValue("matricule") ),
+    header: ({ column }) => matriculeHeader(column),
+    cell: ({ row }) => (row.getValue("matricule")),
     enableSorting: true,
   },
   {
     accessorKey: "model",
-    header: ({column}) => modelHeader(column),
-    cell: ({ row }) => ( row.getValue("model") ),
+    header: ({ column }) => modelHeader(column),
+    cell: ({ row }) => (row.getValue("model")),
     enableSorting: true,
   },
   {
     accessorKey: "year",
-    header: ({column}) => yearHeader(column),
-    cell: ({ row }) => ( row.getValue("year") ),
+    header: ({ column }) => yearHeader(column),
+    cell: ({ row }) => (row.getValue("year")),
     enableSorting: true,
   },
   {
     accessorKey: "brand",
-    header: ({column}) => brandHeader(column),
-    cell: ({ row }) => ( row.getValue("brand") ),
+    header: ({ column }) => brandHeader(column),
+    cell: ({ row }) => (row.getValue("brand")),
     enableSorting: true,
   },
   {
     accessorKey: "vin",
-    header: ({column}) => vinHeader(column),
-    cell: ({ row }) => ( row.getValue("vin") ),
+    header: ({ column }) => vinHeader(column),
+    cell: ({ row }) => (row.getValue("vin")),
     enableSorting: true,
   },
   {
     accessorKey: "park",
-    header: ({column}) => parkHeader(column),
-    cell: ({ row }) => ( row.getValue("park") ),
+    header: ({ column }) => parkHeader(column),
+    cell: ({ row }) => (row.getValue("park")),
     enableSorting: true,
   },
 
@@ -214,7 +220,7 @@ export const columns: ColumnDef<Columns>[] = [
 ];
 
 const deleteHandler = async (id: string) => {
-  if(!origin) return
+  if (!origin) return
   const response = await deleteVehicles([id]);
   if (response.status === 200) {
     toast.success(response.data.message);

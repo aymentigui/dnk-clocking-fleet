@@ -81,6 +81,41 @@ const parkHeader = (column: any) => {
   );
 }
 
+const typeHeader = (column: any) => {
+
+  const t = useTranslations("Device");
+
+  return (
+    <Button
+      variant="ghost"
+      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      className="w-3/6 flex justify-between"
+    >
+      {t("type")}
+      <ArrowUpDown className="ml-2 h-4 w-4" />
+    </Button>
+  );
+}
+
+const typeCell = (column: any) => {
+
+  const t = useTranslations("Device");
+  
+  return (
+    <div>
+      {column.getValue("type") === 0 
+      ? t("devicesortie") 
+      : column.getValue("type") === 1 
+      ? t("deviceentree") 
+      : column.getValue("type") === 2 
+      ? t("devicesortieentree") 
+      : column.getValue("type") === 3
+      ? t("devicecontroller")
+      : "" }
+    </div>
+  );
+}
+
 const actionsCell = (row: any) => {
   const user = row.original;
   const { openDialog } = useAddUpdateDeviceDialog();
@@ -153,6 +188,12 @@ export const columns: ColumnDef<Columns>[] = [
     accessorKey: "park",
     header: ({column}) => parkHeader(column),
     cell: ({ row }) => ( row.getValue("park") ),
+    enableSorting: true,
+  },
+  {
+    accessorKey: "type",
+    header: ({column}) => typeHeader(column),
+    cell: ({ row }) => ( typeCell(row) ),
     enableSorting: true,
   },
 

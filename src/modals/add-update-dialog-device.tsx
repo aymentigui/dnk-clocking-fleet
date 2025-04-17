@@ -34,8 +34,15 @@ export const AddUpdateDeviceDialog = () => {
   const u = useTranslations("Device");
   const t = useTranslations("System");
   const { isOpen, closeDialog, isAdd, device } = useAddUpdateDeviceDialog();
-  const [parks, setParks] = useState<Park[]>([]);
+  const [parks, setParks] = useState<any[]>([{ name: "----", id: "" }]);
   const [loading, setLoading] = useState(false);
+
+  const types = [
+    { id: 0, name: u("devicesortie") },
+    { id: 1, name: u("deviceentree")},
+    { id: 2, name: u("devicesortieentree") },
+    { id: 3, name: u("devicecontroller") },
+  ];
 
   useEffect(() => {
     getParksAdmin().then((res) => {
@@ -52,6 +59,7 @@ export const AddUpdateDeviceDialog = () => {
     }),
     password: z.string().min(6, u("password6")),
     park: z.string().optional(),
+    type: z.number().optional(),
   });
 
   type FormValues = z.infer<typeof schema>;
@@ -63,6 +71,7 @@ export const AddUpdateDeviceDialog = () => {
       username: device?.username ?? "",
       password: device?.password ?? "",
       park: device?.park ?? "",
+      type: device?.type ?? 0,
     },
   });
 
@@ -72,6 +81,7 @@ export const AddUpdateDeviceDialog = () => {
       form.setValue("username", device.username)
       form.setValue("password", device.password)
       form.setValue("park", device.parkId);
+      form.setValue("type", device.type);
     }
   }, [device])
 
@@ -209,6 +219,38 @@ export const AddUpdateDeviceDialog = () => {
                           );
                         }}
                         placeholder={u("selectpark")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{u("type")}</FormLabel>
+                    <FormControl>
+                      <Select
+                        options={
+                          types?.map((t) => ({
+                            value: t.id,
+                            label: t.name,
+                          }))
+                        }
+                        value={
+                          {
+                            value: field.value,
+                            label: types?.find((t) => t.id === field.value)?.name,
+                          }
+                        }
+                        onChange={(selectedOptions) => {
+                          field.onChange(
+                            selectedOptions ? selectedOptions.value : ""
+                          );
+                        }}
+                        placeholder={u("selecttype")}
                       />
                     </FormControl>
                     <FormMessage />

@@ -1,0 +1,115 @@
+"use server"
+
+import { getTranslations } from "next-intl/server";
+import { prisma } from "@/lib/db";
+import { withAuthorizationPermission, verifySession } from "../permissions";
+
+export async function getClockings(page: number, pageSize: number): Promise<{ status: number, data: any }> {
+    const e = await getTranslations('Error');
+    try {
+        const session = await verifySession();
+        if (!session?.data?.user) {
+            return { status: 401, data: { message: e("unauthorized") } };
+        }
+        const hasPermission = await withAuthorizationPermission(['clocking_view'], session.data.user.id);
+
+        if (hasPermission.status != 200 || !hasPermission.data.hasPermission) {
+            return { status: 403, data: { message: e('forbidden') } };
+        }
+
+        const clockings = await prisma.clocking.findMany({
+            skip: page * pageSize,
+            take: pageSize,
+            include: {
+                vehicle: {
+                    include: {
+                        vehicle_park: {
+                            orderBy: {
+                                added_at: "desc",
+                            },
+                            take: 1,
+                            include: {
+                                park: true,
+                            },
+                        },
+                    },
+                },
+                device: {
+                    include: {
+                        park: true,
+                    },
+                },
+            },
+        });
+
+        const clockingFormatted = clockings.map((clocking) => {
+            return {
+                id: clocking.id,
+                created_at: clocking.created_at,
+                vehicle: clocking.vehicle,
+                vehicle_park: clocking.vehicle.vehicle_park[0] ? clocking.vehicle.vehicle_park[0].park : null,
+                device: clocking.device,
+            };
+        });
+
+        return { status: 200, data: clockingFormatted };
+    } catch (error) {
+        console.error("An error occurred in getClockings" + error);
+        return { status: 500, data: { message: e("error") } };
+    }
+}
+
+export async function getClockingsVehicle(vehicle_id: string, page: number, pageSize: number): Promise<{ status: number, data: any }> {
+    const e = await getTranslations('Error');
+    try {
+        const session = await verifySession();
+        if (!session?.data?.user) {
+            return { status: 401, data: { message: e("unauthorized") } };
+        }
+        const hasPermission = await withAuthorizationPermission(['clocking_view'], session.data.user.id);
+
+        if (hasPermission.status != 200 || !hasPermission.data.hasPermission) {
+            return { status: 403, data: { message: e('forbidden') } };
+        }
+
+        const clockings = await prisma.clocking.findMany({
+            skip: page * pageSize,
+            take: pageSize,
+            include: {
+                vehicle: {
+                    include: {
+                        vehicle_park: {
+                            orderBy: {
+                                added_at: "desc",
+                            },
+                            take: 1,
+                            include: {
+                                park: true,
+                            },
+                        },
+                    },
+                },
+                device: {
+                    include: {
+                        park: true,
+                    },
+                },
+            },
+        });
+
+        const clockingFormatted = clockings.map((clocking) => {
+            return {
+                id: clocking.id,
+                created_at: clocking.created_at,
+                vehicle: clocking.vehicle,
+                vehicle_park: clocking.vehicle.vehicle_park[0] ? clocking.vehicle.vehicle_park[0].park : null,
+                device: clocking.device,
+            };
+        });
+
+        return { status: 200, data: clockingFormatted };
+    } catch (error) {
+        console.error("An error occurred in getClockingsVehicle" + error);
+        return { status: 500, data: { message: e("error") } };
+    }
+}

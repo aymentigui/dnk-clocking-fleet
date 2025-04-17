@@ -9,6 +9,7 @@ type Device = {
   password: string;
   park: string;
   parkId: string;
+  type: number;
 };
 
 type DialogContextType = {

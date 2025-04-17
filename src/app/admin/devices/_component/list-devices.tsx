@@ -28,6 +28,7 @@ const selectors = [
   { title: "username", selector: "username" },
   { title: "password", selector: "password" },
   { title: "park", selector: "park" },
+  { title: "type", selector: "type" },
 ];
 
 export default function ListDevices() {

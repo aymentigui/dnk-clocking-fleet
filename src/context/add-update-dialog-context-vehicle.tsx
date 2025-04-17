@@ -9,6 +9,8 @@ type Vehicle = {
   year?: number;
   brand?: string;
   vin?: string | null;
+  park?: string;
+  parkId?: string;
 };
 
 type DialogContextType = {

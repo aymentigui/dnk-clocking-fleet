@@ -83,7 +83,8 @@
         "exportHTML5": "Export HTML5",
         "mustrefreshtoseedata": "Please refresh the page to see the new data.",
         "confermationdelete": "Are you absolutely sure?",
-        "confermationdeletemessage": "This action cannot be undone. This will permanently delete your data and remove your data from our servers."
+        "confermationdeletemessage": "This action cannot be undone. This will permanently delete your data and remove your data from our servers.",
+        "downloadjustselected": "Download just selected"
     },
     "Menu": {
         "title": "Menu",
@@ -241,7 +242,13 @@
         "vehicles_view": "Vehicles View",
         "vehicles_create": "Vehicles Create",
         "vehicles_update": "Vehicles Update",
-        "vehicles_delete": "Vehicles Delete"
+        "vehicles_delete": "Vehicles Delete",
+        "vehicles_park_create": "Vehicles Station Create",
+        "vehicles_park_update": "Vehicles Station Update",
+        "vehicles_park_delete": "Vehicles Station Delete",
+        "vehicles_park_view": "Vehicles Station View",
+        "clocking_view": "Clocking View",
+        "clocking_create": "Clocking Create"
     },
     "Files": {
         "title": "Files",
@@ -332,12 +339,10 @@
         "namerequired": "Please enter a name",
         "nameexists": "Name already exists",
         "required": "This field is required",
-
         "selectparks": "Select stations",
         "deleteparks": "Delete stations",
         "confermationdelete": "Are you absolutely sure?",
         "confermationdeletemessage": "This action cannot be undone. This will permanently delete your stations and remove your data from our servers.",
-
         "name": "Name",
         "description": "Description",
         "address": "Address"
@@ -348,13 +353,12 @@
         "updatedevice": "Update Device",
         "deletedevice": "Delete Device",
         "devicenotfound": "Device not found",
-
         "coderequired": "Please enter a code",
         "codeexists": "Code already exists",
         "required": "This field is required",
         "park": "Station",
         "code": "Code",
-        "username":"Username",
+        "username": "Username",
         "usernamerequired": "Please enter a username",
         "usernameexists": "Username already exists",
         "password": "Password",
@@ -364,11 +368,17 @@
         "emailinvalid": "Email is invalid",
         "usernamecontainspace": "Username cannot contain spaces",
         "selectpark": "Select station",
-
         "selectdevices": "Select devices",
         "deletedevices": "Delete stations",
         "confermationdelete": "Are you absolutely sure?",
-        "confermationdeletemessage": "This action cannot be undone. This will permanently delete your devices and remove your data from our servers."
+        "confermationdeletemessage": "This action cannot be undone. This will permanently delete your devices and remove your data from our servers.",
+        "type": "Type",
+        "selecttype": "Select type",
+        "devicesortie": "Device exit",
+        "deviceentree": "Device entry",
+        "devicesortieentree": "Device entry/exit",
+        "devicecontroller": "Device controller"
+
     },
     "Vehicle": {
         "title": "Vehicle",
@@ -387,11 +397,37 @@
         "brand": "Brand",
         "yearinvalid": "Year is invalid",
         "vin": "VIN",
+        "addedat": "Added at",
+        "addedfrom": "Added from",
         "vininvalid": "VIN is invalid",
         "selectpark": "Select station",
         "selectvehicles": "Select vehicles",
         "deletevehicles": "Delete vehicles",
         "confermationdelete": "Are you absolutely sure?",
-        "confermationdeletemessage": "This action cannot be undone. This will permanently delete your vehicles and remove your data from our servers."
+        "confermationdeletemessage": "This action cannot be undone. This will permanently delete your vehicles and remove your data from our servers.",
+        "updatepark": "Update Station",
+        "clocking": "Clocking"
+    },
+    "Clocking": {
+        "title": "Clocking",
+        "addclocking": "Add Clocking",
+        "updateclocking": "Update Clocking",
+        "deleteclocking": "Delete Clocking",
+        "clockingnotfound": "Clocking not found",
+        "required": "This field is required",
+        "user": "User",
+        "park": "Station",
+        "device": "Device",
+        "vehicle": "Vehicle",
+        "clockin": "Clock In",
+        "clockout": "Clock Out",
+        "clockingdate": "Clocking Date",
+        "clockingtime": "Clocking Time",
+        "clockingdateinvalid": "Clocking date is invalid",
+        "clockingtimeinvalid": "Clocking time is invalid",
+        "usernotfound": "User not found",
+        "devicenotfound": "Device not found",
+        "vehiclenotfound": "Vehicle not found",
+        "parknotfound": "Station not found"
     }
 }

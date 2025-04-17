@@ -36,9 +36,13 @@ export function getColumns(): ColumnSheetsImport[] {
             title: "vin",
             require: { req: false },
             type: { tp: "string", message: translate("invalidtext") },
-            condition: [
-                { cond: (val: string) => (!val || val==="" || val.length === 17), message: translate("invalidvin") },
-            ],
+            condition: [  ],
+        },
+        {
+            title: "park",
+            require: { req: false },
+            type: { tp: "string", message: translate("invalidtext") },
+            condition: [],
         },
     ];
 }

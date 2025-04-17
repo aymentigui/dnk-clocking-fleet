@@ -17,9 +17,12 @@ import ExportButton from "@/components/my/export-button";
 import SelectSearchFetch from "@/components/myui/select-search-fetch";
 import { getParksAdmin } from "@/actions/park/get";
 import { createVehicles } from "@/actions/vehicle/set";
-import { getCountVehicles, getVehicles, getVehiclesAll, getVehiclesWithIds } from "@/actions/vehicle/get";
+import { getCountVehicles, getVehicles, getVehiclesAll, getVehiclesAllMatrciule, getVehiclesMatriculeWithIds, getVehiclesWithIds } from "@/actions/vehicle/get";
 import { deleteVehicles } from "@/actions/vehicle/delete";
 import { getColumns } from "@/actions/util/sheet-columns/vehicle";
+import UpdateParcs from "./dialog/update-parc";
+import { generateQRCodeAndDownload } from "@/actions/util/qrcode";
+import { QrCode } from "lucide-react";
 
 const selectors = [
   { title: "matricule", selector: "matricule" },
@@ -51,12 +54,31 @@ export default function ListVehicles() {
   const [parks, setParks] = useState([])
 
   const [open, setOpen] = useState(false); // for confirm delete
+  const [open2, setOpen2] = useState(false); // for confirm update
 
   const [userSheetNotCreated, setUserSheetNotCreated] = useState<any>([])
   const [userSheetCreated, setUserSheetCreated] = useState(false)
 
   const [data, setData] = useState<any[]>([]);
   const columnsSheet = getColumns()
+
+  const generateQRAll =  () => {
+    // Si des IDs ont été saisis, les utiliser
+    getVehiclesAllMatrciule().then((res) => {
+      if (res && res.status === 200) {
+        generateQRCodeAndDownload(res.data)
+      }
+    })
+  };
+
+  const generateQRAllSelected =  () => {
+    // Si des IDs ont été saisis, les utiliser
+    getVehiclesMatriculeWithIds(selectedIds).then((res) => {
+      if (res && res.status === 200) {
+        generateQRCodeAndDownload(res.data)
+      }
+    })
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -173,7 +195,7 @@ export default function ListVehicles() {
               <ul className="list-disc pl-5">
                 <li>
                   {
-                    (data.message ? data.message + " : " : "") + " " + (data.vehicle.matricule ?? "") + " " + (data.vehicle.vin ?? "") + " " + (data.vehicle.model ?? "") + " " + (data.vehicle.year ?? "") 
+                    (data.message ? data.message + " : " : "") + " " + (data.vehicle.matricule ?? "") + " " + (data.vehicle.vin ?? "") + " " + (data.vehicle.model ?? "") + " " + (data.vehicle.year ?? "")
                   }
                 </li>
               </ul>
@@ -181,14 +203,16 @@ export default function ListVehicles() {
           ))}
         </div>
       )}
-      <div className="flex gap-2 justify-between items-center">
+      <div className="flex gap-2 flex-wrap justify-between items-center">
         <div className="flex gap-2">
           <Link href="/admin/sheetimport">
             <Button>{translateSystem('import')}</Button>
           </Link>
+          <Button onClick={generateQRAll}><QrCode size={20} /></Button>
+          {selectedIds.length > 0 && <Button onClick={generateQRAllSelected}>{translateSystem("downloadjustselected")} <QrCode size={20} /></Button>}
           <ExportButton all={true} handleExportCSV={() => exportAll(1)} handleExportXLSX={() => exportAll(2)} />
           {selectedIds.length > 0 && <ExportButton all={false} handleExportCSV={() => exportSelected(1)} handleExportXLSX={() => exportSelected(2)} />}
-          {(session?.user?.permissions.find((permission: string) => permission === "vehicle_delete") ?? false) || session?.user?.is_admin
+          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_delete") ?? false) || session?.user?.is_admin
             &&
             selectedIds.length > 0
             &&
@@ -201,6 +225,17 @@ export default function ListVehicles() {
               titleText={translate("confermationdelete")}
               descriptionText={translate("confermationdeletemessage")}
               deleteAction={deleteVehicles}
+            />
+          }
+          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_park_update") ?? false) || session?.user?.is_admin
+            &&
+            selectedIds.length > 0
+            &&
+            <UpdateParcs
+              open={open2}
+              setOpen={setOpen2}
+              selectedIds={selectedIds}
+              parcs={parks}
             />
           }
         </div>
@@ -222,7 +257,7 @@ export default function ListVehicles() {
           <div className='w-48 mb-2'>
             <SelectSearchFetch
               value={searchPark}
-              onChange={(val) => setSearchPark(val)}
+              onChange={(val) => {setSearchPark(val)}}
               label={translate("selectpark")}
               placeholder={translate("selectpark")}
               options={
@@ -251,6 +286,7 @@ export default function ListVehicles() {
         showPagination
         showSearch
       />
+      <div className="border p-3  font-bold">{translateSystem("total")}: {count}</div>
     </div>
   );
 }

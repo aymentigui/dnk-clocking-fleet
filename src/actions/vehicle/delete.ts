@@ -18,7 +18,13 @@ export async function deleteVehicles(ids: string[]): Promise<{ status: number, d
             return { status: 403, data: { message: e('forbidden') } };
         }
 
-        await prisma.vehicle.deleteMany({ where: { id: { in: ids } } });
+        await prisma.vehicle.deleteMany({
+            where: {
+                id: {
+                    in: ids,
+                },
+            }
+        });
         return { status: 200, data: { message: s("deletesuccess") } };
     } catch (error) {
         console.error("An error occurred in deleteVehicles" + error);

@@ -1,5 +1,6 @@
 
 
+import { createCipheriv, createDecipheriv, randomBytes } from "crypto";
 import sharp from "sharp";
 
 /**
@@ -51,4 +52,42 @@ async function checkIfImage(buffer: Buffer): Promise<boolean> {
   } catch (error) {
     return false; // Retourne false en cas d'erreur
   }
+}
+
+
+const getEncryptionKey = () => {
+  const key = process.env.AUTH_SECRET
+  if (!key) {
+    throw new Error("NEXT_SECRET_KEY n'est pas défini")
+  }
+
+  // Créer une clé de 32 octets (256 bits) à partir de NEXT_SECRET_KEY
+  // En production, utilisez une méthode plus robuste comme PBKDF2
+  return Buffer.from(key.padEnd(32, "0").slice(0, 32))
+}
+
+// Fonction pour chiffrer une chaîne
+export function encrypt(text: string): string {
+  const iv = randomBytes(16) // Vecteur d'initialisation
+  const key = getEncryptionKey()
+
+  const cipher = createCipheriv("aes-256-cbc", key, iv)
+  let encrypted = cipher.update(text, "utf8", "hex")
+  encrypted += cipher.final("hex")
+
+  // Retourner le vecteur d'initialisation et le texte chiffré
+  return `${iv.toString("hex")}:${encrypted}`
+}
+
+// Fonction pour déchiffrer une chaîne
+export function decrypt(encryptedText: string): string {
+  const [ivHex, encrypted] = encryptedText.split(":")
+  const iv = Buffer.from(ivHex, "hex")
+  const key = getEncryptionKey()
+
+  const decipher = createDecipheriv("aes-256-cbc", key, iv)
+  let decrypted = decipher.update(encrypted, "hex", "utf8")
+  decrypted += decipher.final("utf8")
+
+  return decrypted
 }
