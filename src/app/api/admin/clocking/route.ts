@@ -11,9 +11,8 @@ const headersPost = {
 }
 
 export async function POST(request: Request) {
-
     const { matricule, type } = await request.json();
-
+    
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return NextResponse.json({ error: "Token manquant" }, {
@@ -23,6 +22,7 @@ export async function POST(request: Request) {
     }
     const token = authHeader.split(" ")[1];
     const decoded = decrypt(token);
+    
 
     if (!decoded) {
         return NextResponse.json({ error: "Token invalide" }, {
@@ -30,8 +30,6 @@ export async function POST(request: Request) {
             headers: headersPost
         });
     }
-
-
 
     return authContext.run({ user: decoded }, async () => {
         const res = await createClocking({ matricule, type });
