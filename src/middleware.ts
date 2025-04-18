@@ -14,7 +14,7 @@ export default auth(async (req) => {
     lang = 'en'; // Langue par défaut si non valide
   }
 
-  let session = cookies.get('next-auth.session-token');
+  let session = cookies.get('authjs.session-token');
   const isLogging = session?.value ? true : false
 
   const isPrivateRoutes = privateRoutes.some((route) => nextUrl.pathname.startsWith(route))
