@@ -18,35 +18,6 @@ export const { handlers, auth, signIn, signOut } =
     pages: {
       signIn: "/auth/login"
     },
-    cookies: {
-      sessionToken: {
-        name: `authjs.session-token`,
-        options: {
-          httpOnly: true,
-          sameSite: "none", // <- autorise les requêtes cross-site
-          path: "/",
-          secure: true,     // <- obligatoire avec sameSite: "none"
-        },
-      },
-      csrfToken: {
-        name: `authjs.csrf-token`,
-        options: {
-          httpOnly: true,
-          sameSite: "none", // <- autorise les requêtes cross-site
-          path: "/",
-          secure: true,     // <- obligatoire avec sameSite: "none"
-        },
-      },
-      callbackUrl: {
-        name: `authjs.callback-url`,
-        options: {
-          httpOnly: true,
-          sameSite: "none", // <- autorise les requêtes cross-site
-          path: "/",
-          secure: true,     // <- obligatoire avec sameSite: "none"
-        },
-      },
-    },
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
     callbacks: {
