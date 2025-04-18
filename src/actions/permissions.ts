@@ -36,6 +36,8 @@ export async function verifySession(): Promise<{ status: number, data: any }> {
             return { status: 401, data: { message: e("unauthorized") } }
         }
 
+        console.log(1)
+
         const existingSession = await prisma.session.findFirst({
             where: {
                 // @ts-ignore
