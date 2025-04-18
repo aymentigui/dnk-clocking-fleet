@@ -11,23 +11,23 @@ export default function Home() {
   const origin = "http://localhost:3000";
 
   useEffect(() => {
-    // setTimeout(() => {
-    //   router.push("/admin/vehicles");
-    // }, 1000);
+    setTimeout(() => {
+      router.push("/admin/vehicles");
+    }, 1000);
 
-    axios.post(`http://localhost:3000/api/admin/clocking`, {
-      matricule: "000184-415-16",
-    }, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      },
-    }).then((res) => {
-      if (res && res.status === 200) {
-        console.log("res", res.data);
-      }
-    })
+    // axios.post(`http://localhost:3000/api/admin/clocking`, {
+    //   matricule: "000184-415-16",
+    // }, {
+    //   withCredentials: true,
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     "Accept": "application/json",
+    //   },
+    // }).then((res) => {
+    //   if (res && res.status === 200) {
+    //     console.log("res", res.data);
+    //   }
+    // })
 
 
   }, []);
