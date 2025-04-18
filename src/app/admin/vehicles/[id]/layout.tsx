@@ -69,10 +69,10 @@ export default async function RootLayout({
             <Card className='p-4'>
                 <div className='flex flex-col gap-2'>
                     <div className="flex gap-2 px-6 mb-4">
-                        <Link href={`/admin/vehicles/${paramsID.id}`} className="px-4 py-1 border border-foreground hover:bg-foreground hover:text-white rounded">
+                        <Link href={`/admin/vehicles/${paramsID.id}`} className="px-4 py-1 border border-foreground hover:bg-foreground hover:text-background rounded">
                             {translate("park")}
                         </Link>
-                        <Link href={`/admin/vehicles/${paramsID.id}/clocking`} className="px-4 py-1 border-foreground hover:bg-foreground hover:text-white border rounded">
+                        <Link href={`/admin/vehicles/${paramsID.id}/clocking`} className="px-4 py-1 border-foreground hover:bg-foreground hover:text-background border rounded">
                             {translate("clocking")}
                         </Link>
                     </div>
