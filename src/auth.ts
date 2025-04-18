@@ -20,7 +20,7 @@ export const { handlers, auth, signIn, signOut } =
     },
     cookies: {
       sessionToken: {
-        name: `next-auth.session-token`,
+        name: `authjs.session-token`,
         options: {
           httpOnly: true,
           sameSite: "none", // <- autorise les requêtes cross-site
