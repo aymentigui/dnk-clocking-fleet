@@ -99,6 +99,9 @@ export async function loginUser(data: any): Promise<{ status: number, data: any 
                 OR: [
                     { email: email },
                     { username: email }
+                ],
+                AND: [
+                    { deleted_at: null },
                 ]
             }
         })

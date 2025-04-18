@@ -32,11 +32,14 @@ export async function deleteUsers(ids: string[]): Promise<{ status: number, data
             user.image_compressed && await deleteFileDb(user.image_compressed)
         })
 
-        await prisma.user.deleteMany({
+        await prisma.user.updateMany({
             where: {
                 id: {
                     in: ids
                 }
+            },
+            data: {
+                deleted_at: new Date(),
             }
         })
         return { status: 200, data: { message: s('deletesuccess') } }

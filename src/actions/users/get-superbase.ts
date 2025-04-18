@@ -28,8 +28,17 @@ export async function getUsers(page: number = 1, pageSize: number = 10, searchQu
                     { username: { contains: searchQuery } },
                     { email: { contains: searchQuery } },
                 ],
+                AND: [
+                    { deleted_at: null }, // S'assurer que l'utilisateur n'est pas supprimé
+                    { public: true }
+                ]
             }
-            : {};
+            : {
+                AND: [
+                    { deleted_at: null }, // S'assurer que l'utilisateur n'est pas supprimé
+                    { public: true }
+                ]
+            };
 
         const users = await prisma.user.findMany({
             skip: skip, // Nombre d'éléments à sauter

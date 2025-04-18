@@ -134,6 +134,9 @@ export const { handlers, auth, signIn, signOut } =
               OR: [
                 { email: email },
                 { username: email }
+              ],
+              AND: [
+                { deleted_at: null },
               ]
             }
           })

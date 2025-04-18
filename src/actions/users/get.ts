@@ -31,9 +31,15 @@ export async function getUsers(page: number = 1, pageSize: number = 10, searchQu
                 ],
                 AND: [
                     { public: true }, // Filtrer les utilisateurs non supprimés
+                    { deleted_at: null }
                 ],
             }
-            : { public: true };
+            : {
+                AND: [
+                    { public: true }, // Filtrer les utilisateurs non supprimés
+                    { deleted_at: null } // Filtrer les utilisateurs non supprimés
+                ]
+            };
 
         const users = await prisma.user.findMany({
             skip: skip, // Nombre d'éléments à sauter
@@ -81,6 +87,9 @@ export async function getUsersPublic(): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
     try {
         const users = await prisma.user.findMany({
+            where: {
+                deleted_at: null,
+            },
             select: {
                 id: true,
                 firstname: true,
@@ -124,12 +133,15 @@ export async function getAllUsers(): Promise<{ status: number, data: any }> {
         if (!session || session.status != 200) {
             return { status: 401, data: { message: e('unauthorized') } }
         }
-        const hasPermissionAdd = await withAuthorizationPermission( ['users_view']);
+        const hasPermissionAdd = await withAuthorizationPermission(['users_view']);
 
         if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
             return { status: 403, data: { message: e('forbidden') } };
         }
         const users = await prisma.user.findMany({
+            where: {
+                deleted_at: null,
+            },
             select: {
                 id: true,
                 firstname: true,
@@ -162,7 +174,7 @@ export async function getAllUsers(): Promise<{ status: number, data: any }> {
         return { status: 200, data: formattedUsers };
     } catch (error) {
         console.error("Error fetching users:", error);
-        return { status: 500, data: { message : e("badrequest") } };
+        return { status: 500, data: { message: e("badrequest") } };
     }
 }
 
@@ -183,8 +195,8 @@ export async function getUsersWithIds(userIds: string[]): Promise<{ status: numb
             where: {
                 id: {
                     in: userIds,
-                }
-
+                },
+                deleted_at: null,
             },
             select: {
                 id: true,
@@ -258,8 +270,17 @@ export async function getCountUsers(searchQuery?: string): Promise<{ status: num
                 { username: { contains: searchQuery } },
                 { email: { contains: searchQuery } },
             ],
+            AND: [
+                { public: true }, // Filtrer les utilisateurs non supprimés
+                { deleted_at: null } // Filtrer les utilisateurs non supprimés
+            ]
         }
-        : {};
+        : {
+            AND: [
+                { public: true }, // Filtrer les utilisateurs non supprimés
+                { deleted_at: null } // Filtrer les utilisateurs non supprimés
+            ]
+        };
 
     const e = await getTranslations('Error');
     try {
