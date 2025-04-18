@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const { email, password } = data;
     const cookies = request.cookies;
     const deviceType = cookies.get('type')?.value || 'unknown';
-    console.log(deviceType)
+    console.log("deviceType",request.cookies)
 
 
     const token = await loginUser({ email, password });

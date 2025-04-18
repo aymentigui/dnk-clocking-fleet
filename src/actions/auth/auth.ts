@@ -147,7 +147,7 @@ export async function loginUser(data: any): Promise<{ status: number, data: any 
 
         try {
             await signIn("credentials", { email, password, redirect: false });
-            console.log('Login successful');
+            // console.log('Login successful');
             return { status: 200, data: user };
         } catch (error) {
             if (error instanceof Error) {
