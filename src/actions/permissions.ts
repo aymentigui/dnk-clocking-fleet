@@ -32,9 +32,10 @@ export async function verifySession(): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
     try {
         const store = authContext.getStore();
-        const user = store?.user;
-
-        if(user) return { status: 200, data: {user} }
+        if (store) {
+            const user = store?.user;
+            if (user) return { status: 200, data: { user } }
+        }
 
         const session = await auth();
         // @ts-ignore
@@ -173,8 +174,8 @@ export async function withAuthorizationPermission(
 ) {
     const e = await getTranslations('Error');
     try {
-        let userId=id;
-        if(!userId){
+        let userId = id;
+        if (!userId) {
             const session = await verifySession();
             if (session.status !== 200 || !session.data || !session.data.user || !session.data.user.id) {
                 return { status: 401, data: { message: e("unauthorized") } };
@@ -212,8 +213,8 @@ export async function withAuthorizationRole(
 ) {
     const e = await getTranslations('Error');
     try {
-        let userId=id;
-        if(!userId){
+        let userId = id;
+        if (!userId) {
             const session = await verifySession();
             if (session.status !== 200 || !session.data || !session.data.user || !session.data.user.id) {
                 return { status: 401, data: { message: e("unauthorized") } };
@@ -239,16 +240,16 @@ export async function withAuthorizationRole(
 export async function ISADMIN(id?: string): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
     try {
-        let userId=id;
-        if(!userId){
+        let userId = id;
+        if (!userId) {
             const session = await verifySession();
             if (session.status !== 200 || !session.data || !session.data.user || !session.data.user.id) {
                 return { status: 401, data: { message: e("unauthorized") } };
             }
             userId = session.data.user.id as string;
         }
-        const is_admin = await prisma.user.findUnique({ where: { id: userId} });
-        return { status: 200, data: { is_admin: is_admin?.is_admin?true:false } };
+        const is_admin = await prisma.user.findUnique({ where: { id: userId } });
+        return { status: 200, data: { is_admin: is_admin?.is_admin ? true : false } };
     } catch (error) {
         console.error("An error occurred in ISADMIN");
         return { status: 500, data: { message: e("error") } };
