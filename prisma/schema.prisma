@@ -173,6 +173,7 @@ model park {
   added_from   String?
   device       device[]
   vehicle_park vehicle_park[]
+  clocking     clocking[]
 }
 
 model device {
@@ -229,8 +230,8 @@ model clocking {
   device_id  String
   device     device   @relation(fields: [device_id], references: [id], onDelete: Cascade)
   created_at DateTime @default(now())
-  type      Int?
-  status    Int?
-
-  @@unique([vehicle_id, device_id])
+  park_id    String?
+  park       park?    @relation(fields: [park_id], references: [id])
+  type       Int?
+  status     Int?
 }

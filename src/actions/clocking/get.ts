@@ -20,7 +20,11 @@ export async function getClockings(page: number, pageSize: number): Promise<{ st
         const clockings = await prisma.clocking.findMany({
             skip: page * pageSize,
             take: pageSize,
+            orderBy: {
+                created_at: "desc",
+            },
             include: {
+                park: true,
                 vehicle: {
                     include: {
                         vehicle_park: {
@@ -45,10 +49,11 @@ export async function getClockings(page: number, pageSize: number): Promise<{ st
         const clockingFormatted = clockings.map((clocking) => {
             return {
                 id: clocking.id,
-                created_at: clocking.created_at,
+                created_at: clocking.created_at.getDate() + "/" + (clocking.created_at.getMonth() + 1) + "/" + clocking.created_at.getFullYear()+" " + clocking.created_at.getHours() + ":" + clocking.created_at.getMinutes(),
                 vehicle: clocking.vehicle,
                 vehicle_park: clocking.vehicle.vehicle_park[0] ? clocking.vehicle.vehicle_park[0].park : null,
                 device: clocking.device,
+                park: clocking.park ? clocking.park.name : null,
             };
         });
 
@@ -77,7 +82,14 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
         const clockings = await prisma.clocking.findMany({
             skip: (page - 1) * pageSize,
             take: pageSize,
+            orderBy: {
+                created_at: "desc",
+            },
+            where: {
+                vehicle_id: vehicle_id
+            },
             include: {
+                park: true,
                 vehicle: {
                     include: {
                         vehicle_park: {
@@ -112,12 +124,12 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
         const clockingFormatted = clockings.map((clocking) => {
             return {
                 id: clocking.id,
-                created_at: clocking.created_at.getDate() + "/" + (clocking.created_at.getMonth() + 1) + "/" + clocking.created_at.getFullYear(),
+                created_at: clocking.created_at.getDate() + "/" + (clocking.created_at.getMonth() + 1) + "/" + clocking.created_at.getFullYear()+" " + clocking.created_at.getHours() + ":" + clocking.created_at.getMinutes(),
                 vehicle: clocking.vehicle,
-                park: clocking.vehicle.vehicle_park[0] ? clocking.vehicle.vehicle_park[0].park?.name : null,
                 device: clocking.device,
                 deviceType: clocking.type,
                 status: clocking.status,
+                park: clocking.park ? clocking.park.name : null,
             };
         });
 

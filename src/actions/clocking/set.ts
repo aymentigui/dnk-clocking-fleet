@@ -21,7 +21,6 @@ export async function createClocking(data: any) {
 
         if (!existingDevice) return { status: 404, data: { message: u("devicenotfound") } };
 
-
         if (!existingDevice.park_id) return { status: 404, data: { message: u("parknotfound") } };
 
 
@@ -52,6 +51,7 @@ export async function createClocking(data: any) {
             data: {
                 vehicle_id: existingVehicle.id,
                 device_id: existingDevice.id,
+                park_id: existingDevice.park_id??null,
                 type: data.type?? existingDevice.type?? 0,
                 status: existingVehiclePark && existingDevice.park_id  && existingVehiclePark.park_id == existingDevice.park_id ? 1 : 0,
             },
