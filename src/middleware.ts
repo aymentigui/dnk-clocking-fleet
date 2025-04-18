@@ -22,7 +22,7 @@ export default auth(async (req) => {
   const isAuthRoutes = authRoutes.includes(nextUrl.pathname);
 
   const response = NextResponse.next();
-  response.cookies.set('lang', lang, { sameSite: 'none', secure: true });
+  response.cookies.set('lang', lang, { sameSite: 'none', secure: true, httpOnly: true });
 
   if (isApiAuthRoutes) {
     return response;
