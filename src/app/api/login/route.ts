@@ -1,6 +1,7 @@
 import { loginUser } from "@/actions/auth/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse, NextRequest } from "next/server";
+import { cookies } from "next/headers" 
 
 const headersPost = {
     "Access-Control-Allow-Origin": process.env.API_CORS_AUTORIZED ?? "http://localhost:3001",
@@ -13,9 +14,10 @@ export async function POST(request: NextRequest) {
 
     const data = await request.json();
     const { email, password } = data;
-    const cookies = request.cookies;
-    const deviceType = cookies.get('type')?.value || 'unknown';
-    console.log("deviceType",request.cookies)
+    const cookiesReq = request.cookies;
+    const cookieStore = cookies();
+    const deviceType = (await cookieStore).get('type')?.value
+    console.log("deviceType",deviceType)
 
 
     const token = await loginUser({ email, password });
