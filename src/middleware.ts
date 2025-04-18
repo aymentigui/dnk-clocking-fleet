@@ -6,7 +6,7 @@ const { auth } = NextAuth(authConfig)
 
 export default auth(async (req) => {
   const { cookies, nextUrl } = req;
-  // const isLogging = !!req.auth; // Vérifie si l'utilisateur est connecté
+  const isLogging = !!req.auth; // Vérifie si l'utilisateur est connecté
   // console.log(isLogging)
   let lang = cookies.get('lang')?.value || 'en';
   const supportedLanguages = ['en', 'fr', 'ar'];
@@ -14,8 +14,8 @@ export default auth(async (req) => {
     lang = 'en'; // Langue par défaut si non valide
   }
 
-  let session = cookies.get('authjs.session-token');
-  const isLogging = session?.value ? true : false
+  // let session = cookies.get('authjs.session-token');
+  // const isLogging = session?.value ? true : false
 
   const isPrivateRoutes = privateRoutes.some((route) => nextUrl.pathname.startsWith(route))
   const isApiAuthRoutes = nextUrl.pathname.startsWith(apiAuthPrefix);
