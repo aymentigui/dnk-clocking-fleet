@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     const token = await loginUser({ email, password});
     console.log("token", token)
-    const session= verifySession()
+    const session= await verifySession()
     console.log("session", session)
 
     if (!token || token.status !== 200) {
