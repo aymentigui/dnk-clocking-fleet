@@ -74,6 +74,8 @@ const remarqueCell = (column: any) => {
   const type = column.original.deviceType;
   const status = column.original.status;
 
+  console.log(type, status);
+
   return (
     type === 0 ?
       (status === 1 ?
@@ -81,10 +83,13 @@ const remarqueCell = (column: any) => {
         :
         <ArrowRightFromLine className="text-red-500" />)
       :
-      (status === 1 ?
-        <ArrowLeftToLine className="text-green-500" />
+      type === 1 ?
+        (status === 1 ?
+          <ArrowLeftToLine className="text-green-500" />
+          :
+          <ArrowLeftToLine className="text-red-500" />)
         :
-        <ArrowLeftToLine className="text-red-500" />)
+        <CircleAlert className="text-red-500" />
 
 
   );

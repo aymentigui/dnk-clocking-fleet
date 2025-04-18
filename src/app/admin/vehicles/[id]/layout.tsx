@@ -25,7 +25,7 @@ export default async function RootLayout({
     await accessPage(['vehicles_update']);
 
     const vehicle = await getVehicle(paramsID.id);
-    if (vehicle.status != 200) {
+    if (vehicle.status != 200 || !vehicle.data) {
         return (
             <Card className='p-4'>
                 <div className="container mx-auto p-4">

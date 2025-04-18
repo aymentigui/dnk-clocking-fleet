@@ -111,7 +111,7 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
             },
         });
 
-        const vehicleClockingsCount = await prisma.vehicle_park.count(
+        const vehicleClockingsCount = await prisma.clocking.count(
             {
                 where: {
                     vehicle: {

@@ -35,8 +35,6 @@ export async function deleteDevices(ids: string[]): Promise<{ status: number, da
             },
         });
 
-        console.log(1)
-
         const userIds = devices.map((device) => device.user.id).filter((id) => id !== null);
 
         await prisma.user.deleteMany({
