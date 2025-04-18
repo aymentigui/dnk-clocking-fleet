@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { logoutUser } from "./auth/auth";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import authContext from "@/context/auth-context";
 
 
 //----------------------------------------------
@@ -30,6 +31,11 @@ export async function getSession(): Promise<{ status: number, data: any }> {
 export async function verifySession(): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
     try {
+        const store = authContext.getStore();
+        const user = store?.user;
+
+        if(user) return { status: 200, data: {user} }
+
         const session = await auth();
         // @ts-ignore
         if (!session || !session.user || !session.session) {

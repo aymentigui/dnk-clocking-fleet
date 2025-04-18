@@ -67,12 +67,13 @@ const getEncryptionKey = () => {
 }
 
 // Fonction pour chiffrer une chaîne
-export function encrypt(text: string): string {
+export function encrypt<T>(object: T): string {
   const iv = randomBytes(16) // Vecteur d'initialisation
   const key = getEncryptionKey()
 
   const cipher = createCipheriv("aes-256-cbc", key, iv)
-  let encrypted = cipher.update(text, "utf8", "hex")
+  const stringifiedObject = JSON.stringify(object)
+  let encrypted = cipher.update(stringifiedObject, "utf8", "hex")
   encrypted += cipher.final("hex")
 
   // Retourner le vecteur d'initialisation et le texte chiffré

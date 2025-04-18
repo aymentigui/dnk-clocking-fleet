@@ -1,5 +1,5 @@
 import { loginUser } from "@/actions/auth/auth";
-import { verifySession } from "@/actions/permissions";
+import { encrypt } from "@/actions/util/util";
 import { prisma } from "@/lib/db";
 import { NextResponse, NextRequest } from "next/server";
 
@@ -16,9 +16,7 @@ export async function POST(request: NextRequest) {
     const { email, password } = data;
 
     const token = await loginUser({ email, password});
-    console.log("token", token)
-    const session= await verifySession()
-    console.log("session", session)
+    // console.log(token)
 
     if (!token || token.status !== 200) {
         return NextResponse.json({ message: "login failed" }, {
@@ -39,7 +37,9 @@ export async function POST(request: NextRequest) {
         });
     }
 
-    const response = NextResponse.json({ message: "login success", userId: token.data.id, type: device.type }, {
+    const encryptData = encrypt(token);
+
+    const response = NextResponse.json({ message: "login success", token: encryptData, type: device.type }, {
         headers: headersPost
     });
     return response;
