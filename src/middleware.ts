@@ -7,7 +7,7 @@ const { auth } = NextAuth(authConfig)
 export default auth(async (req) => {
   const { cookies, nextUrl } = req;
   const isLogging = !!req.auth; // Vérifie si l'utilisateur est connecté
-  console.log(isLogging)
+  // console.log(isLogging)
   let lang = cookies.get('lang')?.value || 'en';
   const supportedLanguages = ['en', 'fr', 'ar'];
   if (!supportedLanguages.includes(lang)) {
