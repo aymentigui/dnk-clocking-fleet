@@ -35,29 +35,29 @@ const itemsMenu = async () => {
             admin: false,
             permissions: [],
         },
-        {
-            title: Menu("files"),
-            url: "/admin/files",
-            icon: File,
-            admin: false,
-            permissions: [],
-            subItems: [
-                {
-                    title: Menu("files"),
-                    url: "/admin/files",
-                    icon: File,
-                    admin: false,
-                    permissions: [],
-                },
-                {
-                    title: Menu("files_upload"),
-                    url: "/admin/files/upload-files",
-                    icon: Download,
-                    admin: false,
-                    permissions: ["files_create"],
-                },
-            ],
-        },
+        // {
+        //     title: Menu("files"),
+        //     url: "/admin/files",
+        //     icon: File,
+        //     admin: false,
+        //     permissions: [],
+        //     subItems: [
+        //         {
+        //             title: Menu("files"),
+        //             url: "/admin/files",
+        //             icon: File,
+        //             admin: false,
+        //             permissions: [],
+        //         },
+        //         {
+        //             title: Menu("files_upload"),
+        //             url: "/admin/files/upload-files",
+        //             icon: Download,
+        //             admin: false,
+        //             permissions: ["files_create"],
+        //         },
+        //     ],
+        // },
         {
             title: Menu("parks"),
             url: "/admin/parks",
