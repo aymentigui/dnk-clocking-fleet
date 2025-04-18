@@ -52,7 +52,7 @@ export async function createClocking(data: any) {
             data: {
                 vehicle_id: existingVehicle.id,
                 device_id: existingDevice.id,
-                type: data.type?? existingDevice.type,
+                type: data.type?? existingDevice.type?? 0,
                 status: existingVehiclePark && existingDevice.park_id  && existingVehiclePark.park_id == existingDevice.park_id ? 1 : 0,
             },
         });
