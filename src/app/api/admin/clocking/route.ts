@@ -31,6 +31,8 @@ export async function POST(request: Request) {
         });
     }
 
+    console.log(type)
+
     return authContext.run({ user: decoded }, async () => {
         const res = await createClocking({ matricule, type });
 
