@@ -11,7 +11,6 @@ const headersPost = {
 }
 
 export async function POST(request: Request) {
-    const { matricule, type } = await request.json();
     const data= await request.json()
     console.log(data)
     const authHeader = request.headers.get("Authorization");
@@ -32,10 +31,9 @@ export async function POST(request: Request) {
         });
     }
 
-    console.log(type)
 
     return authContext.run({ user: decoded }, async () => {
-        const res = await createClocking({ matricule, type });
+        const res = await createClocking({ matricule:data.matricule, type:data.type });
 
         return NextResponse.json(
             { data: res },
