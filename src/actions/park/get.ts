@@ -94,3 +94,30 @@ export async function getParksAdmin(): Promise<{ status: number, data: any }> {
     }
 }
 
+export async function getParksName(id: string): Promise<{ status: number, data: any }> {
+    const e = await getTranslations('Error');
+    try {
+        const session = await verifySession()
+        if (!session || session.status != 200) {
+            return { status: 401, data: { message: e('unauthorized') } }
+        }
+
+        if(!id) {
+            return { status: 400, data: { message: e('badrequest') } }
+        }
+
+        const name = await prisma.park.findUnique({
+            where: {
+                id: id
+            },
+            select: {
+                name: true
+            }
+        });
+        
+        return { status: 200, data: name };
+    } catch (error) {
+        console.error("An error occurred in getParksPublic");
+        return { status: 500, data: { message: e("error") } };
+    }
+}

@@ -2,15 +2,12 @@ import { accessPage, withAuthorizationPermission } from "@/actions/permissions";
 import { getVehicle } from "@/actions/vehicle/get";
 import { Card } from "@/components/ui/card";
 import { getTranslations } from "next-intl/server";
-import ClockingList from "../../_component/list-clockings";
+import ClockingList from "./_component/list-clockings";
 
-export default async function Vehicle({ params }: any) {
+export default async function Vehicle() {
 
-    const paramsID = await params;
     const translate = await getTranslations("Vehicle");
 
-    if (!paramsID.id)
-        return null
 
     const hasPermission = await withAuthorizationPermission(['clocking_view']);
 
@@ -23,7 +20,7 @@ export default async function Vehicle({ params }: any) {
 
     return (
         <Card className='mb-2 px-2 py-4'>
-            <ClockingList id={paramsID.id} />
+            <ClockingList />
         </Card>
     );
 }

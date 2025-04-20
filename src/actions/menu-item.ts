@@ -73,6 +73,13 @@ const itemsMenu = async () => {
             permissions: ["vehicles_view"],
         },
         {
+            title: Menu("clockings"),
+            url: "/admin/clockings",
+            icon: BusFront,
+            admin: false,
+            permissions: ["clocking_view"],
+        },
+        {
             title: Menu("devices"),
             url: "/admin/devices",
             icon: ScanQrCode,
