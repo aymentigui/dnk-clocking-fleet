@@ -59,7 +59,7 @@ export function DataTable({
 
     useEffect(() => {
         fetch();
-    }, [page, mounted]); // Ajouter debouncedSearchQuery comme dépendance
+    }, [page, mounted,searchDate]); // Ajouter debouncedSearchQuery comme dépendance
 
 
     const fetch = async () => {

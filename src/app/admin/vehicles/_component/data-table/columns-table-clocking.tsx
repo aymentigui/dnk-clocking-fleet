@@ -74,8 +74,6 @@ const remarqueCell = (column: any) => {
   const type = column.original.deviceType;
   const status = column.original.status;
 
-  console.log(type, status);
-
   return (
     type === 0 ?
       (status === 1 ?
