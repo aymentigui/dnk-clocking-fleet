@@ -68,7 +68,7 @@ export function DataTable({
         try {
             if (!origin) return
 
-            const response = await getClockingsVehicle(id, page, pageSize);
+            const response = await getClockingsVehicle(id, page, pageSize,searchDate ? new Date(searchDate).toISOString() : undefined);
 
             if (response.status === 200) {
                 setData(response.data);
