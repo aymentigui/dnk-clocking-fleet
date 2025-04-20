@@ -1,3 +1,4 @@
+"use server"
 import { getTranslations } from "next-intl/server";
 import { verifySession } from "../permissions";
 import { prisma } from "@/lib/db";
@@ -63,9 +64,16 @@ export async function getUsersCount(): Promise<{ status: number, data: any }> {
 
         const count = await prisma.user.count({
             where: {
-                device: {
-                    none: {},
-                },
+                AND : [
+                    {
+                        device: {
+                            none: {},
+                        },
+                    },
+                    {
+                        deleted_at: null
+                    }
+                ]
             },
         });
 

@@ -1,5 +1,5 @@
 "use server"
-import { BusFront, CircleEllipsis, Download, File, FileSpreadsheet, Home, Newspaper, Plus, ScanQrCode, Settings, UserRoundCog, Users, Warehouse } from "lucide-react";
+import { BusFront, CalendarCheck, CircleEllipsis, Download, File, FileSpreadsheet, Home, Newspaper, Plus, ScanQrCode, Settings, UserRoundCog, Users, Warehouse } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getUserPermissions, verifySession } from "./permissions";
 
@@ -75,7 +75,7 @@ const itemsMenu = async () => {
         {
             title: Menu("clockings"),
             url: "/admin/clockings",
-            icon: BusFront,
+            icon: CalendarCheck,
             admin: false,
             permissions: ["clocking_view"],
         },
