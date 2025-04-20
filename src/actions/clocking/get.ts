@@ -83,8 +83,10 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
     }
 }
 
-export async function getClockingsVehicle(vehicle_id: string, page: number, pageSize: number): Promise<{ status: number, data: any, count: number }> {
+export async function getClockingsVehicle(vehicle_id: string, page: number, pageSize: number, searchDate?: string): Promise<{ status: number, data: any, count: number }> {
     const e = await getTranslations('Error');
+    
+
     try {
         const session = await verifySession();
         if (!session?.data?.user) {
@@ -96,13 +98,31 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
             return { status: 403, data: { message: e('forbidden') }, count: 0 };
         }
 
+        let start = new Date();
+        let end = new Date();
+        if (searchDate) {
+            start = new Date(searchDate);
+            start.setHours(0, 0, 0, 0);
+
+            end = new Date(searchDate);
+            end.setHours(23, 59, 59, 999);
+        }
+
         const clockings = await prisma.clocking.findMany({
             skip: (page - 1) * pageSize,
             take: pageSize,
             orderBy: {
                 created_at: "desc",
             },
-            where: {
+            where: searchDate ? 
+            {
+                created_at: {
+                    gte: start,
+                    lte: end,
+                },
+                vehicle_id: vehicle_id
+            }
+            :{
                 vehicle_id: vehicle_id
             },
             include: {

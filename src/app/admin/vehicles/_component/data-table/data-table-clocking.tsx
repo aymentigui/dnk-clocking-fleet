@@ -24,6 +24,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/components/myui/loading";
 import TablePagination from "@/components/myui/table/table-pagination";
 import { getClockingsVehicle } from "@/actions/clocking/get";
+import { DatePicker } from "@/components/ui/date-picker";
 
 interface DataTableProps {
     id: string;
@@ -46,6 +47,7 @@ export function DataTable({
     const [mounted, setMounted] = useState(false);
 
     const [selectedLanguage, setSelectedLanguage] = useState("");
+    const [searchDate, setSearchDate] = useState<Date | null>(null);
 
     const s = useTranslations('System')
     useEffect(() => {
@@ -80,6 +82,10 @@ export function DataTable({
         }
     };
 
+    const handleDateChange = (date: Date | null) => {
+        setSearchDate(date);
+        setPage(1); // Réinitialiser à la première page lors du changement de filtre
+    };
 
     const table = useReactTable({
         data: data,
@@ -107,11 +113,20 @@ export function DataTable({
                     </div>)
                     :
                     <div className="rounded-md border p-2">
+                        <div className="mb-4">
+                            <DatePicker
+                                selected={searchDate}
+                                onChange={handleDateChange}
+                                placeholderText={s("date")}
+                                isClearable={true}
+                                className="border p-2 rounded"
+                            />
+                        </div>
                         <Table className="border">
                             <TableHeader>
                                 {table.getHeaderGroups().map((headerGroup) => (
                                     <TableRow key={headerGroup.id}>
-                                        {headerGroup.headers.map((header,index) => (
+                                        {headerGroup.headers.map((header, index) => (
                                             <TableHead key={index}
                                                 className={`
                                                             ${selectedLanguage == "ar" ? "text-right " : ""} 
@@ -127,9 +142,9 @@ export function DataTable({
                             </TableHeader>
                             <TableBody>
                                 {table.getRowModel().rows?.length ? (
-                                    table.getRowModel().rows.map((row,index) => (
+                                    table.getRowModel().rows.map((row, index) => (
                                         <TableRow key={index}>
-                                            {row.getVisibleCells().map((cell,index) => (
+                                            {row.getVisibleCells().map((cell, index) => (
                                                 <TableCell key={index}>
                                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                 </TableCell>
@@ -148,7 +163,7 @@ export function DataTable({
                     </div>
             }
             {/* Pagination */}
-            {!isLoading  &&
+            {!isLoading &&
                 <TablePagination page={page} setPage={setPage} count={count} pageSize={pageSize} isLoading={isLoading} debouncedSearchQuery={""} />
             }
         </div>
