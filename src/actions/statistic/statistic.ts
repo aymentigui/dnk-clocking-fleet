@@ -2,6 +2,7 @@
 import { getTranslations } from "next-intl/server";
 import { verifySession } from "../permissions";
 import { prisma } from "@/lib/db";
+import { getPark, getParksName } from "../park/get";
 
 export async function getVehiclesCount(): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
@@ -136,7 +137,17 @@ export async function getParkVehiclesCount(): Promise<{ status: number, data: an
             return acc;
         }, {});
 
-        return { status: 200, data: vehicleCountByPark };
+        const vehicleCountByParkFormatted = await Promise.all(
+            Object.entries(vehicleCountByPark).map(async ([parkId, count]) => {
+                const parkNameResponse = await getParksName(parkId);
+                return {
+                    name: parkNameResponse.data?.name || 'Unknown',
+                    count: count,
+                };
+            })
+        );
+
+        return { status: 200, data: vehicleCountByParkFormatted };
     } catch (error) {
         console.error("Error fetching getVehiclesNoParkCount:", error);
         return { status: 500, data: 0 };

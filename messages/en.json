@@ -84,7 +84,8 @@
         "mustrefreshtoseedata": "Please refresh the page to see the new data.",
         "confermationdelete": "Are you absolutely sure?",
         "confermationdeletemessage": "This action cannot be undone. This will permanently delete your data and remove your data from our servers.",
-        "downloadjustselected": "Download just selected"
+        "downloadjustselected": "Download just selected",
+        "count": "Count"
     },
     "Menu": {
         "title": "Menu",
@@ -346,7 +347,8 @@
         "confermationdeletemessage": "This action cannot be undone. This will permanently delete your stations and remove your data from our servers.",
         "name": "Name",
         "description": "Description",
-        "address": "Address"
+        "address": "Address",
+        "parksvehcilescount": "Vehicles count in station"
     },
     "Device": {
         "title": "Device",

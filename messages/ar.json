@@ -84,7 +84,8 @@
         "mustrefreshtoseedata": "يرجى تحديث الصفحة لرؤية البيانات.",
         "confermationdelete": "  هل انت متأكد تماما؟",
         "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
-        "downloadjustselected": "تحميل المحدد"
+        "downloadjustselected": "تحميل المحدد",
+        "count": "عدد"
     },
     "Menu": {
         "title": "القائمة",
@@ -343,7 +344,8 @@
         "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
         "name": "إسم",
         "description": "الوصف",
-        "address": "العنوان"
+        "address": "العنوان",
+        "parksvehcilescount": "عدد السيارات في الحظيرة"
     },
     "Device": {
         "title": "الجهاز",
