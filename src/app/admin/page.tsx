@@ -68,7 +68,6 @@ const AdminPage = () => {
 
     getParkVehiclesCount().then((res) => {
       if (res.status === 200) {
-        console.log(res.data);
         const newData = res.data.map((item: any) => ({
           name: item.name,
           count: item.count,

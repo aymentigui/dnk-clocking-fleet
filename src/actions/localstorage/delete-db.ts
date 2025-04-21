@@ -21,7 +21,7 @@ export const deleteFileDb = async (fileId: string) => {
         return { status: 200, data: { message: s("deletesuccess") } }
 
     } catch (error) {
-        console.log("error in deleteFileDB");
+        //console.log("error in deleteFileDB");
         return { status: 500, data: { message: e("error") } }
 
     }

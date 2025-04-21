@@ -61,7 +61,7 @@ export async function createDevice(data: any) {
             return { status: 400, data: { message: u("usernameexists") } };
         }
 
-        if (park) {
+        if (park && park!=null && park!="null" && park != "" && park.trim() != ""){
             const parkExists = await prisma.park.findFirst({ where: { id: park } });
 
             if (!parkExists) {
@@ -69,7 +69,7 @@ export async function createDevice(data: any) {
             }
         }
 
-        if (region) {
+        if (region && region!=null && region!="null" && region != "" && region.trim() != "") {
             const regionExists = await prisma.region.findFirst({ where: { id: park } });
 
             if (!regionExists) {

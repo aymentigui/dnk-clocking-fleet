@@ -58,7 +58,7 @@ export async function updateUser(id: string, data: any): Promise<{ status: numbe
 
         const result = userSchema.safeParse(data);
         if (!result.success) {
-            console.log(result.error.errors);
+            //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
 

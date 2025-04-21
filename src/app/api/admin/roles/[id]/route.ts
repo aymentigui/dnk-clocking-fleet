@@ -18,7 +18,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
     const paramsID = await params
 
     const {name, permissions} = await request.json();
-    console.log(permissions)
+    //console.log(permissions)
 
     const role = await UpdateRole(paramsID.id, name, permissions)
 

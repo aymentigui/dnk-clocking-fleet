@@ -35,7 +35,7 @@ export async function UpdateDevice(id: string, data: any) {
         const result = schema.safeParse(data);
 
         if (!result.success) {
-            console.log(result.error.errors);
+            //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { code, username, password, park, type, region } = result.data;
@@ -74,7 +74,7 @@ export async function UpdateDevice(id: string, data: any) {
             return { status: 400, data: { message: u("usernameexists") } };
         }
 
-        if (park) {
+        if (park && park!=null && park!="null" && park != "" && park.trim() != "") {
             const parkExists = await prisma.park.findFirst({ where: { id: park } });
 
             if (!parkExists) {
@@ -93,7 +93,7 @@ export async function UpdateDevice(id: string, data: any) {
             })
         }
 
-        if (region) {
+        if (region && region!=null && region!="null" && region != "" && region.trim() != "")  {
             const regionExists = await prisma.region.findFirst({ where: { id: region } });
 
             if (!regionExists) {

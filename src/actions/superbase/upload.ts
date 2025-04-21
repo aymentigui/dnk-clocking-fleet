@@ -14,7 +14,7 @@ export async function uploadFile(file: File, filename: string, filePath: string,
             upsert: false,
         });
     if (error){
-        console.log(error);
+        //console.log(error);
         return { status: 500, data: { message: error.message } };
     }
     return { status: 200, data: { succes : true, path: filePath+"/"+filename+"."+fileExtension,} };

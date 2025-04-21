@@ -12,7 +12,7 @@ export default function Home() {
 
   useEffect(() => {
     setTimeout(() => {
-      router.push("/admin/vehicles");
+      router.push("/admin");
     }, 1000);
 
     // axios.post(`http://localhost:3000/api/admin/clocking`, {

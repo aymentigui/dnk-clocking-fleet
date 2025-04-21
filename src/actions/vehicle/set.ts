@@ -34,7 +34,7 @@ export async function createVehicle(data: any) {
         const result = schema.safeParse(data);
 
         if (!result.success) {
-            console.log(result.error.errors);
+            //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { matricule, model, year, vin, park, brand, region } = result.data;

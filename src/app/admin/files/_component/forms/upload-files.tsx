@@ -150,7 +150,7 @@ export default function FileUploadForm({
           toast.success("File uploaded successfully")
           form.reset()
         } else {
-          console.log(res.data)
+          //console.log(res.data)
           res.data.forEach((file: any) => {
             file.status !== 200 && toast.error(file.data.message)
           })

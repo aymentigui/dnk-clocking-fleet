@@ -69,7 +69,7 @@ const ResetForm = () => {
             code: values.code
         }
         resetPasswordWithoutConnection(data).then((res) => {
-            console.log(res)
+            //console.log(res)
             if (res.status === 200) {
                 if (res.data.codeConfirmed) {
                     setPasswordForget(true)

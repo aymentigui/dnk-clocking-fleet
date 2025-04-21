@@ -11,7 +11,7 @@ export async function getTemporaryUrl(filePath: string, bucketName = "private", 
     .createSignedUrl(filePath, expireIn); // Lien valide pour 60 secondes
 
   if (error){
-    console.log(error);
+    //console.log(error);
     return { status: 500, data: { message: error.message } };
   }
 

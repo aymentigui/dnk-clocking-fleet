@@ -42,7 +42,7 @@ export const ViewFileFromLocalHost = async (idFile : string, origin="/api/files/
 export const deleteFileFromLocalHost = async (idFile : string, origin = "/api/files/") => {
     const response = await axios.delete(origin+idFile);
     if (response.status !== 200 ) {
-        console.log("Erreur lors du suppression de l'image");
+        //console.log("Erreur lors du suppression de l'image");
         return;
     }
     return response
@@ -54,7 +54,7 @@ export const deleteFileFromLocalHost = async (idFile : string, origin = "/api/fi
 export const getFileBlobFromLocalHost = async (idFile : string, allFile = "false",origin="/api/files/") => {
     const response = await fetch(origin+idFile+"?allFile="+allFile);
     if (!response.ok) {
-        console.log("Erreur lors du téléchargement de l'image");
+        //console.log("Erreur lors du téléchargement de l'image");
         return;
     }
     let metadata = null

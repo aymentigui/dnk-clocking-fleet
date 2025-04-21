@@ -29,7 +29,7 @@ export async function registerUser(data: any): Promise<{ status: number, data: a
     const result = registerSchema.safeParse(data);
 
     if (!result.success) {
-        console.log(result.error.errors);
+        //console.log(result.error.errors);
         return { status: 400, data: result.error.errors };
     }
     const { username, email, password } = result.data;
@@ -41,7 +41,7 @@ export async function registerUser(data: any): Promise<{ status: number, data: a
         });
 
         if (existingUserByUsername) {
-            console.log('Username already exists');
+            //console.log('Username already exists');
             return { status: 400, data: { message: 'Username already exists' } };
         }
 
@@ -50,7 +50,7 @@ export async function registerUser(data: any): Promise<{ status: number, data: a
         });
 
         if (existingUserByEmail) {
-            console.log('Email already exists');
+            //console.log('Email already exists');
             return { status: 400, data: { message: 'Email already exists' } };
         }
 
@@ -63,7 +63,7 @@ export async function registerUser(data: any): Promise<{ status: number, data: a
                 password: passwordHash, // Note: In a real application, make sure to hash the password before storing it
             },
         });
-        console.log('User created successfully');
+        //('User created successfully');
         return { status: 201, data: newUser };
     } catch (error) {
         if (error instanceof Error) {
@@ -88,7 +88,7 @@ export async function loginUser(data: any): Promise<{ status: number, data: any 
     const result = LoginSchema.safeParse(data);
 
     if (!result.success) {
-        console.log(result.error.errors);
+        //console.log(result.error.errors);
         return { status: 400, data: result.error.errors };
     }
     const { email, password, code } = result.data;
@@ -107,12 +107,12 @@ export async function loginUser(data: any): Promise<{ status: number, data: any 
         })
 
         if (!user) {
-            console.log('User not found');
+            //console.log('User not found');
             return { status: 400, data: { message: 'User not found' } };
         }
 
         if (!user.password) {
-            console.log('You must connect with your provider');
+            //console.log('You must connect with your provider');
             return { status: 400, data: { message: 'You must connect with your provider' } };
         }
 
@@ -187,7 +187,7 @@ export async function logoutUser() {
         await signOut({ redirect: false });
         return { status: 200, data: { message: 'Logout successful' } };
     } catch (error) { // @ts-ignore
-        console.log("An error occurred in logout", error.message);
+        //console.log("An error occurred in logout", error.message);
         return { status: 500, data: { message: 'An error occurred in logout' } };
     }
 }

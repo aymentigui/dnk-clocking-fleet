@@ -121,7 +121,7 @@ export const AddUpdateDeviceDialog = () => {
     let status;
     let errors;
 
-    console.log(data)
+    //console.log(data)
     if (isAdd) {
       res = await createDevice(data);
     } else if (device) {

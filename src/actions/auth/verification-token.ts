@@ -12,7 +12,7 @@ export async function getVerificationTokenByEmail(email: string) : Promise<{ sta
             }
         })
         if(!verificationToken){
-            console.log('Verification token not found');
+            //console.log('Verification token not found');
             return { status: 404, data: { message: e("error") } };
         }
         return { status: 200, data: verificationToken };
