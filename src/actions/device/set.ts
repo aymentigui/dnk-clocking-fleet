@@ -105,7 +105,7 @@ export async function createDevice(data: any) {
             },
         });
 
-        if(park && device){
+        if(park && park!=null && park!="null" && park != "" && park.trim() != ""  && device){
             await prisma.device.update({
                 where: {
                     id: device.id
@@ -120,7 +120,7 @@ export async function createDevice(data: any) {
             })
         }
 
-        if(region && device){
+        if(region && region!=null && region!="null" && region != "" && region.trim() != "" && device){
             await prisma.device.update({
                 where: {
                     id: device.id
@@ -226,7 +226,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
             return { status: 400, data: { device: data, message: u("usernameexists") } };
         }
         
-        console.log(region,park);
+        
         if (park && park!=null && park!="null" && park != "" && park.trim() != "") {
             const parkExists = await prisma.park.findFirst({ where: { name: park } });
 
