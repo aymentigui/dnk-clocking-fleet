@@ -37,7 +37,7 @@ export async function createDevice(data: any) {
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { code, username, password, park , type, region} = result.data;
-
+        console.log(type,region)
         const codeExists = await prisma.device.findFirst({ where: { code } });
         if (codeExists) {
             return { status: 400, data: { message: u("codeexists") } };
