@@ -73,12 +73,24 @@ export async function UpdateDevice(id: string, data: any) {
         if (emailExists) {
             return { status: 400, data: { message: u("usernameexists") } };
         }
-
         if (park && park!=null && park!="null" && park != "" && park.trim() != "") {
             const parkExists = await prisma.park.findFirst({ where: { id: park } });
 
             if (!parkExists) {
                 return { status: 400, data: { message: u("parknotexist") } };
+            }else{
+                await prisma.device.update({
+                    where: {
+                        id
+                    },
+                    data: {
+                        park: {
+                            connect: {
+                                id: park
+                            }
+                        }
+                    }
+                })
             }
         }else{
             await prisma.device.update({
@@ -98,6 +110,19 @@ export async function UpdateDevice(id: string, data: any) {
 
             if (!regionExists) {
                 return { status: 400, data: { message: u("regionnotexist") } };
+            }else{
+                await prisma.device.update({
+                    where: {
+                        id
+                    },
+                    data: {
+                        region: {
+                            connect: {
+                                id: region
+                            }
+                        }
+                    }
+                })
             }
         }else{
             await prisma.device.update({
@@ -149,7 +174,7 @@ export async function UpdateDevice(id: string, data: any) {
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
         // @ts-ignore
-        console.error("An error occurred in UpdateDeive"+error.message);
+        //console.error("An error occurred in UpdateDeive"+error.message);
         return { status: 500, data: { message: e("error") } };
     }
 }

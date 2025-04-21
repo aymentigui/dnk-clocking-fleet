@@ -141,7 +141,7 @@ export const AddUpdateDeviceDialog = () => {
       closeDialog();
       form.reset();
       setLoading(false);
-      //window.location.reload()
+      window.location.reload()
     } else {
       setLoading(false);
       if (errors) {
