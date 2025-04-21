@@ -18,7 +18,7 @@ import { loginUser } from '@/actions/auth/auth'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { getConfirmationCodePasswordChange } from '@/actions/auth/password-change'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Eye, EyeOff } from 'lucide-react'  // Assurez-vous d'installer react-feather
 
 const LoginForm = () => {
@@ -26,6 +26,7 @@ const LoginForm = () => {
     const [twoFactorConfermation, setTwoFactorConfermation] = useState(false)
     const [showPassword, setShowPassword] = useState(false)  // Pour gérer l'affichage du mot de passe
     const router = useRouter()
+    const locale =useLocale()
 
     const t = useTranslations("Settings")
     const s = useTranslations("System")
@@ -108,7 +109,7 @@ const LoginForm = () => {
                                         />
                                         <Button
                                             type="button"
-                                            className="absolute p-3 bg-background hover:bg-border border right-0 top-0"
+                                            className={"absolute p-3 bg-background hover:bg-border border top-0 "+(locale!=="ar" ? "right-0" : "left-0")}
                                             onClick={() => setShowPassword(!showPassword)}  // Toggle pour l'icône
                                         >
                                             {showPassword ? <EyeOff className='text-foreground' size={20} /> : <Eye className='text-foreground' size={20} />}
