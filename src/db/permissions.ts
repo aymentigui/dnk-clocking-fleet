@@ -24,6 +24,11 @@ export const permissions = [
     { name: "park_create" },
     { name: "park_update" },
     { name: "park_delete" },
+    
+    { name: "region_view" },
+    { name: "region_create" },
+    { name: "region_update" },
+    { name: "region_delete" },
 
     { name: "vehicles_view" },
     { name: "vehicles_create" },
@@ -39,6 +44,11 @@ export const permissions = [
     { name: "vehicles_park_create" },
     { name: "vehicles_park_update" },
     { name: "vehicles_park_delete" },
+
+    { name: "vehicles_region_view" },
+    { name: "vehicles_region_create" },
+    { name: "vehicles_region_update" },
+    { name: "vehicles_region_delete" },
 
     { name: "clocking_view" },
     { name: "clocking_create" },

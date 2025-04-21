@@ -118,6 +118,22 @@ const parkHeader = (column: any) => {
   );
 }
 
+const regionHeader = (column: any) => {
+
+  const t = useTranslations("Vehicle");
+
+  return (
+    <Button
+      variant="ghost"
+      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      className="w-3/6 flex justify-between"
+    >
+      {t("region")}
+      <ArrowUpDown className="ml-2 h-4 w-4" />
+    </Button>
+  );
+}
+
 const actionsCell = (row: any) => {
   const vehicle = row.original;
   const { openDialog } = useAddUpdateVehicleDialog();
@@ -207,6 +223,12 @@ export const columns: ColumnDef<Columns>[] = [
     accessorKey: "park",
     header: ({ column }) => parkHeader(column),
     cell: ({ row }) => (row.getValue("park")),
+    enableSorting: true,
+  },
+  {
+    accessorKey: "region",
+    header: ({ column }) => regionHeader(column),
+    cell: ({ row }) => (row.getValue("region")),
     enableSorting: true,
   },
 

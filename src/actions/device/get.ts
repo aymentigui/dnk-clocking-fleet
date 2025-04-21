@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 import { withAuthorizationPermission, verifySession } from "../permissions";
 
 
-export async function getDevices(page: number = 1, pageSize: number = 10, searchQuery?: string, searchPark?: string): Promise<{ status: number, data: any }> {
+export async function getDevices(page: number = 1, pageSize: number = 10, searchQuery?: string, searchPark?: string, searchRegion?: string): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
     try {
         const session = await verifySession()
@@ -33,6 +33,16 @@ export async function getDevices(page: number = 1, pageSize: number = 10, search
             searchConditions.AND = [
                 { park: { id: searchPark } }
             ]
+        if((searchRegion && searchRegion !== "" && searchRegion !== "0")) {
+            // @ts-ignore
+            if (!searchConditions.AND)
+                // @ts-ignore
+                searchConditions.AND = []
+            // @ts-ignore
+            searchConditions.AND.push(
+                { region: { id: searchRegion } }
+            )
+        }
 
         const devices = await prisma.device.findMany({
             skip: skip, // Nombre d'éléments à sauter
@@ -50,6 +60,12 @@ export async function getDevices(page: number = 1, pageSize: number = 10, search
                         name: true,
                     },
                 },
+                region: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
             }
         });
 
@@ -60,7 +76,9 @@ export async function getDevices(page: number = 1, pageSize: number = 10, search
             type: device.type,
             password: device.password,
             park: device.park ? device.park.name : "",
-            parkId: device.park ? device.park.id : ""
+            parkId: device.park ? device.park.id : "",
+            region: device.region ? device.region.name : "",
+            regionId: device.region ? device.region.id : "",
         }))
 
 
@@ -70,7 +88,7 @@ export async function getDevices(page: number = 1, pageSize: number = 10, search
         return { status: 500, data: null };
     }
 }
-export async function getCountDevices(searchQuery?: string, searchPark?: string): Promise<{ status: number, data: any }> {
+export async function getCountDevices(searchQuery?: string, searchPark?: string, searchRegion?: string): Promise<{ status: number, data: any }> {
 
     const searchConditions = {}
     if ((searchQuery && searchQuery !== ""))
@@ -85,6 +103,16 @@ export async function getCountDevices(searchQuery?: string, searchPark?: string)
         searchConditions.AND = [
             { park: { id: searchPark } }
         ]
+    if ((searchRegion && searchRegion !== "" && searchRegion !== "0")) {
+        // @ts-ignore
+        if (!searchConditions.AND)
+            // @ts-ignore
+            searchConditions.AND = []
+        // @ts-ignore
+        searchConditions.AND.push(
+            { region: { id: searchRegion } }
+        )
+    }
 
     const e = await getTranslations('Error');
     try {

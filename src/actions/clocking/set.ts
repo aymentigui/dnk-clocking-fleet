@@ -16,19 +16,29 @@ export async function createClocking(data: any) {
         }
 
         const existingDevice = await prisma.device.findFirst({
-            where: { user_id: session.data.user.id},
+            where: { user_id: session.data.user.id },
         });
 
         if (!existingDevice) return { status: 404, data: { message: u("devicenotfound") } };
 
-        if (!existingDevice.park_id) return { status: 404, data: { message: u("parknotfound") } };
+        if (!existingDevice.park_id && !existingDevice.region_id) return { status: 404, data: { message: u("parknotfound") } };
 
+        if (existingDevice.park_id) {
+            const existingPark = await prisma.park.findFirst({
+                where: { id: existingDevice.park_id },
+            });
 
-        const existingPark = await prisma.park.findFirst({
-            where: { id: existingDevice.park_id },
-        });
+            if (!existingPark) return { status: 404, data: { message: u("parknotfound") } };
+        }
 
-        if (!existingPark) return { status: 404, data: { message: u("parknotfound") } };
+        if (existingDevice.region_id) {
+            const existingPark = await prisma.region.findFirst({
+                where: { id: existingDevice.region_id },
+            });
+
+            if (!existingPark) return { status: 404, data: { message: u("regionnotfound") } };
+        }
+
 
         const existingVehicle = await prisma.vehicle.findFirst({
             where: { matricule: data.matricule },
@@ -46,14 +56,27 @@ export async function createClocking(data: any) {
             take: 1,
         });
 
+        const existingVehicleRegion = await prisma.vehicle_region.findFirst({
+            where: {
+                vehicle_id: existingVehicle.id,
+            },
+            orderBy: {
+                added_at: "desc",
+            },
+            take: 1,
+        });
+
 
         await prisma.clocking.create({
             data: {
                 vehicle_id: existingVehicle.id,
                 device_id: existingDevice.id,
-                park_id: existingDevice.park_id??null,
-                type: data.type?? 0,
-                status: existingVehiclePark && existingDevice.park_id  && existingVehiclePark.park_id == existingDevice.park_id ? 1 : 0,
+                park_id: existingDevice.park_id ?? null,
+                regionId: existingDevice.region_id ?? null,
+                type: data.type ?? 0,
+                status: data.type !== 3 ?
+                    (existingVehiclePark && existingDevice.park_id && existingVehiclePark.park_id == existingDevice.park_id ? 1 : 0)
+                    : (existingVehicleRegion && existingDevice.region_id && existingVehicleRegion.region_id == existingDevice.region_id ? 1 : 0),
             },
         });
 

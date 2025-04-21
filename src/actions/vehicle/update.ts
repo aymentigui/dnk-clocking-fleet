@@ -20,6 +20,7 @@ export async function UpdateVehicle(id: string, data: any) {
             brand: z.string().optional(),
             vin: z.string().optional(),
             park: z.string().optional(),
+            region: z.string().optional(),
         });
 
         const session = await verifySession();
@@ -38,7 +39,7 @@ export async function UpdateVehicle(id: string, data: any) {
             console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { matricule, model, year, brand, vin, park } = result.data;
+        const { matricule, model, year, brand, vin, park, region } = result.data;
 
         const vehicle = await prisma.vehicle.findUnique({
             where: { id },
@@ -86,19 +87,43 @@ export async function UpdateVehicle(id: string, data: any) {
                 },
             });
 
+            const region_vehicle = await prisma.vehicle_region.findFirst({
+                where: {
+                    vehicle_id: id,
+                },
+                orderBy: {
+                    added_at: 'desc',
+                },
+            });
+
 
             if ((parc_vehicle && parc_vehicle.park_id !== park) || (!parc_vehicle && park)) {
 
                 const hasPermission = await withAuthorizationPermission(['vehicles_park_update']);
                 if (hasPermission.status === 200 && hasPermission.data.hasPermission) {
                     const parkExists = await prisma.park.findFirst({ where: { id: park } });
-                    await prisma.vehicle_park.create({
-                        data: {
-                            vehicle_id: id,
-                            park_id: parkExists ? parkExists.id : null,
-                            added_from: session.data.user.id,
-                        },
-                    });
+                    if (parkExists)
+                        await prisma.vehicle_park.create({
+                            data: {
+                                vehicle_id: id,
+                                park_id: parkExists ? parkExists.id : null,
+                                added_from: session.data.user.id,
+                            },
+                        });
+                }
+            }
+            if ((region_vehicle && region_vehicle.region_id !== region) || (!region_vehicle && region)) {
+                const hasPermission = await withAuthorizationPermission(['vehicles_region_update']);
+                if (hasPermission.status === 200 && hasPermission.data.hasPermission) {
+                    const regionExists = await prisma.region.findFirst({ where: { id: region } });
+                    if (regionExists)
+                        await prisma.vehicle_region.create({
+                            data: {
+                                vehicle_id: id,
+                                region_id: regionExists ? regionExists.id : null,
+                                added_from: session.data.user.id,
+                            },
+                        });
                 }
             }
         }
@@ -139,7 +164,7 @@ export async function UpdateVehiclesParc(vehicleIds: string[], parcId: string) {
         await prisma.vehicle_park.createMany({
             data: vehicleIds.map((id) => ({
                 vehicle_id: id,
-                park_id: parcId==="null"?null:parcId,
+                park_id: parcId === "null" ? null : parcId,
                 added_from: session.data.user.id,
             })),
         });
@@ -152,3 +177,41 @@ export async function UpdateVehiclesParc(vehicleIds: string[], parcId: string) {
 }
 
 
+export async function UpdateVehiclesRegion(vehicleIds: string[], regionId: string) {
+    const e = await getTranslations('Error');
+    const s = await getTranslations('System');
+    const v = await getTranslations('Vehicle');
+
+    try {
+
+        const session = await verifySession();
+        if (!session?.data?.user) {
+            return { status: 401, data: { message: e("unauthorized") } };
+        }
+        const hasPermissionAdd = await withAuthorizationPermission(['vehicles_region_update']);
+
+        if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
+            return { status: 403, data: { message: e('forbidden') } };
+        }
+
+        if (regionId && regionId !== "null") {
+            const regionExists = await prisma.region.findFirst({ where: { id: regionId } });
+            if (!regionExists) {
+                return { status: 404, data: { message: v("regionnotfound") } };
+            }
+        }
+
+        await prisma.vehicle_region.createMany({
+            data: vehicleIds.map((id) => ({
+                vehicle_id: id,
+                region_id: regionId === "null" ? null : regionId,
+                added_from: session.data.user.id,
+            })),
+        });
+
+        return { status: 200, data: { message: s("updatesuccess") } };
+    } catch (error) {
+        console.error("An error occurred in UpdateVehiclesRegion:", error);
+        return { status: 500, data: { message: e("error") } };
+    }
+}

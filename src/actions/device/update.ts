@@ -18,6 +18,7 @@ export async function UpdateDevice(id: string, data: any) {
                 message: u("usernamecontainspace")
             }),            password: z.string().min(6, u("password6")),
             park: z.string().optional(),
+            region: z.string().optional(),
             type: z.number().optional(),
         });
 
@@ -37,7 +38,7 @@ export async function UpdateDevice(id: string, data: any) {
             console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { code, username, password, park, type } = result.data;
+        const { code, username, password, park, type, region } = result.data;
 
         const deviceExists = await prisma.device.findFirst({ where: { id } });
 
@@ -79,6 +80,36 @@ export async function UpdateDevice(id: string, data: any) {
             if (!parkExists) {
                 return { status: 400, data: { message: u("parknotexist") } };
             }
+        }else{
+            await prisma.device.update({
+                where: {
+                    id
+                },
+                data: {
+                    park: {
+                        disconnect: true
+                    },
+                },
+            })
+        }
+
+        if (region) {
+            const regionExists = await prisma.region.findFirst({ where: { id: region } });
+
+            if (!regionExists) {
+                return { status: 400, data: { message: u("regionnotexist") } };
+            }
+        }else{
+            await prisma.device.update({
+                where: {
+                    id
+                },
+                data: {
+                    region: {
+                        disconnect: true
+                    },
+                },
+            })
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -115,36 +146,10 @@ export async function UpdateDevice(id: string, data: any) {
             },
         });
 
-        if (!park && park!=="") {
-            await prisma.device.update({
-                where: {
-                    id
-                },
-                data: {
-                    park: {
-                        disconnect: true
-                    },
-                },
-            })
-        } else {
-            await prisma.device.update({
-                where: {
-                    id
-                },
-                data: {
-                    park: {
-                        connect: {
-                            id: park
-                        }
-                    },
-                },
-            })
-        }
-
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
         // @ts-ignore
-        console.error("An error occurred in UpdatePark"+error.message);
+        console.error("An error occurred in UpdateDeive"+error.message);
         return { status: 500, data: { message: e("error") } };
     }
 }

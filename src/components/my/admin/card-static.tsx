@@ -3,7 +3,7 @@ import React from 'react'
 
 const CardStatic = ({ Icon, title, data, isLoading }: any) => {
     return (
-        <div className='p-4 flex border rounded flex-row justify-start items-center w-64 gap-5'>
+        <div className='p-4 flex border rounded-lg flex-row justify-start items-center w-64 gap-5'>
             {
                 isLoading ?
                     <div className='w-full flex justify-center items-center'>

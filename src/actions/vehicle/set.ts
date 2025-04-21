@@ -18,6 +18,7 @@ export async function createVehicle(data: any) {
         brand: z.string().optional(),
         vin: z.string().optional(),
         park: z.string().optional(),
+        region: z.string().optional(),
     });
 
     try {
@@ -36,7 +37,7 @@ export async function createVehicle(data: any) {
             console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { matricule, model, year, vin, park, brand } = result.data;
+        const { matricule, model, year, vin, park, brand, region } = result.data;
 
         const matriculeExists = await prisma.vehicle.findFirst({
             where: {
@@ -86,6 +87,22 @@ export async function createVehicle(data: any) {
             }
         }
 
+        if (region) {
+            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_region_create'])
+            if (hasPermissionAdd.status === 200 && hasPermissionAdd.data.hasPermission) {
+                const regionExists = await prisma.region.findFirst({ where: { id: region } });
+                if (regionExists) {
+                    await prisma.vehicle_region.create({
+                        data: {
+                            vehicle_id: vehicle.id,
+                            region_id: region,
+                            added_from: session.data.user.id,
+                        },
+                    });
+                }
+            }
+        }
+
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
         console.error("An error occurred in createVehicle" + error);
@@ -106,6 +123,7 @@ export async function createVehicles(data: any) {
         }),
         brand: z.string().optional(),
         park: z.string().optional(),
+        region: z.string().optional(),
         vin: z.string().optional(),
     });
 
@@ -144,6 +162,7 @@ const addVehicle = async (data: any, schema: any, session: any, u: any, s: any) 
             brand: data.brand === null ? undefined : data.brand,
             vin: data.vin === null ? undefined : data.vin,
             park: data.park === null ? undefined : data.park,
+            region: data.region === null ? undefined : data.region
         });
 
 
@@ -154,7 +173,7 @@ const addVehicle = async (data: any, schema: any, session: any, u: any, s: any) 
             return { status: 400, data: { message: message, vehicle: data } };
         }
 
-        const { matricule, model, year, vin, brand, park } = result.data;
+        const { matricule, model, year, vin, brand, park, region } = result.data;
 
         const matriculeExists = await prisma.vehicle.findFirst({ where: { matricule } });
         if (matriculeExists) {
@@ -195,6 +214,23 @@ const addVehicle = async (data: any, schema: any, session: any, u: any, s: any) 
                 }
             }
         }
+
+        if (region) {
+            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_region_create'])
+            if (hasPermissionAdd.status === 200 && hasPermissionAdd.data.hasPermission) {
+                const regionExists = await prisma.region.findFirst({ where: { name: park } });
+                if (regionExists) {
+                    await prisma.vehicle_region.create({
+                        data: {
+                            vehicle_id: vehicle.id,
+                            region_id: regionExists.id,
+                            added_from: session.data.user.id,
+                        },
+                    });
+                }
+            }
+        }
+
         return { status: 200, data: data };
     } catch (error) {
         // @ts-ignore

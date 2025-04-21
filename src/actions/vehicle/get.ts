@@ -5,10 +5,9 @@ import { prisma } from "@/lib/db";
 import { withAuthorizationPermission, verifySession } from "../permissions";
 
 
-export async function getVehicles(page: number = 1, pageSize: number = 10, searchQuery?: string, searchPark?: string): Promise<{ status: number, data: any }> {
+export async function getVehicles(page: number = 1, pageSize: number = 10, searchQuery?: string, searchPark?: string, searchRegion?: string): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
     try {
-        console.log(searchPark)
         const session = await verifySession()
         if (!session || session.status != 200) {
             return { status: 401, data: { message: e('unauthorized') } }
@@ -50,6 +49,33 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
                     }
                 }
             ]
+        if ((searchRegion && searchRegion !== "" && searchRegion !== "0")) {
+            // @ts-ignore
+            if (!searchConditions.AND)
+                // @ts-ignore
+                searchConditions.AND = []
+            // @ts-ignore
+            searchConditions.AND.push(
+                {
+                    vehicle_region: {
+                        every: {
+                            region: {
+                                region: {
+                                    id: searchRegion,
+                                }
+                            }
+                        },
+                        some: {
+                            region: {
+                                region: {
+                                    id: searchRegion,
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        }
 
         const vehicles = await prisma.vehicle.findMany({
             skip: skip, // Nombre d'éléments à sauter
@@ -64,7 +90,16 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
                         park: true,
                     },
                     take: 1,
-                }
+                },
+                vehicle_region: {
+                    orderBy: {
+                        added_at: 'desc',
+                    },
+                    include: {
+                        region: true,
+                    },
+                    take: 1,
+                },
             }
         });
 
@@ -78,20 +113,10 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
                 year: vehicle.year,
                 park: vehicle.vehicle_park && vehicle.vehicle_park[0] && vehicle.vehicle_park[0].park ? vehicle.vehicle_park[0].park.name : "",
                 parkId: vehicle.vehicle_park && vehicle.vehicle_park[0] && vehicle.vehicle_park[0].park ? vehicle.vehicle_park[0].park.id : "",
+                region: vehicle.vehicle_region && vehicle.vehicle_region[0] && vehicle.vehicle_region[0].region ? vehicle.vehicle_region[0].region.name : "",
+                regionId: vehicle.vehicle_region && vehicle.vehicle_region[0] && vehicle.vehicle_region[0].region ? vehicle.vehicle_region[0].region.id : "",
             }
         })
-
-
-
-        // const vehiclesFormatted = devices.map((vehicle) => ({
-        //     id: vehicle.id,
-        //     username: vehicle.username,
-        //     code: vehicle.code,
-        //     password: vehicle.password,
-        //     park: vehicle.park ? device.park.name : "",
-        //     parkId: vehicle.park ? device.park.id : ""
-        // }))
-
 
         return { status: 200, data: vehiclesFormatted };
     } catch (error) {
@@ -99,7 +124,7 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
         return { status: 500, data: null };
     }
 }
-export async function getCountVehicles(searchQuery?: string, searchPark?: string): Promise<{ status: number, data: any }> {
+export async function getCountVehicles(searchQuery?: string, searchPark?: string, searchRegion?: string): Promise<{ status: number, data: any }> {
 
     const searchConditions = {}
     if ((searchQuery && searchQuery !== ""))
@@ -115,6 +140,11 @@ export async function getCountVehicles(searchQuery?: string, searchPark?: string
         searchConditions.AND = [
             {
                 vehicle_park: {
+                    every: {
+                        park: {
+                            id: searchPark,
+                        }
+                    },
                     some: {
                         park: {
                             id: searchPark,
@@ -123,6 +153,29 @@ export async function getCountVehicles(searchQuery?: string, searchPark?: string
                 }
             }
         ]
+    if((searchRegion && searchRegion !== "" && searchRegion !== "0")) {
+        // @ts-ignore
+        if (!searchConditions.AND)
+            // @ts-ignore
+            searchConditions.AND = []
+        // @ts-ignore
+        searchConditions.AND.push(
+            {
+                vehicle_region: {
+                    every: {
+                        region: {
+                            id: searchRegion,
+                        }
+                    },
+                    some: {
+                        region: {
+                            id: searchRegion,
+                        }
+                    }
+                }
+            }
+        )
+    }
 
     const e = await getTranslations('Error');
     try {
@@ -137,7 +190,16 @@ export async function getCountVehicles(searchQuery?: string, searchPark?: string
                         park: true,
                     },
                     take: 1,
-                }
+                },
+                vehicle_region: {
+                    orderBy: {
+                        added_at: 'desc',
+                    },
+                    include: {
+                        region: true,
+                    },
+                    take: 1,
+                },
             }
         });
 
@@ -217,7 +279,16 @@ export async function getVehicle(id: string): Promise<{ status: number, data: an
                         park: true,
                     },
                     take: 1,
-                }
+                },
+                vehicle_region: {
+                    orderBy: {
+                        added_at: 'desc',
+                    },
+                    include: {
+                        region: true,
+                    },
+                    take: 1,
+                },
             }
         });
 
@@ -230,6 +301,8 @@ export async function getVehicle(id: string): Promise<{ status: number, data: an
             year: vehicle.year,
             park: vehicle.vehicle_park && vehicle.vehicle_park[0] && vehicle.vehicle_park[0].park ? vehicle.vehicle_park[0].park.name : "",
             parkId: vehicle.vehicle_park && vehicle.vehicle_park[0] && vehicle.vehicle_park[0].park ? vehicle.vehicle_park[0].park.id : "",
+            region: vehicle.vehicle_region && vehicle.vehicle_region[0] && vehicle.vehicle_region[0].region ? vehicle.vehicle_region[0].region.name : "",
+            regionId: vehicle.vehicle_region && vehicle.vehicle_region[0] && vehicle.vehicle_region[0].region ? vehicle.vehicle_region[0].region.id : "",
         } : null
 
         return { status: 200, data: vehicleFormatted };
@@ -343,6 +416,68 @@ export async function getVehicleParks(id: string, page: number, pageSize: number
         return { status: 200, data: vehicleParksFormatted, count: vehicleParksCount };
     } catch (error) {
         console.error("An error occurred in getVehicleParks:", error);
+        return { status: 500, data: { message: e("error") }, count: 0 };
+    }
+}
+
+export async function getVehicleRegions(id: string, page: number, pageSize: number): Promise<{ status: number, data: any, count: number }> {
+    const e = await getTranslations('Error');
+    try {
+        const session = await verifySession();
+        if (!session?.data?.user) {
+            return { status: 401, data: { message: e("unauthorized") }, count: 0 };
+        }
+        const hasPermissionAdd = await withAuthorizationPermission(['vehicles_region_view'], session.data.user.id);
+
+        if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
+            return { status: 403, data: { message: e('forbidden') }, count: 0 };
+        }
+        const vehicle = await prisma.vehicle.findUnique({ where: { id } });
+
+        if (!vehicle) {
+            return { status: 404, data: null, count: 0 };
+        }
+
+        const vehicleRegions = await prisma.vehicle_region.findMany({
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            orderBy: {
+                added_at: 'desc',
+            },
+            where: {
+                vehicle_id: id,
+            },
+            include: {
+                region: true,
+                user: {
+                    select: {
+                        username: true,
+                        firstname: true,
+                        lastname: true,
+                    }
+                }
+            },
+        });
+
+        const vehicleRegionsFormatted = vehicleRegions.map((vehicleRegions) => {
+            return {
+                id: vehicleRegions.id,
+                added_at: vehicleRegions.added_at.getDate() + "/" + (vehicleRegions.added_at.getMonth() + 1) + "/" + vehicleRegions.added_at.getFullYear(),
+                added_from: vehicleRegions.user ? vehicleRegions.user.firstname + " " + vehicleRegions.user.lastname : "---",
+                region: vehicleRegions.region ? vehicleRegions.region.name : "---",
+                regionId: vehicleRegions.region ? vehicleRegions.region.id : "---",
+            }
+        })
+
+        const vehicleRegionCount = await prisma.vehicle_region.count({
+            where: {
+                vehicle_id: id,
+            },
+        });
+
+        return { status: 200, data: vehicleRegionsFormatted, count: vehicleRegionCount };
+    } catch (error) {
+        console.error("An error occurred in getVehicleRegion:", error);
         return { status: 500, data: { message: e("error") }, count: 0 };
     }
 }

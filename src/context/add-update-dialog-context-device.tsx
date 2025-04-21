@@ -9,6 +9,8 @@ type Device = {
   password: string;
   park: string;
   parkId: string;
+  region: string;
+  regionId: string;
   type: number;
 };
 

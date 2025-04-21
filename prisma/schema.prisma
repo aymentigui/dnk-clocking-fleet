@@ -36,11 +36,12 @@ model user {
   // Optional for WebAuthn support
   // Authenticator                 Authenticator[]
 
-  created_at   DateTime       @default(now())
-  updated_at   DateTime       @updatedAt
-  deleted_at   DateTime?
-  device       device[]
-  vehicle_park vehicle_park[]
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+  deleted_at     DateTime?
+  device         device[]
+  vehicle_park   vehicle_park[]
+  vehicle_region vehicle_region[]
 }
 
 // model Account {
@@ -176,6 +177,19 @@ model park {
   clocking     clocking[]
 }
 
+model region {
+  id           String           @id @default(cuid())
+  name         String           @unique
+  description  String?
+  address      String?
+  created_at   DateTime         @default(now())
+  deleted_at   DateTime?
+  added_from   String?
+  device       device[]
+  vehicle_park vehicle_region[]
+  clocking     clocking[]
+}
+
 model device {
   id       String  @id @default(cuid())
   code     String?
@@ -191,6 +205,8 @@ model device {
   deleted_at DateTime?
   added_from String?
   clocking   clocking[]
+  region     region?    @relation(fields: [region_id], references: [id])
+  region_id  String?
 
   @@index([park_id])
 }
@@ -203,11 +219,12 @@ model vehicle {
   year      Int?
   brand     String?
 
-  created_at   DateTime       @default(now())
-  deleted_at   DateTime?
-  added_from   String?
-  vehicle_park vehicle_park[]
-  clocking     clocking[]
+  created_at     DateTime         @default(now())
+  deleted_at     DateTime?
+  added_from     String?
+  vehicle_park   vehicle_park[]
+  clocking       clocking[]
+  vehicle_region vehicle_region[]
 }
 
 model vehicle_park {
@@ -223,6 +240,19 @@ model vehicle_park {
   @@unique([vehicle_id, park_id])
 }
 
+model vehicle_region {
+  id         String   @id @default(cuid())
+  vehicle_id String
+  vehicle    vehicle  @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
+  region_id  String?
+  region     region?  @relation(fields: [region_id], references: [id])
+  added_from String
+  user       user     @relation(fields: [added_from], references: [id])
+  added_at   DateTime @default(now())
+
+  @@unique([vehicle_id, region_id])
+}
+
 model clocking {
   id         String   @id @default(cuid())
   vehicle_id String
@@ -234,4 +264,6 @@ model clocking {
   park       park?    @relation(fields: [park_id], references: [id])
   type       Int?
   status     Int?
+  region     region?  @relation(fields: [regionId], references: [id])
+  regionId   String?
 }

@@ -44,6 +44,12 @@ export function getColumns(): ColumnSheetsImport[] {
             type: { tp: "string", message: translate("invalidtext") },
             condition: [],
         },
+        {
+            title: "region",
+            require: { req: false },
+            type: { tp: "string", message: translate("invalidtext") },
+            condition: [],
+        },
     ];
 }
 

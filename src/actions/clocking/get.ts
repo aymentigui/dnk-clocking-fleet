@@ -41,6 +41,7 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
             } : {},
             include: {
                 park: true,
+                region: true,
                 vehicle: {
                     include: {
                         vehicle_park: {
@@ -70,7 +71,7 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
                 device: clocking.device,
                 deviceType: clocking.type,
                 status: clocking.status,
-                park: clocking.park ? clocking.park.name : null,
+                park: clocking.park ? clocking.park.name : clocking.region ? clocking.region.name : "",
             };
         });
 
@@ -127,6 +128,7 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
             },
             include: {
                 park: true,
+                region: true,
                 vehicle: {
                     include: {
                         vehicle_park: {
@@ -166,7 +168,7 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
                 device: clocking.device,
                 deviceType: clocking.type,
                 status: clocking.status,
-                park: clocking.park ? clocking.park.name : null,
+                park: clocking.park ? clocking.park.name : clocking.region ? clocking.region.name : "",
             };
         });
 

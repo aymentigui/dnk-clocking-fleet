@@ -17,6 +17,7 @@ export async function createDevice(data: any) {
         }),
         password: z.string().min(6, u("password6")),
         park: z.string().optional(),
+        region: z.string().optional(),
         type: z.number().optional(),
     });
 
@@ -35,7 +36,7 @@ export async function createDevice(data: any) {
         if (!result.success) {
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { code, username, password, park , type} = result.data;
+        const { code, username, password, park , type, region} = result.data;
 
         const codeExists = await prisma.device.findFirst({ where: { code } });
         if (codeExists) {
@@ -65,6 +66,14 @@ export async function createDevice(data: any) {
 
             if (!parkExists) {
                 return { status: 400, data: { message: u("parknotexist") } };
+            }
+        }
+
+        if (region) {
+            const regionExists = await prisma.region.findFirst({ where: { id: park } });
+
+            if (!regionExists) {
+                return { status: 400, data: { message: u("regionnotexist") } };
             }
         }
 
@@ -111,6 +120,21 @@ export async function createDevice(data: any) {
             })
         }
 
+        if(region && device){
+            await prisma.device.update({
+                where: {
+                    id: device.id
+                },
+                data: {
+                    region: {
+                        connect: {
+                            id: region
+                        }
+                    }
+                }
+            })
+        }
+
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
         console.error("An error occurred in createDevice" + error);
@@ -129,6 +153,7 @@ export async function createDevices(data: any) {
             message: u("usernamecontainspace")
         }),        password: z.string().min(6, u("password6")),
         park: z.string().optional(),
+        region: z.string().optional(),
         type: z.number().optional(),
     });
     try {
@@ -164,6 +189,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
             username: String(data.username),
             password: String(data.password),
             park: String(data.park),
+            region: String(data.region),
             type: parseInt(String(data.type)) || 0,
         });
 
@@ -175,7 +201,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
             return { status: 400, data: { message: message, device: data } };
         }
 
-        const { code, username, password, park, type } = result.data;
+        const { code, username, password, park, type, region } = result.data;
 
         const codeExists = await prisma.device.findFirst({ where: { code } });
         if (codeExists) {
@@ -199,13 +225,20 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
         if (emailExists) {
             return { status: 400, data: { device: data, message: u("usernameexists") } };
         }
-        console.log("park", park)
         
         if (park && park!=null && park!="null" && park != "" && park.trim() != "") {
             const parkExists = await prisma.park.findFirst({ where: { name: park } });
 
             if (!parkExists) {
                 return { status: 400, data: { device: data, message: u("parknotexist") } };
+            }
+        }
+
+        if (region && region!=null && region!="null" && region != "" && region.trim() != "") {
+            const regionExists = await prisma.region.findFirst({ where: { name: region } });
+
+            if (!regionExists) {
+                return { status: 400, data: { device: data, message: u("regionnotexist") } };
             }
         }
 
@@ -251,12 +284,26 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
                 }
             })
         }
+        if(region && device && region.trim() != "" && region!=="null" ){
+            await prisma.device.update({
+                where: {
+                    id: device.id
+                },
+                data: {
+                    region: {
+                        connect: {
+                            name: region
+                        }
+                    }
+                }
+            })
+        }
 
 
         return { status: 200, data: data };
     } catch (error) {
         // @ts-ignore
-        console.error("An error occurred in addPDevice" + error.message);
+        console.error("An error occurred in addDevice" + error.message);
         return { status: 500, data: { message: s("createfail"), device: data } }
     };
 }

@@ -42,7 +42,7 @@ export function BarChartPark({ chartData }: { chartData: any }) {
                 <CardTitle>{translate("parksvehcilescount")}</CardTitle>
             </CardHeader>
             <CardContent dir="ltr">
-                <ChartContainer config={chartConfig}>
+                <ChartContainer className="h-96" config={chartConfig}>
                     <BarChart
                         accessibilityLayer
                         data={chartData}

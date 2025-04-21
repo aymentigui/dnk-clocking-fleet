@@ -23,8 +23,14 @@ import { useAddUpdateDeviceDialog } from "@/context/add-update-dialog-context-de
 import { getParksAdmin } from "@/actions/park/get";
 import { createDevice } from "@/actions/device/set";
 import { UpdateDevice } from "@/actions/device/update";
+import { getRegionsAdmin } from "@/actions/region/get";
 
 type Park = {
+  id: string;
+  name: string;
+};
+
+type Region = {
   id: string;
   name: string;
 };
@@ -35,6 +41,7 @@ export const AddUpdateDeviceDialog = () => {
   const t = useTranslations("System");
   const { isOpen, closeDialog, isAdd, device } = useAddUpdateDeviceDialog();
   const [parks, setParks] = useState<any[]>([{ name: "----", id: "" }]);
+  const [regions, setRegions] = useState<any[]>([{ name: "----", id: "" }]);
   const [loading, setLoading] = useState(false);
 
   const types = [
@@ -44,13 +51,6 @@ export const AddUpdateDeviceDialog = () => {
     { id: 3, name: u("devicecontroller") },
   ];
 
-  useEffect(() => {
-    getParksAdmin().then((res) => {
-      if (res && res.status === 200) {
-        setParks(res.data)
-      }
-    });
-  }, []);
 
   const schema = z.object({
     code: z.string().min(1, u("coderequired")),
@@ -59,6 +59,7 @@ export const AddUpdateDeviceDialog = () => {
     }),
     password: z.string().min(6, u("password6")),
     park: z.string().optional(),
+    region: z.string().optional(),
     type: z.number().optional(),
   });
 
@@ -71,9 +72,26 @@ export const AddUpdateDeviceDialog = () => {
       username: device?.username ?? "",
       password: device?.password ?? "",
       park: device?.park ?? "",
+      region: device?.region ?? "",
       type: device?.type ?? 0,
     },
   });
+
+  const { watch } = form;
+  const type = watch("type");
+
+  useEffect(() => {
+    getParksAdmin().then((res) => {
+      if (res && res.status === 200) {
+        setParks(res.data)
+      }
+    });
+    getRegionsAdmin().then((res) => {
+      if (res && res.status === 200) {
+        setRegions(res.data)
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (device) {
@@ -81,9 +99,20 @@ export const AddUpdateDeviceDialog = () => {
       form.setValue("username", device.username)
       form.setValue("password", device.password)
       form.setValue("park", device.parkId);
+      form.setValue("region", device.regionId);
       form.setValue("type", device.type);
     }
   }, [device])
+
+
+  useEffect(() => {
+    if (type === 0 || type === 1 || type === 2) {
+      form.setValue("region", "");
+    }
+    if (type === 3) {
+      form.setValue("park", "");
+    }
+  }, [type])
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
@@ -93,9 +122,17 @@ export const AddUpdateDeviceDialog = () => {
     let errors;
 
     if (isAdd) {
-      res = await createDevice(data);
+      res = await createDevice({
+        ...data,
+        park: data.park === "" ? undefined : data.park,
+        region: data.region === "" ? undefined : data.region
+      });
     } else if (device) {
-      res = await UpdateDevice(device.id, data);
+      res = await UpdateDevice(device.id, {
+        ...data,
+        park: data.park === "" ? undefined : data.park,
+        region: data.region === "" ? undefined : data.region
+      });
     }
     else {
       toast.error(t("updatefail"));
@@ -137,7 +174,7 @@ export const AddUpdateDeviceDialog = () => {
           <DialogTitle className="text-center">{isAdd ? u("adddevice") : u("updatedevice")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} style={{ paddingInline: "1px" }} className="space-y-4 overflow-auto h-fit px-1">
+          <form onSubmit={form.handleSubmit(onSubmit)} style={{ paddingInline: "1px", height: "100%" }} className="space-y-4 overflow-auto h-fit px-1">
             <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
               {/* First Name */}
               <FormField
@@ -195,38 +232,6 @@ export const AddUpdateDeviceDialog = () => {
               />
               <FormField
                 control={form.control}
-                name="park"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{u("park")}</FormLabel>
-                    <FormControl>
-                      <Select
-                        options={
-                          parks?.map((p) => ({
-                            value: p.id,
-                            label: p.name,
-                          }))
-                        }
-                        value={
-                          {
-                            value: field.value,
-                            label: parks?.find((p) => p.id === field.value)?.name,
-                          }
-                        }
-                        onChange={(selectedOptions) => {
-                          field.onChange(
-                            selectedOptions ? selectedOptions.value : ""
-                          );
-                        }}
-                        placeholder={u("selectpark")}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="type"
                 render={({ field }) => (
                   <FormItem>
@@ -257,6 +262,70 @@ export const AddUpdateDeviceDialog = () => {
                   </FormItem>
                 )}
               />
+              {type !== 3 && <FormField
+                control={form.control}
+                name="park"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{u("park")}</FormLabel>
+                    <FormControl>
+                      <Select
+                        options={
+                          parks?.map((p) => ({
+                            value: p.id,
+                            label: p.name,
+                          }))
+                        }
+                        value={
+                          {
+                            value: field.value,
+                            label: parks?.find((p) => p.id === field.value)?.name,
+                          }
+                        }
+                        onChange={(selectedOptions) => {
+                          field.onChange(
+                            selectedOptions ? selectedOptions.value : ""
+                          );
+                        }}
+                        placeholder={u("selectpark")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />}
+              {type === 3 && <FormField
+                control={form.control}
+                name="region"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{u("region")}</FormLabel>
+                    <FormControl>
+                      <Select
+                        options={
+                          regions?.map((r) => ({
+                            value: r.id,
+                            label: r.name,
+                          }))
+                        }
+                        value={
+                          {
+                            value: field.value,
+                            label: regions?.find((r) => r.id === field.value)?.name,
+                          }
+                        }
+                        onChange={(selectedOptions) => {
+                          field.onChange(
+                            selectedOptions ? selectedOptions.value : ""
+                          );
+                        }}
+                        placeholder={u("selectregion")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />}
             </div>
 
             {/* Submit Button */}

@@ -2,54 +2,48 @@
 
 import { createContext, useContext, useState } from "react";
 
-type Vehicle = {
+type Region = {
   id: string;
-  matricule: string;
-  model?: string;
-  year?: number;
-  brand?: string;
-  vin?: string | null;
-  park?: string;
-  parkId?: string;
-  region?: string;
-  regionId?: string;
+  name: string;
+  description?: string;
+  address?: string;
 };
 
 type DialogContextType = {
   isOpen: boolean;
   isAdd: boolean;
-  vehicle?: Vehicle;
-  openDialog: (isAdd?: boolean, vehicle?: Vehicle) => void;
+  region?: Region;
+  openDialog: (isAdd?: boolean, region?: Region) => void;
   closeDialog: () => void;
 };
 
 const DialogContext = createContext<DialogContextType | undefined>(undefined);
 
-export const AddUpdateVehicleDialogProvider = ({ children }: { children: React.ReactNode }) => {
+export const AddUpdateRegionDialogProvider = ({ children }: { children: React.ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAdd, setIsAdd] = useState(true);
-  const [vehicle, setVehicle] = useState<Vehicle>();
+  const [region, setRegion] = useState<Region>();
 
-  const openDialog = (isAdd?: boolean, vehicle?: Vehicle) => {
+  const openDialog = (isAdd?: boolean, region?: Region) => {
     if (isAdd !== undefined) setIsAdd(isAdd);
-    if (vehicle) setVehicle(vehicle)
+    if (region) setRegion(region)
     setIsOpen(true);
   };
 
   const closeDialog = () => {
     setIsOpen(false);
     setIsAdd(true);
-    setVehicle(undefined);
+    setRegion(undefined);
   };
 
   return (
-    <DialogContext.Provider value={{ isOpen, isAdd, vehicle, openDialog, closeDialog }}>
+    <DialogContext.Provider value={{ isOpen, isAdd, region, openDialog, closeDialog }}>
       {children}
     </DialogContext.Provider>
   );
 };
 
-export const useAddUpdateVehicleDialog = () => {
+export const useAddUpdateRegionDialog = () => {
   const context = useContext(DialogContext);
   if (!context) {
     throw new Error("useDialog must be used within a DialogProvider");

@@ -25,6 +25,7 @@ import { UpdateVehicle } from "@/actions/vehicle/update";
 import Select from "react-select";
 import { getParksAdmin } from "@/actions/park/get";
 import { useSession } from "@/hooks/use-session";
+import { getRegionsAdmin } from "@/actions/region/get";
 
 export const AddUpdateDialogVehicle = () => {
   const v = useTranslations("Vehicle");
@@ -32,10 +33,11 @@ export const AddUpdateDialogVehicle = () => {
   const { isOpen, closeDialog, isAdd, vehicle } = useAddUpdateVehicleDialog();
   const [loading, setLoading] = useState(false);
   const [parks, setParks] = useState<any[]>([{ name: "----", id: "" }]);
+  const [regions, setRegions] = useState<any[]>([{ name: "----", id: "" }]);
   const [hasPermissionAffectation, setHasPermissionAffectation] = useState(false);
+  const [hasPermissionAffectation2, setHasPermissionAffectation2] = useState(false);
   const origin = useOrigin()
   const { session } = useSession()
-
 
 
 
@@ -48,6 +50,7 @@ export const AddUpdateDialogVehicle = () => {
     brand: z.string().optional(),
     vin: z.string().optional(),
     park: z.string().optional(),
+    region: z.string().optional(),
   });
 
   type formValues = z.infer<typeof schema>;
@@ -70,6 +73,11 @@ export const AddUpdateDialogVehicle = () => {
         setParks([...parks, ...res.data])
       }
     });
+    getRegionsAdmin().then((res) => {
+      if (res && res.status === 200) {
+        setRegions([...regions, ...res.data])
+      }
+    })
   }, []);
 
   useEffect(() => {
@@ -80,6 +88,7 @@ export const AddUpdateDialogVehicle = () => {
       form.setValue("brand", vehicle.brand ?? "");
       form.setValue("vin", vehicle.vin ?? "");
       form.setValue("park", vehicle.parkId);
+      form.setValue("region", vehicle.regionId);
     }
   }, [vehicle])
 
@@ -88,6 +97,10 @@ export const AddUpdateDialogVehicle = () => {
       setHasPermissionAffectation(isAdd ?
         (session?.user?.permissions.find((permission: string) => permission === "vehicles_park_create") ?? false) || session?.user?.is_admin
         : (session?.user?.permissions.find((permission: string) => permission === "vehicles_park_update") ?? false) || session?.user?.is_admin
+      )
+      setHasPermissionAffectation2(isAdd ?
+        (session?.user?.permissions.find((permission: string) => permission === "vehicles_region_create") ?? false) || session?.user?.is_admin
+        : (session?.user?.permissions.find((permission: string) => permission === "vehicles_region_update") ?? false) || session?.user?.is_admin
       )
     }
   }, [session])
@@ -145,7 +158,7 @@ export const AddUpdateDialogVehicle = () => {
           <DialogTitle className="text-center">{isAdd ? v("addvehicle") : v("updatevehicle")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} style={{ paddingInline: "1px" }} className="space-y-4 overflow-auto h-fit">
+          <form onSubmit={form.handleSubmit(onSubmit)} style={{ paddingInline: "1px", height: "100%" }} className="space-y-4 overflow-auto h-fit">
             <div className="px-2">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* matricule */}
@@ -266,6 +279,38 @@ export const AddUpdateDialogVehicle = () => {
                             );
                           }}
                           placeholder={v("selectpark")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />}
+                {hasPermissionAffectation2 && <FormField
+                  control={form.control}
+                  name="region"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{v("region")}</FormLabel>
+                      <FormControl>
+                        <Select
+                          options={
+                            regions?.map((p) => ({
+                              value: p.id,
+                              label: p.name,
+                            }))
+                          }
+                          value={
+                            {
+                              value: field.value,
+                              label: regions?.find((p) => p.id === field.value)?.name,
+                            }
+                          }
+                          onChange={(selectedOptions) => {
+                            field.onChange(
+                              selectedOptions ? selectedOptions.value : ""
+                            );
+                          }}
+                          placeholder={v("selectregion")}
                         />
                       </FormControl>
                       <FormMessage />
