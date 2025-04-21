@@ -226,6 +226,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
             return { status: 400, data: { device: data, message: u("usernameexists") } };
         }
         
+        console.log(region,park);
         if (park && park!=null && park!="null" && park != "" && park.trim() != "") {
             const parkExists = await prisma.park.findFirst({ where: { name: park } });
 
@@ -234,9 +235,10 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
             }
         }
 
+        
         if (region && region!=null && region!="null" && region != "" && region.trim() != "") {
             const regionExists = await prisma.region.findFirst({ where: { name: region } });
-
+            
             if (!regionExists) {
                 return { status: 400, data: { device: data, message: u("regionnotexist") } };
             }
