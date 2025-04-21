@@ -170,7 +170,7 @@ export const AddUpdateDeviceDialog = () => {
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="w-[70%] max-w-[70%] flex flex-col h-[50%] lg:h-[70%]">
-        <DialogHeader>
+        <DialogHeader> 
           <DialogTitle className="text-center">{isAdd ? u("adddevice") : u("updatedevice")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
