@@ -107,10 +107,10 @@ export const AddUpdateDeviceDialog = () => {
 
   useEffect(() => {
     if (type === 0 || type === 1 || type === 2) {
-      form.setValue("region", "");
+      form.setValue("region", undefined);
     }
     if (type === 3) {
-      form.setValue("park", "");
+      form.setValue("park", undefined);
     }
   }, [type])
 
@@ -122,17 +122,9 @@ export const AddUpdateDeviceDialog = () => {
     let errors;
 
     if (isAdd) {
-      res = await createDevice({
-        ...data,
-        park: data.park === "" ? undefined : data.park,
-        region: data.region === "" ? undefined : data.region
-      });
+      res = await createDevice(data);
     } else if (device) {
-      res = await UpdateDevice(device.id, {
-        ...data,
-        park: data.park === "" ? undefined : data.park,
-        region: data.region === "" ? undefined : data.region
-      });
+      res = await UpdateDevice(device.id, data);
     }
     else {
       toast.error(t("updatefail"));
