@@ -75,7 +75,7 @@ export async function createClocking(data: any) {
                 regionId: existingDevice.region_id ?? null,
                 type: data.type ?? 0,
                 status: data.type !== 3 ?
-                    (existingVehiclePark && existingDevice.park_id && existingVehiclePark.park_id == existingDevice.park_id ? 1 : 0)
+                    (data.type !== 3 && existingVehiclePark && existingDevice.park_id && existingVehiclePark.park_id == existingDevice.park_id ? 1 : 0)
                     : (existingVehicleRegion && existingDevice.region_id && existingVehicleRegion.region_id == existingDevice.region_id ? 1 : 0),
             },
         });

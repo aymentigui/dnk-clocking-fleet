@@ -168,7 +168,7 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
                 device: clocking.device,
                 deviceType: clocking.type,
                 status: clocking.status,
-                park: clocking.park ? clocking.park.name : clocking.region ? clocking.region.name : "",
+                park: clocking.park && clocking.type!==3 ? clocking.park.name : clocking.region ? clocking.region.name : "",
             };
         });
 
