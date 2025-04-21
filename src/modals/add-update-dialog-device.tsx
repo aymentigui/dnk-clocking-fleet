@@ -121,6 +121,7 @@ export const AddUpdateDeviceDialog = () => {
     let status;
     let errors;
 
+    console.log(data)
     if (isAdd) {
       res = await createDevice(data);
     } else if (device) {
@@ -136,11 +137,11 @@ export const AddUpdateDeviceDialog = () => {
     errors = res.data.errors
 
     if (status === 200) {
-      toast.success(message ?? t("createsuccess"));
+      toast.success(message?? (isAdd ? t("createsuccess") : t("updatesuccess")));
       closeDialog();
       form.reset();
       setLoading(false);
-      window.location.reload()
+      //window.location.reload()
     } else {
       setLoading(false);
       if (errors) {
