@@ -15,12 +15,11 @@ export async function createClocking(data: any) {
             return { status: 401, data: { message: e('unauthorized') } }
         }
 
+        console.log(session)
 
         const existingDevice = await prisma.device.findFirst({
             where: { user_id: session.data.user.id },
         });
-
-        console.log(existingDevice);
 
         if (!existingDevice) return { status: 404, data: { message: u("devicenotfound") } };
 
@@ -68,6 +67,7 @@ export async function createClocking(data: any) {
             },
             take: 1,
         });
+
 
         await prisma.clocking.create({
             data: {
