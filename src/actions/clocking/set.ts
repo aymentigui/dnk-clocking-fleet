@@ -15,8 +15,6 @@ export async function createClocking(data: any) {
             return { status: 401, data: { message: e('unauthorized') } }
         }
 
-        console.log(session)
-
         const existingDevice = await prisma.device.findFirst({
             where: { user_id: session.data.user.id },
         });

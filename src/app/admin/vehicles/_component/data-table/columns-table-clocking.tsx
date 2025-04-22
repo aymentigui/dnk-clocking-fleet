@@ -1,7 +1,7 @@
 "use client"
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftToLine, ArrowRightFromLine, ArrowUpDown, CircleAlert } from "lucide-react";
+import { ArrowLeftToLine, ArrowRightFromLine, ArrowUpDown, CircleAlert, CircleCheckBig } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export type Columns = {
@@ -87,9 +87,13 @@ const remarqueCell = (column: any) => {
           :
           <ArrowLeftToLine className="text-red-500" />)
         :
-        <CircleAlert className="text-red-500" />
-
-
+        type === 3 ?
+          (status === 1 ?
+            <CircleCheckBig className="text-green-500" />
+            :
+            <CircleCheckBig className="text-red-500" />)
+            :
+            <CircleAlert className="text-red-500" />
   );
 }
 

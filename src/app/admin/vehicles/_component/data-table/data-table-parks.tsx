@@ -14,16 +14,16 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { columns } from "./columns-table-parks"; // Importez les colonnes
-import { Columns } from "./columns-table-parks";
 import { useEffect, useState } from "react";
 import Cookies from 'js-cookie';
 import { useTranslations } from "next-intl";
 import { useOrigin } from "@/hooks/use-origin";
 import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/components/myui/loading";
-import { getVehicleParks } from "@/actions/vehicle/get";
+import { getVehicleRegions } from "@/actions/vehicle/get";
 import TablePagination from "@/components/myui/table/table-pagination";
+import { Columns } from "./columns-table-regions";
+import { columns } from "./columns-table-regions";
 
 interface DataTableProps {
     id: string;
@@ -66,7 +66,7 @@ export function DataTable({
         try {
             if (!origin) return
 
-            const response = await getVehicleParks(id, page, pageSize);
+            const response = await getVehicleRegions(id, page, pageSize);
 
             if (response.status === 200) {
                 setData(response.data);
@@ -74,7 +74,7 @@ export function DataTable({
             }
 
         } catch (error) {
-            console.error("Error fetching vehcile parks:", error);
+            console.error("Error fetching vehcile region:", error);
         } finally {
             setIsLoading(false);
         }

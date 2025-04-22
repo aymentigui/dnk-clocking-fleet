@@ -36,7 +36,6 @@ export async function verifySession(): Promise<{ status: number, data: any }> {
             const user = store?.user;
             if (user) {
                 const parsedObject = JSON.parse(user);
-                console.log(parsedObject);
                 return { status: 200, data: { user :parsedObject.data } }
             }
             else return { status: 401, data: { message: e("unauthorized") } }

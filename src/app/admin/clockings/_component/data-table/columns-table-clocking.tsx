@@ -109,8 +109,6 @@ const remarqueCell = (column: any) => {
             <CircleCheckBig className="text-red-500" />)
             :
             <CircleAlert className="text-red-500" />
-
-
   );
 }
 
