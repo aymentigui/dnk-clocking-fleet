@@ -34,6 +34,7 @@ export async function verifySession(): Promise<{ status: number, data: any }> {
         const store = authContext.getStore();
         if (store) {
             const user = store?.user;
+            console.log(user)
             if (user) return { status: 200, data: { user :user.data } }
         }
 
