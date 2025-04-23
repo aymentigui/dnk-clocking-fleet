@@ -60,16 +60,12 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
                     vehicle_region: {
                         every: {
                             region: {
-                                region: {
-                                    id: searchRegion,
-                                }
+                                id: searchRegion,
                             }
                         },
                         some: {
                             region: {
-                                region: {
-                                    id: searchRegion,
-                                }
+                                id: searchRegion,
                             }
                         }
                     }
@@ -375,10 +371,11 @@ export async function getVehicleParks(id: string, page: number, pageSize: number
         if (!vehicle) {
             return { status: 404, data: null, count: 0 };
         }
+        
 
         const vehicleParks = await prisma.vehicle_park.findMany({
             skip: (page - 1) * pageSize,
-            take: pageSize,
+            take: 5,
             orderBy: {
                 added_at: 'desc',
             },

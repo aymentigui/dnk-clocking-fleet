@@ -34,6 +34,7 @@ export const AddUpdateDialogVehicle = () => {
   const [loading, setLoading] = useState(false);
   const [parks, setParks] = useState<any[]>([{ name: "----", id: "" }]);
   const [regions, setRegions] = useState<any[]>([{ name: "----", id: "" }]);
+  const [hasPermissionUpdate, setHasPermissionUpdate] = useState(false);
   const [hasPermissionAffectation, setHasPermissionAffectation] = useState(false);
   const [hasPermissionAffectation2, setHasPermissionAffectation2] = useState(false);
   const origin = useOrigin()
@@ -95,12 +96,16 @@ export const AddUpdateDialogVehicle = () => {
   useEffect(() => {
     if (session) {
       setHasPermissionAffectation(isAdd ?
-        (session?.user?.permissions.find((permission: string) => permission === "vehicles_park_create") ?? false) || session?.user?.is_admin
+        (session?.user?.permissions.find((permission: string) => permission === "vehicles_park_update") ?? false) || session?.user?.is_admin
         : (session?.user?.permissions.find((permission: string) => permission === "vehicles_park_update") ?? false) || session?.user?.is_admin
       )
       setHasPermissionAffectation2(isAdd ?
-        (session?.user?.permissions.find((permission: string) => permission === "vehicles_region_create") ?? false) || session?.user?.is_admin
+        (session?.user?.permissions.find((permission: string) => permission === "vehicles_region_update") ?? false) || session?.user?.is_admin
         : (session?.user?.permissions.find((permission: string) => permission === "vehicles_region_update") ?? false) || session?.user?.is_admin
+      )
+      setHasPermissionUpdate(isAdd ?
+        (session?.user?.permissions.find((permission: string) => permission === "vehicles_update") ?? false) || session?.user?.is_admin
+        : (session?.user?.permissions.find((permission: string) => permission === "vehicles_update") ?? false) || session?.user?.is_admin
       )
     }
   }, [session])
@@ -172,6 +177,7 @@ export const AddUpdateDialogVehicle = () => {
                         <Input
                           {...field}
                           placeholder={v("matricule")}
+                          disabled={!hasPermissionUpdate && !isAdd}
                         />
                       </FormControl>
                       <FormMessage />
@@ -189,6 +195,7 @@ export const AddUpdateDialogVehicle = () => {
                         <Input
                           {...field}
                           placeholder={v("model")}
+                          disabled={!hasPermissionUpdate && !isAdd}
                         />
                       </FormControl>
                       <FormMessage />
@@ -210,6 +217,7 @@ export const AddUpdateDialogVehicle = () => {
                           type="number"
                           {...field}
                           placeholder={v("year")}
+                          disabled={!hasPermissionUpdate && !isAdd}
                         />
                       </FormControl>
                       <FormMessage />
@@ -227,6 +235,7 @@ export const AddUpdateDialogVehicle = () => {
                         <Input
                           {...field}
                           placeholder={v("brand")}
+                          disabled={!hasPermissionUpdate && !isAdd}
                         />
                       </FormControl>
                       <FormMessage />
@@ -247,6 +256,7 @@ export const AddUpdateDialogVehicle = () => {
                         <Input
                           {...field}
                           placeholder={v("vin")}
+                          disabled={!hasPermissionUpdate && !isAdd}
                         />
                       </FormControl>
                       <FormMessage />

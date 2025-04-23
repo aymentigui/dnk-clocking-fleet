@@ -1,5 +1,5 @@
 "use client"
-import { DataTable } from "./data-table/data-table-parks";
+import { DataTable } from "./data-table/data-table-regions";
 
 export default function RegionsList({ id }: { id: string }) {
 

@@ -236,8 +236,6 @@ model vehicle_park {
   added_from String
   user       user     @relation(fields: [added_from], references: [id])
   added_at   DateTime @default(now())
-
-  @@unique([vehicle_id, park_id])
 }
 
 model vehicle_region {
@@ -249,8 +247,6 @@ model vehicle_region {
   added_from String
   user       user     @relation(fields: [added_from], references: [id])
   added_at   DateTime @default(now())
-
-  @@unique([vehicle_id, region_id])
 }
 
 model clocking {
@@ -266,4 +262,12 @@ model clocking {
   status     Int?
   region     region?  @relation(fields: [regionId], references: [id])
   regionId   String?
+}
+
+model notification {
+  id         String   @id @default(cuid())
+  title      String
+  contenu    String
+  view_by    String?
+  created_at DateTime @default(now())
 }

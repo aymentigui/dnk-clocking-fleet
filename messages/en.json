@@ -415,6 +415,8 @@
     },
     "Vehicle": {
         "title": "Vehicle",
+        "importvehiclespark": "Import vehicles with his station",
+        "importvehiclesregion": "Import vehicles with his region",
         "addvehicle": "Add Vehicle",
         "updatevehicle": "Update Vehicle",
         "deletevehicle": "Delete Vehicle",
@@ -443,6 +445,7 @@
         "confermationdelete": "Are you absolutely sure?",
         "confermationdeletemessage": "This action cannot be undone. This will permanently delete your vehicles and remove your data from our servers.",
         "updatepark": "Update Station",
+        "updateregion": "Update Region",
         "clocking": "Clocking"
     },
     "Clocking": {

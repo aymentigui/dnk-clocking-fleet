@@ -72,7 +72,7 @@ export async function createVehicle(data: any) {
         });
 
         if (park) {
-            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_park_create'])
+            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_park_update'])
             if (hasPermissionAdd.status === 200 && hasPermissionAdd.data.hasPermission) {
                 const parkExists = await prisma.park.findFirst({ where: { id: park } });
                 if (parkExists) {
@@ -88,7 +88,7 @@ export async function createVehicle(data: any) {
         }
 
         if (region) {
-            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_region_create'])
+            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_region_update'])
             if (hasPermissionAdd.status === 200 && hasPermissionAdd.data.hasPermission) {
                 const regionExists = await prisma.region.findFirst({ where: { id: region } });
                 if (regionExists) {
@@ -200,7 +200,7 @@ const addVehicle = async (data: any, schema: any, session: any, u: any, s: any) 
 
 
         if (park) {
-            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_park_create'])
+            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_park_update'])
             if (hasPermissionAdd.status === 200 && hasPermissionAdd.data.hasPermission) {
                 const parkExists = await prisma.park.findFirst({ where: { name: park } });
                 if (parkExists) {
@@ -216,7 +216,7 @@ const addVehicle = async (data: any, schema: any, session: any, u: any, s: any) 
         }
 
         if (region) {
-            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_region_create'])
+            const hasPermissionAdd = await withAuthorizationPermission(['vehicles_region_update'])
             if (hasPermissionAdd.status === 200 && hasPermissionAdd.data.hasPermission) {
                 const regionExists = await prisma.region.findFirst({ where: { name: park } });
                 if (regionExists) {

@@ -11,13 +11,17 @@ export interface ColumnSheetsImport {
 interface ImportSheetsStore {
   columns: ColumnSheetsImport[];
   data: any[];
+  typeData: string;
   setColumns: (columns: ColumnSheetsImport[]) => void;
   setData: (data: any[]) => void;
+  setTypeData: (typeData: string) => void;
 }
 
 export const useImportSheetsStore = create<ImportSheetsStore>((set) => ({
   columns: [],
   data: [],
+  typeData: "",
   setColumns: (columns) => set({ columns }),
   setData: (data) => set({ data }),
+  setTypeData: (typeData) => set({ typeData }),
 }));

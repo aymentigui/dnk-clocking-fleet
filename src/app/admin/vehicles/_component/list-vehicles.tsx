@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import Loading from "@/components/myui/loading";
 import { useEffect, useState } from "react";
 import { useOrigin } from "@/hooks/use-origin";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import SelectFetch from "@/components/myui/select-fetch";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -20,9 +20,14 @@ import { createVehicles } from "@/actions/vehicle/set";
 import { getCountVehicles, getVehicles, getVehiclesAll, getVehiclesAllMatrciule, getVehiclesMatriculeWithIds, getVehiclesWithIds } from "@/actions/vehicle/get";
 import { deleteVehicles } from "@/actions/vehicle/delete";
 import { getColumns } from "@/actions/util/sheet-columns/vehicle";
+import { getColumns as getColumnsParc } from "@/actions/util/sheet-columns/vehicles-park";
+import { getColumns as getColumnsRegion } from "@/actions/util/sheet-columns/vehicles-region";
 import UpdateParcs from "./dialog/update-parc";
 import { generateQRCodeAndDownload } from "@/actions/util/qrcode";
 import { QrCode } from "lucide-react";
+import { getRegionsAdmin } from "@/actions/region/get";
+import UpdateRegion from "./dialog/update-region";
+import { UpdateVehiclesParc, UpdateVehiclesParcMatricule, UpdateVehiclesRegionMatricules } from "@/actions/vehicle/update";
 
 const selectors = [
   { title: "matricule", selector: "matricule" },
@@ -41,7 +46,8 @@ export default function ListVehicles() {
   const origin = useOrigin()
   const { session } = useSession()
   const searchParams = useSearchParams();
-  const { data: sheetData, setColumns, setData: setSheetData } = useImportSheetsStore();
+  const { data: sheetData, setColumns, setData: setSheetData, typeData, setTypeData } = useImportSheetsStore();
+  const router = useRouter();
 
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false);
@@ -51,18 +57,23 @@ export default function ListVehicles() {
   const [count, setCount] = useState(0);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(""); // Etat pour la recherche avec debounce
   const [searchPark, setSearchPark] = useState("");
+  const [searchRegion, setSearchRegion] = useState("");
   const [parks, setParks] = useState([])
+  const [regions, setRegions] = useState([])
 
   const [open, setOpen] = useState(false); // for confirm delete
   const [open2, setOpen2] = useState(false); // for confirm update
+  const [open3, setOpen3] = useState(false);
 
   const [userSheetNotCreated, setUserSheetNotCreated] = useState<any>([])
   const [userSheetCreated, setUserSheetCreated] = useState(false)
 
   const [data, setData] = useState<any[]>([]);
   const columnsSheet = getColumns()
+  const columnsSheetVehiclesPark = getColumnsParc()
+  const columnsSheetVehiclesRegion = getColumnsRegion()
 
-  const generateQRAll =  () => {
+  const generateQRAll = () => {
     // Si des IDs ont été saisis, les utiliser
     getVehiclesAllMatrciule().then((res) => {
       if (res && res.status === 200) {
@@ -71,7 +82,7 @@ export default function ListVehicles() {
     })
   };
 
-  const generateQRAllSelected =  () => {
+  const generateQRAllSelected = () => {
     // Si des IDs ont été saisis, les utiliser
     getVehiclesMatriculeWithIds(selectedIds).then((res) => {
       if (res && res.status === 200) {
@@ -80,6 +91,25 @@ export default function ListVehicles() {
     })
   };
 
+  const importvehicles = () => {
+    setColumns(columnsSheet);
+    setTypeData("Vehicle")
+    router.push("/admin/sheetimport")
+  }
+
+  const importvehiclespark = () => {
+    setColumns(columnsSheetVehiclesPark);
+    setTypeData("Parc")
+    router.push("/admin/sheetimport")
+  }
+
+  const importvehiclesregion = () => {
+    setColumns(columnsSheetVehiclesRegion);
+    setTypeData("Region")
+    router.push("/admin/sheetimport")
+  }
+
+
   useEffect(() => {
     setMounted(true);
     getParksAdmin().then((res) => {
@@ -87,37 +117,70 @@ export default function ListVehicles() {
         setParks(res.data)
       }
     });
-    setColumns(columnsSheet);
+    getRegionsAdmin().then((res) => {
+      if (res && res.status === 200) {
+        setRegions(res.data)
+      }
+    });
   }, []);
 
   // pour la creation depuis les sheet
   useEffect(() => {
     if (sheetData && sheetData.length > 0) {
-      createVehicles(sheetData).then((res) => {
-        if (res.status === 200) {
-          if (res.data.vehicles) {
-            res.data.vehicles.forEach((vehicle) => {
-              if (vehicle.status !== 200) {
-                setUserSheetNotCreated((prev: any) => [...prev, vehicle.data])
-              } else {
-                setUserSheetCreated(true)
-              }
-            })
+      if (typeData === "Vehicle") {
+        createVehicles(sheetData).then((res) => {
+          if (res.status === 200) {
+            if (res.data.vehicles) {
+              res.data.vehicles.forEach((vehicle) => {
+                if (vehicle.status !== 200) {
+                  setUserSheetNotCreated((prev: any) => [...prev, vehicle.data])
+                } else {
+                  setUserSheetCreated(true)
+                }
+              })
+            }
+          } else {
+            toast.error(res.data.message);
           }
-        } else {
-          toast.error(res.data.message);
-        }
-      }).catch((error) => {
-        toast.error(translateSystem("errorcreate"));
-      }).finally(() => {
-        setSheetData([]); // Mettre à jour le tableau avec les données créées
-      });
+        }).catch((error) => {
+          toast.error(translateSystem("errorcreate"));
+        }).finally(() => {
+          setSheetData([]); // Mettre à jour le tableau avec les données créées
+        });
+      } else if (typeData === "Parc") {
+        UpdateVehiclesParcMatricule(sheetData).then((res) => {
+          if (res.status === 200) {
+            toast.success(res.data.message);
+            window.location.reload()
+          } else {
+            toast.error(res.data.message);
+          }
+        }).catch((error) => {
+          toast.error(translateSystem("errorcreate"));
+        }).finally(() => {
+          setSheetData([]); // Mettre à jour le tableau avec les données créées
+        });
+      } else if (typeData === "Region") {
+        UpdateVehiclesRegionMatricules(sheetData).then((res) => {
+          if (res.status === 200) {
+            toast.success(res.data.message);
+            window.location.reload()
+          } else {
+            toast.error(res.data.message);
+            setColumns(columnsSheet);
+          }
+        }).catch((error) => {
+          toast.error(translateSystem("errorcreate"));
+        }).finally(() => {
+          setSheetData([]); // Mettre à jour le tableau avec les données créées
+        });
+      }
     }
   }, [sheetData]);
 
   useEffect(() => {
     fetchDevices();
-  }, [page, debouncedSearchQuery, mounted, pageSize, searchPark]); // Ajouter debouncedSearchQuery comme dépendance
+  }, [page, debouncedSearchQuery, mounted, pageSize, searchPark, searchRegion]); // Ajouter debouncedSearchQuery comme dépendance
 
 
   const fetchDevices = async () => {
@@ -126,12 +189,12 @@ export default function ListVehicles() {
     try {
       if (!origin) return
       setIsLoading(true);
-      const response = await getVehicles(page, pageSize, debouncedSearchQuery, searchPark);
+      const response = await getVehicles(page, pageSize, debouncedSearchQuery, searchPark, searchRegion);
       if (response.status === 200) {
         setData(response.data);
       }
 
-      const countResponse = await getCountVehicles(debouncedSearchQuery, searchPark);
+      const countResponse = await getCountVehicles(debouncedSearchQuery, searchPark, searchRegion);
       if (countResponse.status === 200) {
         setCount(countResponse.data);
       }
@@ -182,11 +245,13 @@ export default function ListVehicles() {
   return (
     <div className="py-10">
       <h1 className="text-2xl font-bold mb-4">{translate("title")}</h1>
+      {/* import sheet msg succees */}
       {userSheetCreated && (
         <div className="bg-blue-500 text-white p-4 mb-4 rounded">
           {translateSystem("mustrefreshtoseedata")}
         </div>
       )}
+      {/* import sheet msg errors */}
       {userSheetNotCreated && userSheetNotCreated.length > 0 && (
         <div className="max-h-48 overflow-auto">
           {userSheetNotCreated.map((data: any, index: any) => (
@@ -203,11 +268,20 @@ export default function ListVehicles() {
           ))}
         </div>
       )}
-      <div className="flex gap-2 flex-wrap justify-between items-center">
+      {/* action buttons */}
+      <div className="flex gap-2 flex-wrap justify-start items-center mb-2">
         <div className="flex flex-wrap gap-2">
-          <Link href="/admin/sheetimport">
-            <Button>{translateSystem('import')}</Button>
-          </Link>
+          <Button onClick={importvehicles}>{translateSystem('import')}</Button>
+          {
+            (session?.user?.permissions.find((permission: string) => permission === "vehicles_park_update") ?? false) || session?.user?.is_admin
+            &&
+            <Button onClick={importvehiclespark}>{translate('importvehiclespark')}</Button>
+          }
+          {
+            (session?.user?.permissions.find((permission: string) => permission === "vehicles_park_region") ?? false) || session?.user?.is_admin
+            &&
+            <Button onClick={importvehiclesregion}>{translate('importvehiclesregion')}</Button>
+          }
           <Button onClick={generateQRAll}><QrCode size={20} /></Button>
           {selectedIds.length > 0 && <Button onClick={generateQRAllSelected}>{translateSystem("downloadjustselected")} <QrCode size={20} /></Button>}
           <ExportButton all={true} handleExportCSV={() => exportAll(1)} handleExportXLSX={() => exportAll(2)} />
@@ -238,8 +312,22 @@ export default function ListVehicles() {
               parcs={parks}
             />
           }
+          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_region_update") ?? false) || session?.user?.is_admin
+            &&
+            selectedIds.length > 0
+            &&
+            <UpdateRegion
+              open={open3}
+              setOpen={setOpen3}
+              selectedIds={selectedIds}
+              parcs={regions}
+            />
+          }
         </div>
-        <div className="flex flex-wrap gap-2">
+      </div>
+      <div>
+        {/* filters */}
+        <div className="flex flex-wrap gap-2 justify-end">
           <div className='w-48 mb-2'>
             <SelectFetch
               value={pageSize.toString()}
@@ -257,13 +345,27 @@ export default function ListVehicles() {
           <div className='w-48 mb-2'>
             <SelectSearchFetch
               value={searchPark}
-              onChange={(val) => {setSearchPark(val)}}
+              onChange={(val) => { setSearchPark(val) }}
               label={translate("selectpark")}
               placeholder={translate("selectpark")}
               options={
                 parks.map((park: any) => ({
                   value: park.id,
                   label: park.name
+                }))
+              }
+            />
+          </div>
+          <div className='w-48 mb-2'>
+            <SelectSearchFetch
+              value={searchRegion}
+              onChange={(val) => { setSearchRegion(val) }}
+              label={translate("selectregion")}
+              placeholder={translate("selectregion")}
+              options={
+                regions.map((region: any) => ({
+                  value: region.id,
+                  label: region.name
                 }))
               }
             />

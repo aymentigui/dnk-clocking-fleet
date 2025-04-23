@@ -411,6 +411,8 @@
     },
     "Vehicle": {
         "title": "المركبة",
+        "importvehiclespark": "استيراد المركبات مع حظيرته",
+        "importvehiclesregion": "استيراد المركبات مع منطقته",
         "addvehicle": "إضافة مركبة",
         "updatevehicle": "تحديث مركبة",
         "deletevehicle": "حذف مركبة",
@@ -439,6 +441,7 @@
         "confermationdelete": "هل أنت متأكد تماماً؟",
         "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
         "updatepark": "تحديث الحظيرة",
+        "updateregion": "تحديث المنطقة",
         "clocking": "ضبط الوقت"
     },
     "Clocking": {

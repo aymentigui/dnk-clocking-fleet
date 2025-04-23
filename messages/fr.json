@@ -420,6 +420,8 @@
     },
     "Vehicle": {
         "title": "Véhicule",
+        "importvehiclespark": "Importer des véhicules avec sa station",
+        "importvehiclesregion": "Importer des véhicules avec sa région",
         "addvehicle": "Ajouter un véhicule",
         "updatevehicle": "Mettre à jour le véhicule",
         "deletevehicle": "Supprimer le véhicule",
@@ -448,6 +450,7 @@
         "confermationdelete": "Etes-vous sûr de vouloir supprimer?",
         "confermationdeletemessage": "Cette action ne peut pas être annulée. Cela supprimera définitivement vos véhicules et supprimera vos données de nos serveurs.",
         "updatepark": "Mettre à jour la station",
+        "updateregion": "Mettre à jour la region",
         "clocking": "Pointage"
     },
     "Clocking": {

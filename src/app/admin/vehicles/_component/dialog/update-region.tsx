@@ -1,10 +1,10 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useLocale, useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
-import { UpdateVehiclesParc } from '@/actions/vehicle/update';
+import { UpdateVehiclesRegion } from '@/actions/vehicle/update';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -16,7 +16,7 @@ interface ConfirmDialogProps {
     parcs: { id: string; name: string }[];
 }
 
-const UpdateParcs = ({ open, setOpen, selectedIds, parcs }: ConfirmDialogProps) => {
+const UpdateRegion = ({ open, setOpen, selectedIds, parcs }: ConfirmDialogProps) => {
     const translateSystem = useTranslations("System")
     const translate = useTranslations("Vehicle")
     const [parc, setParc] = useState<any>(null)
@@ -41,7 +41,7 @@ const UpdateParcs = ({ open, setOpen, selectedIds, parcs }: ConfirmDialogProps) 
 
     const handleUpdate = async () => {
         if (selectedIds.length === 0) return
-        const res = await UpdateVehiclesParc(selectedIds, parc)
+        const res = await UpdateVehiclesRegion(selectedIds, parc)
         if (res.status === 200 && res.data.message) {
             toast.success(translateSystem("updatesuccess"))
             setOpen(false)
@@ -54,18 +54,18 @@ const UpdateParcs = ({ open, setOpen, selectedIds, parcs }: ConfirmDialogProps) 
     return (
         <AlertDialog open={open} onOpenChange={hadnleConfirmUpdate}>
             <AlertDialogTrigger asChild>
-                <Button variant="primary">{translate("updatepark")}</Button>
+                <Button variant="primary">{translate("updateregion")}</Button>
             </AlertDialogTrigger>
             <AlertDialogContent >
                 <AlertDialogHeader>
-                    <AlertDialogTitle className={cn(locale == "ar" ? "text-right" : "text-left")}>{translate("updatepark")}</AlertDialogTitle>
+                    <AlertDialogTitle className={cn(locale == "ar" ? "text-right" : "text-left")}>{translate("updateregion")}</AlertDialogTitle>
                     <div className='flex flex-col'>
                         <Select value={parc} onValueChange={(value) => setParc(value)}>
                             <SelectGroup>
-                                <SelectLabel>{translate("selectpark")}</SelectLabel>
+                                <SelectLabel>{translate("selectregion")}</SelectLabel>
                             </SelectGroup>
                             <SelectTrigger>
-                                <SelectValue placeholder={translate("selectpark")} />
+                                <SelectValue placeholder={translate("selectregion")} />
                             </SelectTrigger>
                             <SelectContent>
                                 {/* Ajout d'un champ de recherche */}
@@ -96,4 +96,4 @@ const UpdateParcs = ({ open, setOpen, selectedIds, parcs }: ConfirmDialogProps) 
     )
 }
 
-export default UpdateParcs
+export default UpdateRegion
