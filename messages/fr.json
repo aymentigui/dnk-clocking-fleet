@@ -477,5 +477,8 @@
         "vehiclenotfound": "Le véhicule n'a pas été trouvé",
         "parknotfound": "La station n'a pas été trouvée",
         "regionnotfound": "La region n'a pas été trouvée"
+    },
+    "Notification":{
+        "title": "Notification"
     }
 }

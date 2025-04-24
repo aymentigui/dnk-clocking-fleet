@@ -468,5 +468,8 @@
         "vehiclenotfound": "لم يتم العثور على المركبة",
         "parknotfound": "لم يتم العثور على الحظيرة",
         "regionnotfound": "لم يتم العثور على المنطقة"
+    },
+    "Notification":{
+        "title": "الاشعارات"
     }
 }

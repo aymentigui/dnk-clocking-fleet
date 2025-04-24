@@ -22,7 +22,10 @@ export async function getNotifications(page: number): Promise<{ status: number, 
             take: 10,
             include: {
                 user: true
-            }
+            },
+            orderBy: {
+                created_at: "desc",
+            },
         });
 
         const notificationCount = await prisma.notification.count();
