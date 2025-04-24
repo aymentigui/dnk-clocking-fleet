@@ -107,6 +107,7 @@
         "devices": "Devices",
         "logout": "Logout",
         "clockings": "Clockings",
+        "notifications": "Notifications",
         "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
@@ -259,7 +260,8 @@
         "vehicles_region_delete": "Vehicles Region Delete",
         "vehicles_region_view": "Vehicles Region View",
         "clocking_view": "Clocking View",
-        "clocking_create": "Clocking Create"
+        "clocking_create": "Clocking Create",
+        "notifications_view" : "Notifications View"
     },
     "Files": {
         "title": "Files",
@@ -470,5 +472,8 @@
         "vehiclenotfound": "Vehicle not found",
         "parknotfound": "Station not found",
         "regionnotfound": "Region not found"
+    },
+    "Notification":{
+        "title": "Notification"
     }
 }

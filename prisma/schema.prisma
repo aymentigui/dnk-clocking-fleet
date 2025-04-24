@@ -42,6 +42,7 @@ model user {
   device         device[]
   vehicle_park   vehicle_park[]
   vehicle_region vehicle_region[]
+  notification   notification[]
 }
 
 // model Account {
@@ -270,4 +271,6 @@ model notification {
   contenu    String
   view_by    String?
   created_at DateTime @default(now())
+  added_by   String?
+  user       user?     @relation(fields: [added_by], references: [id])
 }

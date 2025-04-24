@@ -107,6 +107,7 @@
         "devices": "الأجهزة",
         "logout": "تسجيل الخروج",
         "clockings": "التسجيلات",
+        "notifications": "الاشعارات",
         "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
@@ -259,7 +260,8 @@
         "عرض مركبة للمنطقة": "عرض مركبة للمنطقة",
         "vehicles_park_view": "عرض مركبة للحظيرة",
         "clocking_view": "عرض ساعات العمل",
-        "clocking_create": "انشاء ساعات العمل"
+        "clocking_create": "انشاء ساعات العمل",
+        "notifications_view" : "عرض الاشعارات"
     },
     "Files": {
         "title": "الملفات",

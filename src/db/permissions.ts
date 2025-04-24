@@ -52,4 +52,6 @@ export const permissions = [
 
     { name: "clocking_view" },
     { name: "clocking_create" },
+
+    { name: "notifications_view" },
   ];

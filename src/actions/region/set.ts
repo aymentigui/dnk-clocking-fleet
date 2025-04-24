@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { withAuthorizationPermission, verifySession } from "../permissions";
 import { z } from "zod";
+import { getUserName } from "../users/get";
 
 export async function createRegion(data: any) {
     const u = await getTranslations("Region");
@@ -46,6 +47,18 @@ export async function createRegion(data: any) {
             },
         });
 
+        await prisma.notification.create({
+            data: {
+                title: "nouvelle region",
+                contenu: "Une nouvelle region a été ajouté par " + getUserName(session.data.user.id) + "\n Nom du region : " + name + "\n Description : " + description + "\n Adresse : " + address,
+                user: {
+                    connect: {
+                        id: session.data.user.id
+                    }
+                }
+            }
+        })
+
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
         console.error("An error occurred in createRegion" + error);
@@ -79,6 +92,22 @@ export async function createRegions(data: any) {
         })
 
         const regionsResuls = await Promise.all(regions);
+
+        prisma.notification.create({
+            data: {
+                title: "nouvelles regions",
+                contenu: "Des nouvelles regions ont éte ajouté par " + getUserName(session.data.user.id)
+                + regions.map((region: any) => {
+                    return "\n Nom du region : " + region.data.name + " Description : " + region.data.description + " Adresse : " + region.data.address
+                })
+                ,
+                user: {
+                    connect: {
+                        id: session.data.user.id
+                    }
+                }
+            }
+        })
 
         return { status: 200, data: { message: s("createsuccess") , regions: regionsResuls } };
     } catch (error) {

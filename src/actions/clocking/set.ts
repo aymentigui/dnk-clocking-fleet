@@ -17,6 +17,7 @@ export async function createClocking(data: any) {
 
         const existingDevice = await prisma.device.findFirst({
             where: { user_id: session.data.user.id },
+            include: { park: true, region: true },
         });
 
         if (!existingDevice) return { status: 404, data: { message: u("devicenotfound") } };
@@ -50,6 +51,9 @@ export async function createClocking(data: any) {
             where: {
                 vehicle_id: existingVehicle.id,
             },
+            include:{
+                park: true
+            },
             orderBy: {
                 added_at: "desc",
             },
@@ -60,12 +64,18 @@ export async function createClocking(data: any) {
             where: {
                 vehicle_id: existingVehicle.id,
             },
+            include:{
+                region: true
+            },
             orderBy: {
                 added_at: "desc",
             },
             take: 1,
         });
 
+        const status = data.type !== 3 ?
+            (existingVehiclePark && existingDevice.park_id && existingVehiclePark.park_id == existingDevice.park_id ? 1 : 0)
+            : (existingVehicleRegion && existingDevice.region_id && existingVehicleRegion.region_id == existingDevice.region_id ? 1 : 0)
 
         await prisma.clocking.create({
             data: {
@@ -74,11 +84,24 @@ export async function createClocking(data: any) {
                 park_id: existingDevice.park_id ?? null,
                 regionId: existingDevice.region_id ?? null,
                 type: data.type ?? 0,
-                status: data.type !== 3 ?
-                    (existingVehiclePark && existingDevice.park_id && existingVehiclePark.park_id == existingDevice.park_id ? 1 : 0)
-                    : (existingVehicleRegion && existingDevice.region_id && existingVehicleRegion.region_id == existingDevice.region_id ? 1 : 0),
+                status: status,
             },
         });
+
+        if (status == 0) {
+            await prisma.notification.create({
+                data: {
+                    title: "un mauvais pointage d'une véhicule",
+                    contenu: "La véhicule " + existingVehicle.matricule+"(de parc :"+existingVehiclePark?.park?.name+" et station :"+existingVehicleRegion?.region?.name+")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la station " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région"),
+                    user: {
+                        connect: {
+                            id: session.data.user.id
+                        }
+                    }
+                }
+            })
+        }
+
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {

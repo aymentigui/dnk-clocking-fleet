@@ -111,6 +111,7 @@
         "vehicles": "Véhicules",
         "devices": "Dispositifs",
         "clockings": "Pointages",
+        "notifications": "Notifications",
         "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
@@ -264,7 +265,8 @@
         "supprimerunvehiculepourlaregion": "Supprimer un véhicule pour la région",
         "voirlesvehiculespourlaregion": "Voir les véhicules pour la région",
         "clocking_view": "Vue des horaires",
-        "clocking_create": "Créer un horaire"
+        "clocking_create": "Créer un horaire",
+        "notifications_view" : "Vue des notifications"
     },
     "Files": {
         "title": "Fichiers",

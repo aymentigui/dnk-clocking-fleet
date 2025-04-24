@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { withAuthorizationPermission,verifySession } from "../permissions";
 import { z } from "zod";
+import { getUserName } from "../users/get";
 
 export async function UpdatePark(id:string, data: any) {
     const e = await getTranslations('Error');
@@ -55,6 +56,19 @@ export async function UpdatePark(id:string, data: any) {
                 address,
             },
         })
+
+        await prisma.notification.create({
+            data: {
+                title: "mise à jour parc",
+                contenu: "Un parc a été mise à jour par " + getUserName(session.data.user.id) + "\n Nom du parc : " + name + "\n Description : " + description + "\n Adresse : " + address+ "\n Ancien parc : " + park.name+ "\n Ancienne description : " + park.description+ "\n Ancienne adresse : " + park.address,
+                user: {
+                    connect: {
+                        id: session.data.user.id
+                    }
+                }
+            }
+        })
+
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
         console.error("An error occurred in UpdatePark");

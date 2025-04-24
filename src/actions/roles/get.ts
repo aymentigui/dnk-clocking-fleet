@@ -52,7 +52,7 @@ export async function getRole(id: string): Promise<{ status: number, data: any }
         if (!session?.data?.user) {
             return { status: 401, data: { message: e("unauthorized") } };
         }
-        const hasPermissionAdd = await withAuthorizationPermission(['roles_update'],session.data.user.id);
+        const hasPermissionAdd = await withAuthorizationPermission(['roles_view'],session.data.user.id);
         
         if(hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
             return { status: 403, data: { message: e('forbidden') } };
