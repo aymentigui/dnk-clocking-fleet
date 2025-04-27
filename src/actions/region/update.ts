@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { withAuthorizationPermission,verifySession } from "../permissions";
 import { z } from "zod";
 import { getUserName } from "../users/get";
+import { sendEmail } from "../email";
 
 export async function UpdateRegion(id:string, data: any) {
     const e = await getTranslations('Error');
@@ -56,11 +57,11 @@ export async function UpdateRegion(id:string, data: any) {
                 address,
             },
         })
-
+        const userName = (await getUserName(session.data.user.id)).data
         await prisma.notification.create({
             data: {
                 title: "mise à jour region",
-                contenu: "Une region a été mise à jour par " + getUserName(session.data.user.id) + "\n Nom du region : " + name + "\n Description : " + description + "\n Adresse : " + address+ "\n Ancienne region : " + region.name+ "\n Ancienne description : " + region.description+ "\n Ancienne adresse : " + region.address,
+                contenu: "Une region a été mise à jour par " + userName + "\n Nom du region : " + name + "\n Description : " + description + "\n Adresse : " + address+ "\n Ancienne region : " + region.name+ "\n Ancienne description : " + region.description+ "\n Ancienne adresse : " + region.address,
                 user: {
                     connect: {
                         id: session.data.user.id
@@ -68,6 +69,23 @@ export async function UpdateRegion(id:string, data: any) {
                 }
             }
         })
+
+        const emails = await prisma.user.findMany({ where: { is_admin: true } })
+        await Promise.all(
+            emails.map(async (email) => {
+                if (email.email) {
+                    try {
+                        await sendEmail(
+                            email.email,
+                           "mise à jour region",
+                           "Une region a été mise à jour par " + userName + "\n Nom du region : " + name + "\n Description : " + description + "\n Adresse : " + address+ "\n Ancienne region : " + region.name+ "\n Ancienne description : " + region.description+ "\n Ancienne adresse : " + region.address,
+                        )
+                    } catch (erreur) {
+                        console.log("error sendig mail analyse to" + email.email)
+                    }
+                }
+            })
+        )
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {

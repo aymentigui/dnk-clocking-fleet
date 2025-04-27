@@ -346,3 +346,20 @@ export async function getUserName(id:string){
         return { status: 500, data: "" };
     }
 }
+
+export async function getUsersAdmin(){
+    const e = await getTranslations('Error');
+    try {
+        
+        const users = await prisma.user.findMany(
+            { where: {
+                is_admin:true,
+                deleted_at:null
+            }} 
+        );
+        return { status: 200, data: users};
+    } catch (error) {
+        console.error("An error occurred in getUserByid");
+        return { status: 500, data: "" };
+    }
+}

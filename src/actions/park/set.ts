@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { withAuthorizationPermission, verifySession } from "../permissions";
 import { z } from "zod";
 import { getUserName } from "../users/get";
+import { sendEmail } from "../email";
 
 export async function createPark(data: any) {
     const u = await getTranslations("Park");
@@ -47,10 +48,11 @@ export async function createPark(data: any) {
             },
         });
 
+        const userName = (await getUserName(session.data.user.id)).data
         await prisma.notification.create({
             data: {
                 title: "nouveau parc",
-                contenu: "Un nouveau parc a été ajouté par " + getUserName(session.data.user.id) + "\n Nom du parc : " + name + "\n Description : " + description + "\n Adresse : " + address,
+                contenu: "Un nouveau parc a été ajouté par " + userName + "\n Nom du parc : " + name + "\n Description : " + description + "\n Adresse : " + address,
                 user: {
                     connect: {
                         id: session.data.user.id
@@ -58,6 +60,23 @@ export async function createPark(data: any) {
                 }
             }
         })
+
+        const emails = await prisma.user.findMany({ where: { is_admin: true } })
+        await Promise.all(
+            emails.map(async (email) => {
+                if (email.email) {
+                    try {
+                        await sendEmail(
+                            email.email,
+                            "nouveau parc",
+                            "Un nouveau parc a été ajouté par " + userName + "\n Nom du parc : " + name + "\n Description : " + description + "\n Adresse : " + address,
+                        )
+                        } catch (erreur) {
+                        console.log("error sendig mail analyse to" + email.email)
+                    }
+                }
+            })
+        )
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
@@ -93,10 +112,11 @@ export async function createParks(data: any) {
 
         const parksResuls = await Promise.all(parks);
         
+        const userName = (await getUserName(session.data.user.id)).data
         prisma.notification.create({
             data: {
                 title: "nouveaux parcs",
-                contenu: "Des nouveaux parcs ont éte ajouté par " + getUserName(session.data.user.id)
+                contenu: "Des nouveaux parcs ont éte ajouté par " + userName
                 + parks.map((park: any) => {
                     return "\n Nom du parc : " + park.data.name + " Description : " + park.data.description + " Adresse : " + park.data.address
                 })

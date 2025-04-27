@@ -27,10 +27,22 @@ export async function UpdateVehicle(id: string, data: any) {
         if (!session?.data?.user) {
             return { status: 401, data: { message: e("unauthorized") } };
         }
-        const hasPermissionAdd = await withAuthorizationPermission(['vehicles_update']);
+        const hasPermissionRes = await withAuthorizationPermission(['vehicles_update']);
+        const hasPermissionUpdateParkRes = await withAuthorizationPermission(['vehicles_park_update']);
+        const hasPermissionUpdateRegionRes = await withAuthorizationPermission(['vehicles_region_update']);
 
-        if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
-            return { status: 403, data: { message: e('forbidden') } };
+        let hasPermission = true
+        let hasPermissionUpdatePark = true
+        let hasPermissionUpdateRegion = true
+
+        if (hasPermissionRes.status != 200 || !hasPermissionRes.data.hasPermission) {
+            hasPermission = false
+        }
+        if (hasPermissionUpdateParkRes.status != 200 || !hasPermissionUpdateParkRes.data.hasPermission) {
+            hasPermissionUpdatePark = false
+        }
+        if (hasPermissionUpdateRegionRes.status != 200 || !hasPermissionUpdateRegionRes.data.hasPermission) {
+            hasPermissionUpdateRegion = false
         }
 
         const result = schema.safeParse(data);
@@ -49,97 +61,106 @@ export async function UpdateVehicle(id: string, data: any) {
             return { status: 404, data: { message: v("vehiclenotfound") } };
         }
 
-        const matriculeExisting = await prisma.vehicle.findFirst({
-            where: { matricule, id: { not: id } },
-        });
+        if (hasPermission) {
 
-        if (matriculeExisting) {
-            return { status: 400, data: { message: v("matriculeexists") } };
-        }
-
-        if (vin) {
-            const vinExisting = await prisma.vehicle.findFirst({
-                where: { vin, id: { not: id } },
+            const matriculeExisting = await prisma.vehicle.findFirst({
+                where: { matricule, id: { not: id } },
             });
-            if (vinExisting) {
-                return { status: 400, data: { message: v("vinexists") } };
+
+            if (matriculeExisting) {
+                return { status: 400, data: { message: v("matriculeexists") } };
             }
-        }
 
-        const vehicleUpdated = await prisma.vehicle.update({
-            where: { id },
-            data: {
-                matricule,
-                model,
-                year: year === "" ? null : Number(year),
-                brand,
-                vin,
-            },
-        })
-
-        const parc_vehicle = await prisma.vehicle_park.findFirst({
-            where: {
-                vehicle_id: id,
-            },
-            orderBy: {
-                added_at: 'desc',
-            },
-        });
-
-        const region_vehicle = await prisma.vehicle_region.findFirst({
-            where: {
-                vehicle_id: id,
-            },
-            orderBy: {
-                added_at: 'desc',
-            },
-        });
-
-
-        if ((parc_vehicle && parc_vehicle.park_id !== park) || (!parc_vehicle && park)) {
-
-            const hasPermission = await withAuthorizationPermission(['vehicles_park_update']);
-            if (hasPermission.status === 200 && hasPermission.data.hasPermission) {
-                const parkExists = await prisma.park.findFirst({ where: { id: park } });
-                if (parkExists)
-                    await prisma.vehicle_park.create({
-                        data: {
-                            vehicle_id: id,
-                            park_id: parkExists ? parkExists.id : null,
-                            added_from: session.data.user.id,
-                        },
-                    });
-                else if (!park) {
-                    await prisma.vehicle_park.create({
-                        data: {
-                            vehicle_id: id,
-                            park_id: null,
-                            added_from: session.data.user.id,
-                        },
-                    });
+            if (vin) {
+                const vinExisting = await prisma.vehicle.findFirst({
+                    where: { vin, id: { not: id } },
+                });
+                if (vinExisting) {
+                    return { status: 400, data: { message: v("vinexists") } };
                 }
             }
+
+            await prisma.vehicle.update({
+                where: { id },
+                data: {
+                    matricule,
+                    model,
+                    year: year === "" ? null : Number(year),
+                    brand,
+                    vin,
+                },
+            })
         }
-        if ((region_vehicle && region_vehicle.region_id !== region) || (!region_vehicle && region)) {
-            const hasPermission = await withAuthorizationPermission(['vehicles_region_update']);
-            if (hasPermission.status === 200 && hasPermission.data.hasPermission) {
-                const regionExists = await prisma.region.findFirst({ where: { id: region } });
-                if (regionExists)
-                    await prisma.vehicle_region.create({
-                        data: {
-                            vehicle_id: id,
-                            region_id: regionExists ? regionExists.id : null,
-                            added_from: session.data.user.id,
-                        },
-                    });
-                else if (!region)
-                    await prisma.vehicle_region.create({
-                        data: {
-                            vehicle_id: id,
-                            region_id: null,
-                            added_from: session.data.user.id,
-                        },
-                    });
+
+        if (hasPermissionUpdatePark) {
+
+            const parc_vehicle = await prisma.vehicle_park.findFirst({
+                where: {
+                    vehicle_id: id,
+                },
+                orderBy: {
+                    added_at: 'desc',
+                },
+            });
+
+            if ((parc_vehicle && parc_vehicle.park_id !== park) || (!parc_vehicle && park)) {
+
+                const hasPermission = await withAuthorizationPermission(['vehicles_park_update']);
+                if (hasPermission.status === 200 && hasPermission.data.hasPermission) {
+                    const parkExists = await prisma.park.findFirst({ where: { id: park } });
+                    if (parkExists)
+                        await prisma.vehicle_park.create({
+                            data: {
+                                vehicle_id: id,
+                                park_id: parkExists ? parkExists.id : null,
+                                added_from: session.data.user.id,
+                            },
+                        });
+                    else if (!park) {
+                        await prisma.vehicle_park.create({
+                            data: {
+                                vehicle_id: id,
+                                park_id: null,
+                                added_from: session.data.user.id,
+                            },
+                        });
+                    }
+                }
+            }
+
+        }
+
+        if (hasPermissionUpdateRegion) {
+            const region_vehicle = await prisma.vehicle_region.findFirst({
+                where: {
+                    vehicle_id: id,
+                },
+                orderBy: {
+                    added_at: 'desc',
+                },
+            });
+
+            if ((region_vehicle && region_vehicle.region_id !== region) || (!region_vehicle && region)) {
+                const hasPermission = await withAuthorizationPermission(['vehicles_region_update']);
+                if (hasPermission.status === 200 && hasPermission.data.hasPermission) {
+                    const regionExists = await prisma.region.findFirst({ where: { id: region } });
+                    if (regionExists)
+                        await prisma.vehicle_region.create({
+                            data: {
+                                vehicle_id: id,
+                                region_id: regionExists ? regionExists.id : null,
+                                added_from: session.data.user.id,
+                            },
+                        });
+                    else if (!region)
+                        await prisma.vehicle_region.create({
+                            data: {
+                                vehicle_id: id,
+                                region_id: null,
+                                added_from: session.data.user.id,
+                            },
+                        });
+                }
             }
         }
 
@@ -304,18 +325,18 @@ export async function UpdateVehiclesRegionMatricules(vehicleMatriculesRegion: { 
         await Promise.all(vehicleMatriculesRegion.map(async (vehicleMatricule) => {
             const vehicleExists = await prisma.vehicle.findFirst({ where: { matricule: vehicleMatricule.matricule } });
             const regionExists = !vehicleMatricule.region
-            || vehicleMatricule.region === null
-            || vehicleMatricule.region === "null"
-            || vehicleMatricule.region === ""
-            ? null
-            :await prisma.region.findFirst({
-                where: {
-                    name: {
-                        equals: vehicleMatricule.region,
-                        mode: 'insensitive',
+                || vehicleMatricule.region === null
+                || vehicleMatricule.region === "null"
+                || vehicleMatricule.region === ""
+                ? null
+                : await prisma.region.findFirst({
+                    where: {
+                        name: {
+                            equals: vehicleMatricule.region,
+                            mode: 'insensitive',
+                        },
                     },
-                },
-            });
+                });
             if (regionExists && vehicleExists)
                 await prisma.vehicle_region.create({
                     data: {

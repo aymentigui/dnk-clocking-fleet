@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { verifySession } from "../permissions";
+import { sendEmail } from "../email";
 
 export async function createClocking(data: any) {
     const u = await getTranslations("Clocking");
@@ -51,7 +52,7 @@ export async function createClocking(data: any) {
             where: {
                 vehicle_id: existingVehicle.id,
             },
-            include:{
+            include: {
                 park: true
             },
             orderBy: {
@@ -64,7 +65,7 @@ export async function createClocking(data: any) {
             where: {
                 vehicle_id: existingVehicle.id,
             },
-            include:{
+            include: {
                 region: true
             },
             orderBy: {
@@ -89,10 +90,27 @@ export async function createClocking(data: any) {
         });
 
         if (status == 0) {
+            const emails = await prisma.user.findMany({ where: { is_admin: true } })
+
+            await Promise.all(
+                emails.map(async (email) => {
+                    if (email.email) {
+                        try {
+                            await sendEmail(
+                                email.email,
+                                "un mauvais pointage d'une véhicule",
+                                "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehiclePark?.park?.name + " et station :" + existingVehicleRegion?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la station " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région")
+                            )
+                        } catch (erreur) {
+                            console.log("error sendig mail analyse to" + email.email)
+                        }
+                    }
+                })
+            )
             await prisma.notification.create({
                 data: {
                     title: "un mauvais pointage d'une véhicule",
-                    contenu: "La véhicule " + existingVehicle.matricule+"(de parc :"+existingVehiclePark?.park?.name+" et station :"+existingVehicleRegion?.region?.name+")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la station " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région"),
+                    contenu: "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehiclePark?.park?.name + " et station :" + existingVehicleRegion?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la station " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région"),
                     user: {
                         connect: {
                             id: session.data.user.id

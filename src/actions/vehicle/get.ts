@@ -25,9 +25,9 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
             // @ts-ignore
             searchConditions.OR = [
                 { matricule: { contains: searchQuery } },
-                { vin: { contains: searchQuery } },
-                { brand: { contains: searchQuery } },
-                { model: { contains: searchQuery } },
+                { vin: { contains: searchQuery, mode: "insensitive" } },
+                { brand: { contains: searchQuery,mode: "insensitive" } },
+                { model: { contains: searchQuery, mode: "insensitive" } },
                 // { year: { contains: Number(searchQuery) } },
             ]
 
@@ -127,9 +127,9 @@ export async function getCountVehicles(searchQuery?: string, searchPark?: string
         // @ts-ignore
         searchConditions.OR = [
             { matricule: { contains: searchQuery } },
-            { vin: { contains: searchQuery } },
-            { brand: { contains: searchQuery } },
-            { model: { contains: searchQuery } },
+            { vin: { contains: searchQuery, mode: "insensitive" } },
+            { brand: { contains: searchQuery,mode: "insensitive" } },
+            { model: { contains: searchQuery,mode: "insensitive" } },
         ]
     if ((searchPark && searchPark !== "" && searchPark !== "0"))
         // @ts-ignore
