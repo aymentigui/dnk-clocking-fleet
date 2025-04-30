@@ -166,17 +166,7 @@ export async function GET(request: NextRequest) {
         await prisma.notification.create({
             data: {
                 title: title,
-                contenu: `<!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Analyse quotidienne des véhicules</title>
-                </head>
-                <body>
-                    <pre>${content}</pre>
-                </body>
-                </html>`
+                contenu: content
             }
         })
 
@@ -189,7 +179,17 @@ export async function GET(request: NextRequest) {
                         await sendEmail(
                             email.email,
                             title,
-                            content
+                            `<!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                    <title>Analyse quotidienne des véhicules</title>
+                                </head>
+                                <body>
+                                    <pre>${content}</pre>
+                                </body>
+                                </html>`
                         )
                     } catch (erreur) {
                         console.log("error sendig mail analyse to" + email.email)
