@@ -25,7 +25,7 @@ export async function AddRole(name: string, permission: string) {
         })
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.error("An error occurred in AddRolePermission");
+        console.log("An error occurred in AddRolePermission");
         return { status: 500, data: { message: e("error") } };
     }
 }

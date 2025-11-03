@@ -111,7 +111,7 @@ export default function FileUploadForm({
     try {
       handleUpload(values.files)
     } catch (error) {
-      console.error('Error uploading files:', error)
+      console.log('Error uploading files:', error)
     } finally {
       setUploading(false)
     }

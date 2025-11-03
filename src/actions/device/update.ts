@@ -207,7 +207,7 @@ export async function UpdateDevice(id: string, data: any) {
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
         // @ts-ignore
-        //console.error("An error occurred in UpdateDeive"+error.message);
+        //console.log("An error occurred in UpdateDeive"+error.message);
         return { status: 500, data: { message: e("error") } };
     }
 }

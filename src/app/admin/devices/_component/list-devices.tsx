@@ -117,7 +117,7 @@ export default function ListDevices() {
       }
       setIsLoading(false);
     } catch (error) {
-      console.error("Error fetching devices:", error);
+      console.log("Error fetching devices:", error);
     } finally {
       setIsLoading(false);
     }

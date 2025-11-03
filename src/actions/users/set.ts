@@ -84,6 +84,7 @@ export async function createUser(data: any) {
                 image_compressed: imageCompressedUrl,
                 password: hashedPassword,
                 is_admin: (is_admin && session.data.user.is_admin) ? true : false,
+                email_verified:new Date(),
             },
         });
 
@@ -101,7 +102,7 @@ export async function createUser(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.error("An error occurred in createUser" + error);
+        console.log("An error occurred in createUser" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -140,7 +141,7 @@ export async function createUsers(data: any) {
         return { status: 200, data: { message: s("createsuccess") , users: usersResuls } };
     } catch (error) {
         //@ts-ignore
-        console.error("An error occurred in createUser" + error.message);
+        console.log("An error occurred in createUser" + error.message);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -182,6 +183,7 @@ const addUser = async (data: any, userSchema: any, session: any, u:any, s:any) =
                 email,
                 password: hashedPassword,
                 is_admin: (is_admin && session.data.user.is_admin) ? true : false,
+                email_verified:new Date(),
             },
         });
 
@@ -198,7 +200,7 @@ const addUser = async (data: any, userSchema: any, session: any, u:any, s:any) =
         return { status: 200, data: data };
     } catch (error) {
         // @ts-ignore
-        console.error("An error occurred in addUser" + error.message);
+        console.log("An error occurred in addUser" + error.message);
         return { status: 500, data: { message: s("createfail") , user : data} }
     };
 }

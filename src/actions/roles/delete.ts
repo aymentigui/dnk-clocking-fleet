@@ -20,7 +20,7 @@ export async function deleteRole(roleId: string): Promise<{ status: number, data
         await prisma.role.delete({ where: { id: roleId } });
         return { status: 200, data: { message: s("deletesuccess") } };
     } catch (error) {
-        console.error("An error occurred in deleteRole");
+        console.log("An error occurred in deleteRole");
         return { status: 500, data: { message: e("error") } };
     }
 }

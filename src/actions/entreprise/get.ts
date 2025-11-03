@@ -21,7 +21,7 @@ export async function getEntreprises(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: entreprises };
     } catch (error) {
-        console.error("An error occurred in getentreprises");
+        console.log("An error occurred in getentreprises");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -43,7 +43,7 @@ export async function getEnteprise(id: string): Promise<{ status: number, data: 
         const device = await prisma.entreprise.findUnique({ where: { id } });
         return { status: 200, data: device };
     } catch (error) {
-        console.error("An error occurred in getentreprise");
+        console.log("An error occurred in getentreprise");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -72,7 +72,7 @@ export async function getEnteprisesWithIds(entrepriseIds: string[]): Promise<{ s
 
         return { status: 200, data: entreprises };
     } catch (error) {
-        console.error("Error fetching getentreprisesWithIds:", error);
+        console.log("Error fetching getentreprisesWithIds:", error);
         return { status: 500, data: null };
     }
 }
@@ -89,7 +89,7 @@ export async function getEnteprisesAdmin(): Promise<{ status: number, data: any 
         const entreprises = await prisma.entreprise.findMany();
         return { status: 200, data: entreprises };
     } catch (error) {
-        console.error("An error occurred in getentreprisesPublic");
+        console.log("An error occurred in getentreprisesPublic");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -117,7 +117,7 @@ export async function getEnteprisesName(id: string): Promise<{ status: number, d
         
         return { status: 200, data: name };
     } catch (error) {
-        console.error("An error occurred in getentreprisesPublic");
+        console.log("An error occurred in getentreprisesPublic");
         return { status: 500, data: { message: e("error") } };
     }
 }

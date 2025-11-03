@@ -55,7 +55,7 @@ export async function deletePark(ids: string[]): Promise<{ status: number, data:
 
         return { status: 200, data: { message: s("deletesuccess") } };
     } catch (error) {
-        console.error("An error occurred in deletePark");
+        console.log("An error occurred in deletePark");
         return { status: 500, data: { message: e("error") } };
     }
 }

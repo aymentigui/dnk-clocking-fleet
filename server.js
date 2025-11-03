@@ -13,7 +13,7 @@ try {
   execSync("npx prisma generate", { stdio: "inherit" });
   console.log("✅ Prisma client generated successfully.");
 } catch (error) {
-  console.error("❌ Failed to generate Prisma client:", error);
+  console.log("❌ Failed to generate Prisma client:", error);
 }
 
 app.prepare().then(() => {

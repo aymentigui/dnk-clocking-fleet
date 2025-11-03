@@ -91,7 +91,7 @@ export async function registerUser(data: any): Promise<AuthResponse> {
 
         return { status: 201, data: newUser };
     } catch (error) {
-        console.error("Registration error:", error);
+        console.log("Registration error:", error);
         return { status: 500, data: { message: e("errorregistering") } };
     }
 }
@@ -174,7 +174,7 @@ export async function loginUser(data: any): Promise<AuthResponse> {
             });
         }
 
-        if (user.email_verified === null) {
+        if (user.email_verified === null && user.public) {
             return { status: 403, data: { message: u('emailnotverified') || 'You must verify your email', emailNotVerified: true } };
         }
 
@@ -248,14 +248,14 @@ export async function loginUser(data: any): Promise<AuthResponse> {
         return { status: 200, data: user };
 
     } catch (error) {
-        console.error("Login error:", error);
+        console.log("Login error:", error);
 
         // Gestion spécifique du verrouillage de compte
         if (error instanceof Error && error.message === "ACCOUNT_LOCKED") {
             return { status: 423, data: { message: u('accountlocked') || 'Your account is temporarily locked. Please try again in 15 minutes.' } };
         }
 
-        return { status: 500, data: { message: e("errorinlogin") } };
+        return { status: 500, data: { message: e("error") } };
     }
 }
 /**
@@ -314,7 +314,7 @@ export async function confermationRegister(data: any, email: string): Promise<Au
         return { status: 200, data: { message: s("emailconfirmed") } };
 
     } catch (error) {
-        console.error("Confirmation error:", error);
+        console.log("Confirmation error:", error);
         return { status: 500, data: { message: e("errorconfirmation") } };
     }
 }
@@ -401,7 +401,7 @@ export const SendVerificationCode = async (email: string): Promise<AuthResponse>
         await sendCode({ email, code: token.data.token });
         return { status: 200, data: { message: s("codesent") } };
     } catch (error) {
-        console.error("Error sending verification code:", error);
+        console.log("Error sending verification code:", error);
         return { status: 500, data: { message: e("errorsendcode") } };
     }
 };
@@ -448,7 +448,7 @@ export const SendVerificationCode2FA = async (email: string): Promise<AuthRespon
         return { status: 200, data: { message: s("codesent") } };
 
     } catch (error) {
-        console.error("Error sending 2FA code:", error);
+        console.log("Error sending 2FA code:", error);
         return { status: 500, data: { message: e("error2afa") } };
     }
 };
@@ -475,7 +475,7 @@ export async function logoutUser(): Promise<AuthResponse> {
         await signOut({ redirect: false });
         return { status: 200, data: { message: 'Logout successful' } };
     } catch (error) {
-        console.error("An error occurred in logout:", error);
+        console.log("An error occurred in logout:", error);
         return { status: 500, data: { message: e("errorlogout") } };
     }
 }

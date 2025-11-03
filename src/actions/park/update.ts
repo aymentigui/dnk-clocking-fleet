@@ -89,7 +89,7 @@ export async function UpdatePark(id: string, data: any) {
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.error("An error occurred in UpdatePark");
+        console.log("An error occurred in UpdatePark");
         return { status: 500, data: { message: e("error") } };
     }
 }

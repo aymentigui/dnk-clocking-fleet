@@ -33,7 +33,7 @@ export function LocationSearch({ onLocationSelect }: LocationSearchProps) {
         alert("Aucun résultat trouvé pour cette recherche")
       }
     } catch (error) {
-      console.error("Erreur lors de la recherche:", error)
+      console.log("Erreur lors de la recherche:", error)
       alert("Erreur lors de la recherche")
     } finally {
       setLoading(false)

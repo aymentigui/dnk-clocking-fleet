@@ -80,7 +80,7 @@ export async function createPark(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.error("An error occurred in createPark" + error);
+        console.log("An error occurred in createPark" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -132,7 +132,7 @@ export async function createParks(data: any) {
         return { status: 200, data: { message: s("createsuccess") , parks: parksResuls } };
     } catch (error) {
         //@ts-ignore
-        console.error("An error occurred in createParks" + error.message);
+        console.log("An error occurred in createParks" + error.message);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -173,7 +173,7 @@ const addPark = async (data: any, userSchema: any, session: any, u:any, s:any) =
         return { status: 200, data: data };
     } catch (error) {
         // @ts-ignore
-        console.error("An error occurred in addPark" + error.message);
+        console.log("An error occurred in addPark" + error.message);
         return { status: 500, data: { message: s("createfail") , park : data} }
     };
 }

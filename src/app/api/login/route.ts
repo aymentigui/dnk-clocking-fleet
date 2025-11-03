@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     if (!token || token.status !== 200) {
         return NextResponse.json({ message: "login failed" }, {
-            status: 401,
+            status: 400,
             headers: headersPost
         }
         );
@@ -30,9 +30,11 @@ export async function POST(request: NextRequest) {
         where: { user_id: token.data.id },
     });
 
+    console.log(token)
+
     if (!device) {
         return NextResponse.json({ message: "login failed" }, {
-            status: 401,
+            status: 400,
             headers: headersPost
         });
     }

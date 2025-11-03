@@ -55,7 +55,7 @@ export async function deleteDevices(ids: string[]): Promise<{ status: number, da
         return { status: 200, data: { message: s("deletesuccess") } };
     } catch (error) {
         // @ts-ignore
-        console.error("An error occurred in deleteDevice"+error.message);
+        console.log("An error occurred in deleteDevice"+error.message);
         return { status: 500, data: { message: e("error") } };
     }
 }

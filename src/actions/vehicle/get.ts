@@ -122,7 +122,7 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
 
         return { status: 200, data: vehiclesFormatted };
     } catch (error) {
-        console.error("Error fetching vehicles:", error);
+        console.log("Error fetching vehicles:", error);
         return { status: 500, data: null };
     }
 }
@@ -213,7 +213,7 @@ export async function getCountVehicles(searchQuery?: string, searchPark?: string
 
         return { status: 200, data: vehicles.length };
     } catch (error) {
-        console.error("Error fetching count vehicles:", error);
+        console.log("Error fetching count vehicles:", error);
         return { status: 500, data: null };
     }
 }
@@ -234,7 +234,7 @@ export async function getVehiclesAll(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: devices };
     } catch (error) {
-        console.error("An error occurred in getVehiclesAll");
+        console.log("An error occurred in getVehiclesAll");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -253,7 +253,7 @@ export async function getVehiclesAllMatrciule(): Promise<{ status: number, data:
 
         return { status: 200, data: vehicleFormatted };
     } catch (error) {
-        console.error("An error occurred in getVehiclesAllMatricles");
+        console.log("An error occurred in getVehiclesAllMatricles");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -315,7 +315,7 @@ export async function getVehicle(id: string): Promise<{ status: number, data: an
 
         return { status: 200, data: vehicleFormatted };
     } catch (error) {
-        console.error("An error occurred in getvehicle:", error);
+        console.log("An error occurred in getvehicle:", error);
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -337,7 +337,7 @@ export async function getVehiclesWithIds(vehicleIds: string[]): Promise<{ status
 
         return { status: 200, data: devices };
     } catch (error) {
-        console.error("Error fetching getVehiclesWithIds:", error);
+        console.log("Error fetching getVehiclesWithIds:", error);
         return { status: 500, data: null };
     }
 }
@@ -361,7 +361,7 @@ export async function getVehiclesMatriculeWithIds(vehicleIds: string[]): Promise
 
         return { status: 200, data: vehiclesFormatted };
     } catch (error) {
-        console.error("Error fetching getVehiclesMatriclesWithIds:", error);
+        console.log("Error fetching getVehiclesMatriclesWithIds:", error);
         return { status: 500, data: null };
     }
 }
@@ -424,7 +424,7 @@ export async function getVehicleParks(id: string, page: number, pageSize: number
 
         return { status: 200, data: vehicleParksFormatted, count: vehicleParksCount };
     } catch (error) {
-        console.error("An error occurred in getVehicleParks:", error);
+        console.log("An error occurred in getVehicleParks:", error);
         return { status: 500, data: { message: e("error") }, count: 0 };
     }
 }
@@ -486,7 +486,7 @@ export async function getVehicleRegions(id: string, page: number, pageSize: numb
 
         return { status: 200, data: vehicleRegionsFormatted, count: vehicleRegionCount };
     } catch (error) {
-        console.error("An error occurred in getVehicleRegion:", error);
+        console.log("An error occurred in getVehicleRegion:", error);
         return { status: 500, data: { message: e("error") }, count: 0 };
     }
 }

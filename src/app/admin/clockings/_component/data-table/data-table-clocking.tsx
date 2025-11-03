@@ -72,7 +72,7 @@ export function DataTable() {
                 setCount(response.count);
             }
         } catch (error) {
-            console.error("Error fetching vehicle clocking:", error);
+            console.log("Error fetching vehicle clocking:", error);
         } finally {
             setIsLoading(false);
         }

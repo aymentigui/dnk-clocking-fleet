@@ -105,7 +105,7 @@ export async function createVehicle(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.error("An error occurred in createVehicle" + error);
+        console.log("An error occurred in createVehicle" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -148,7 +148,7 @@ export async function createVehicles(data: any) {
         return { status: 200, data: { message: s("createsuccess"), vehicles: vehiclesResuls } };
     } catch (error) {
         //@ts-ignore
-        console.error("An error occurred in createVehicles" + error.message);
+        console.log("An error occurred in createVehicles" + error.message);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -234,7 +234,7 @@ const addVehicle = async (data: any, schema: any, session: any, u: any, s: any) 
         return { status: 200, data: data };
     } catch (error) {
         // @ts-ignore
-        console.error("An error occurred in addVehicle" + error.message);
+        console.log("An error occurred in addVehicle" + error.message);
         return { status: 500, data: { message: s("createfail"), vehicle: data } }
     };
 }

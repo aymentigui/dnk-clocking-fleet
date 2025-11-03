@@ -167,7 +167,7 @@ export async function UpdateVehicle(id: string, data: any) {
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.error("An error occurred in UpdateVehicle:", error);
+        console.log("An error occurred in UpdateVehicle:", error);
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -208,7 +208,7 @@ export async function UpdateVehiclesParc(vehicleIds: string[], parcId: string) {
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.error("An error occurred in UpdateVehiclesParc:", error);
+        console.log("An error occurred in UpdateVehiclesParc:", error);
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -248,7 +248,7 @@ export async function UpdateVehiclesRegion(vehicleIds: string[], regionId: strin
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.error("An error occurred in UpdateVehiclesRegion:", error);
+        console.log("An error occurred in UpdateVehiclesRegion:", error);
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -300,7 +300,7 @@ export async function UpdateVehiclesParcMatricule(vehicleMatriculesPark: { matri
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.error("An error occurred in UpdateVehiclesParc:", error);
+        console.log("An error occurred in UpdateVehiclesParc:", error);
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -349,7 +349,7 @@ export async function UpdateVehiclesRegionMatricules(vehicleMatriculesRegion: { 
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.error("An error occurred in UpdateVehiclesRegion:", error);
+        console.log("An error occurred in UpdateVehiclesRegion:", error);
         return { status: 500, data: { message: e("error") } };
     }
 }

@@ -49,7 +49,7 @@ export const { handlers, auth, signIn, signOut } =
               token.session = session
 
           } catch (error) {
-            console.error("An error occurred in jwt");
+            console.log("An error occurred in jwt");
           }
         }
         return token
@@ -188,7 +188,7 @@ export const { handlers, auth, signIn, signOut } =
             });
           }
 
-          if (user.email_verified === null) {
+          if (user.email_verified === null && user.public) {
             return null
           }
 

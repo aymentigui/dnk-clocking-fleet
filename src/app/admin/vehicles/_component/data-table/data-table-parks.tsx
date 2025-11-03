@@ -74,7 +74,7 @@ export function DataTable({
             }
 
         } catch (error) {
-            console.error("Error fetching vehcile region:", error);
+            console.log("Error fetching vehcile region:", error);
         } finally {
             setIsLoading(false);
         }

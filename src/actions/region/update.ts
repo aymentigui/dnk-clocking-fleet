@@ -89,7 +89,7 @@ export async function UpdateRegion(id:string, data: any) {
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.error("An error occurred in UpdateRegion");
+        console.log("An error occurred in UpdateRegion");
         return { status: 500, data: { message: e("error") } };
     }
 }

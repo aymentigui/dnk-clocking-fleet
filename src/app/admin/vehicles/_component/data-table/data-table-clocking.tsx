@@ -76,7 +76,7 @@ export function DataTable({
             }
 
         } catch (error) {
-            console.error("Error fetching vehcile clocking:", error);
+            console.log("Error fetching vehcile clocking:", error);
         } finally {
             setIsLoading(false);
         }

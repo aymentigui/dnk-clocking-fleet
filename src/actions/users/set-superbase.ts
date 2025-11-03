@@ -106,7 +106,7 @@ export async function createUser(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.error("An error occurred in createUser" + error);
+        console.log("An error occurred in createUser" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }

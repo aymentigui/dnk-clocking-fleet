@@ -128,7 +128,7 @@ export function AdvancedMapComponent() {
         }
       },
       (error) => {
-        console.error("Erreur de géolocalisation:", error)
+        console.log("Erreur de géolocalisation:", error)
         alert("Impossible d'obtenir votre position")
       },
     )

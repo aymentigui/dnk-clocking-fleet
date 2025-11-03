@@ -108,7 +108,7 @@ export default function UsersAdminPage() {
       }
 
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.log("Error fetching users:", error);
     } finally {
       setIsLoading(false);
     }

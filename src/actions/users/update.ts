@@ -143,7 +143,7 @@ export async function updateUser(id: string, data: any): Promise<{ status: numbe
 
         return { status: 200, data: { message: s("updatesuccess") } }
     } catch (error) {
-        console.error("An error occurred in updateUser")
+        console.log("An error occurred in updateUser")
         return { status: 500, data: { message: e("error") } }
     }
 }

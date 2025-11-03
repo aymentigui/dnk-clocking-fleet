@@ -79,7 +79,7 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
 
         return { status: 200, data: clockingFormatted, count: vehicleClockingsCount };
     } catch (error) {
-        console.error("An error occurred in getClockings" + error);
+        console.log("An error occurred in getClockings" + error);
         return { status: 500, data: { message: e("error") }, count: 0 };
     }
 }
@@ -175,7 +175,7 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
 
         return { status: 200, data: clockingFormatted, count: vehicleClockingsCount };
     } catch (error) {
-        console.error("An error occurred in getClockingsVehicle" + error);
+        console.log("An error occurred in getClockingsVehicle" + error);
         return { status: 500, data: { message: e("error") }, count: 0 };
     }
 }

@@ -95,6 +95,7 @@ export async function createDevice(data: any) {
                 password: hashedPassword,
                 is_admin: false,
                 public: false,
+                email_verified: new Date(),
             },
         });
 
@@ -161,7 +162,7 @@ export async function createDevice(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.error("An error occurred in createDevice" + error);
+        console.log("An error occurred in createDevice" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -201,7 +202,7 @@ export async function createDevices(data: any) {
         return { status: 200, data: { message: s("createsuccess"), devices: devicesResuls } };
     } catch (error) {
         //@ts-ignore
-        console.error("An error occurred in createDevices" + error.message);
+        console.log("An error occurred in createDevices" + error.message);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -288,6 +289,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s: an
                 password: hashedPassword,
                 is_admin: false,
                 public: false,
+                email_verified:new Date(),
             },
         });
 
@@ -353,7 +355,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s: an
         return { status: 200, data: data };
     } catch (error) {
         // @ts-ignore
-        console.error("An error occurred in addDevice" + error.message);
+        console.log("An error occurred in addDevice" + error.message);
         return { status: 500, data: { message: s("createfail"), device: data } }
     };
 }

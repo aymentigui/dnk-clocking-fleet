@@ -21,7 +21,7 @@ export async function getParks(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: parks };
     } catch (error) {
-        console.error("An error occurred in getParks");
+        console.log("An error occurred in getParks");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -43,7 +43,7 @@ export async function getPark(id: string): Promise<{ status: number, data: any }
         const device = await prisma.park.findUnique({ where: { id } });
         return { status: 200, data: device };
     } catch (error) {
-        console.error("An error occurred in getPark");
+        console.log("An error occurred in getPark");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -72,7 +72,7 @@ export async function getParksWithIds(parkIds: string[]): Promise<{ status: numb
 
         return { status: 200, data: parks };
     } catch (error) {
-        console.error("Error fetching getParksWithIds:", error);
+        console.log("Error fetching getParksWithIds:", error);
         return { status: 500, data: null };
     }
 }
@@ -89,7 +89,7 @@ export async function getParksAdmin(): Promise<{ status: number, data: any }> {
         const parks = await prisma.park.findMany();
         return { status: 200, data: parks };
     } catch (error) {
-        console.error("An error occurred in getParksPublic");
+        console.log("An error occurred in getParksPublic");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -117,7 +117,7 @@ export async function getParksName(id: string): Promise<{ status: number, data: 
         
         return { status: 200, data: name };
     } catch (error) {
-        console.error("An error occurred in getParksPublic");
+        console.log("An error occurred in getParksPublic");
         return { status: 500, data: { message: e("error") } };
     }
 }

@@ -212,7 +212,7 @@ export async function GET(request: NextRequest) {
             },
         })
     } catch (error) {
-        console.error("Erreur lors de l'analyse quotidienne:", error)
+        console.log("Erreur lors de l'analyse quotidienne:", error)
         return Response.json(
             {
                 success: false,

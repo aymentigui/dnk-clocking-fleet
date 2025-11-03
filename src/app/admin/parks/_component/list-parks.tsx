@@ -92,7 +92,7 @@ export default function ListParks() {
       }
 
     } catch (error) {
-      console.error("Error fetching parks:", error);
+      console.log("Error fetching parks:", error);
     } finally {
       setIsLoading(false);
     }

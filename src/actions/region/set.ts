@@ -79,7 +79,7 @@ export async function createRegion(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.error("An error occurred in createRegion" + error);
+        console.log("An error occurred in createRegion" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -130,7 +130,7 @@ export async function createRegions(data: any) {
         return { status: 200, data: { message: s("createsuccess"), regions: regionsResuls } };
     } catch (error) {
         //@ts-ignore
-        console.error("An error occurred in createRegions" + error.message);
+        console.log("An error occurred in createRegions" + error.message);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -171,7 +171,7 @@ const addRegion = async (data: any, userSchema: any, session: any, u: any, s: an
         return { status: 200, data: data };
     } catch (error) {
         // @ts-ignore
-        console.error("An error occurred in addRegion" + error.message);
+        console.log("An error occurred in addRegion" + error.message);
         return { status: 500, data: { message: s("createfail"), region: data } }
     };
 }

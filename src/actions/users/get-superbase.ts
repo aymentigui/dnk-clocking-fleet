@@ -85,7 +85,7 @@ export async function getUsers(page: number = 1, pageSize: number = 10, searchQu
 
         return { status: 200, data: formattedUsers };
     } catch (error) {
-        console.error("Error fetching users:", error);
+        console.log("Error fetching users:", error);
         return { status: 500, data: null };
     }
 }
@@ -122,7 +122,7 @@ export async function getUser(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: user };
     } catch (error) {
-        console.error("An error occurred in getUsers");
+        console.log("An error occurred in getUsers");
         return { status: 500, data: { message: e("error") } };
     }
 }

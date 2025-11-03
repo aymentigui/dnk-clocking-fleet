@@ -24,6 +24,6 @@ export async function init() {
         });
         //console.log("Admin user created successfully");
     } catch (error) {
-        //console.error("An error occurred in init: ", error);
+        //console.log("An error occurred in init: ", error);
     }
 }

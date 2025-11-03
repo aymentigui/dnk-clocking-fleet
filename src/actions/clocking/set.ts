@@ -123,7 +123,7 @@ export async function createClocking(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.error("An error occurred in createColocking" + error);
+        console.log("An error occurred in createColocking" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }

@@ -26,6 +26,6 @@ export const generateQRCodeAndDownload = async (matricules: string[]) => {
       saveAs(content, 'vehicles-qr-codes.zip');
     });
   } catch (error) {
-    console.error('Erreur lors de la génération des QR codes', error);
+    console.log('Erreur lors de la génération des QR codes', error);
   }
 };

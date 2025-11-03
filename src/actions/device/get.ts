@@ -84,7 +84,7 @@ export async function getDevices(page: number = 1, pageSize: number = 10, search
 
         return { status: 200, data: devicesFormatted };
     } catch (error) {
-        console.error("Error fetching devices:", error);
+        console.log("Error fetching devices:", error);
         return { status: 500, data: null };
     }
 }
@@ -123,7 +123,7 @@ export async function getCountDevices(searchQuery?: string, searchPark?: string,
         );
         return { status: 200, data: count };
     } catch (error) {
-        console.error("Error fetching count devices:", error);
+        console.log("Error fetching count devices:", error);
         return { status: 500, data: null };
     }
 }
@@ -144,7 +144,7 @@ export async function getDevicesAll(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: devices };
     } catch (error) {
-        console.error("An error occurred in getAllDevices");
+        console.log("An error occurred in getAllDevices");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -166,7 +166,7 @@ export async function getDevice(id: string): Promise<{ status: number, data: any
         const device = await prisma.device.findUnique({ where: { id } });
         return { status: 200, data: device };
     } catch (error) {
-        console.error("An error occurred in getDevice");
+        console.log("An error occurred in getDevice");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -195,7 +195,7 @@ export async function getDevicesWithIds(deviceIds: string[]): Promise<{ status: 
 
         return { status: 200, data: devices };
     } catch (error) {
-        console.error("Error fetching getDevicesWithIds:", error);
+        console.log("Error fetching getDevicesWithIds:", error);
         return { status: 500, data: null };
     }
 }

@@ -57,7 +57,7 @@ export async function deleteEntreprise(ids: string[]): Promise<{ status: number,
 
         return { status: 200, data: { message: s("deletesuccess") } };
     } catch (error) {
-        console.error("An error occurred in deleteentreprise");
+        console.log("An error occurred in deleteentreprise");
         return { status: 500, data: { message: e("error") } };
     }
 }

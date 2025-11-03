@@ -27,7 +27,7 @@ export async function UpdateRole(id: string, name: string, permission: string) {
         })
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.error("An error occurred in UpdateRolePermission");
+        console.log("An error occurred in UpdateRolePermission");
         return { status: 500, data: { message: e("error") } };
     }
 }

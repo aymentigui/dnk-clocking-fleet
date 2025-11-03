@@ -81,7 +81,7 @@ export async function createEntreprise(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.error("An error occurred in createentreprise" + error);
+        console.log("An error occurred in createentreprise" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -133,7 +133,7 @@ export async function createentreprises(data: any) {
         return { status: 200, data: { message: s("createsuccess"), entreprises: entreprisesResuls } };
     } catch (error) {
         //@ts-ignore
-        console.error("An error occurred in createentreprises" + error.message);
+        console.log("An error occurred in createentreprises" + error.message);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -176,7 +176,7 @@ const addentreprise = async (data: any, userSchema: any, session: any, u: any, s
         return { status: 200, data: data };
     } catch (error) {
         // @ts-ignore
-        console.error("An error occurred in addentreprise" + error.message);
+        console.log("An error occurred in addentreprise" + error.message);
         return { status: 500, data: { message: s("createfail"), entreprise: data } }
     };
 }
