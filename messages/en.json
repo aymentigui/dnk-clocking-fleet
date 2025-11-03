@@ -132,7 +132,16 @@
         "invalidtoken": "Invalid token",
         "tokenexpired": "Token expired",
         "badrequest": "Bad request",
-        "errorscreating": "Error creating"
+        "errorscreating": "Error creating",
+        "invalideorexpiredcode": "Invalid or expired code",
+        "errorregistering": "Error registering",
+        "errorinlogin": "An unexpected error occurred during login",
+        "errorlogout": "An unexpected error occurred during logout",
+        "errorsendcode": "An error occurred while sending the code",
+        "errorconfirmation": "An error occurred during confirmation",
+        "error2afa": "An error occurred during two factor authentication",
+        "account_blocked": "Account blocked. Please try again in {{minutes}} minutes.",
+        "too_many_attempts": "Too many attempts. Account blocked for 15 minutes."
     },
     "Settings": {
         "title": "Settings",

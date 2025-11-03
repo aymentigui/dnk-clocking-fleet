@@ -133,7 +133,16 @@
         "invalidtoken": "Le token fourni est invalide",
         "tokenexpired": "Le token fourni a expiré",
         "badrequest": "Mauvaise requête",
-        "errorscreating": "Erreur lors de la création"
+        "errorscreating": "Erreur lors de la création",
+        "invalideorexpiredcode": "Le code fourni est invalide ou a expiré",
+        "errorregistering": "Erreur lors de l'inscription",
+        "errorinlogin": "Erreur lors de la connexion",
+        "errorlogout": "Erreur lors de la déconnexion",
+        "errorsendcode": "Erreur lors de l'envoi du code",
+        "errorconfirmation": "Erreur lors de la confirmation",
+        "error2afa": "Erreur lors de la configuration de la vérification en deux étapes",
+        "account_blocked": "Compte bloqué. Réessayez dans {{minutes}} minutes.",
+        "too_many_attempts": "Trop de tentatives. Compte bloqué pour 15 minutes."
     },
     "Settings": {
         "title": "Paramètres",

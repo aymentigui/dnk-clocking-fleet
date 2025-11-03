@@ -133,7 +133,16 @@
         "invalidtoken": "رمز غير صحيح",
         "tokenexpired": "انتهت صلاحية الرمز",
         "badrequest": "طلب غير صالح",
-        "errorscreating": "خطأ في انشاء"
+        "errorscreating": "خطأ في انشاء",
+        "invalideorexpiredcode": "رمز غير صحيح أو انتهت صلاحيته",
+        "errorregistering": "خطأ في التسجيل",
+        "errorinlogin": "خطأ في تسجيل الدخول",
+        "errorlogout": "خطأ في تسجيل الخروج",
+        "errorsendcode": "خطأ في ارسال الكود",
+        "errorconfirmation": "خطأ في التأكيد",
+        "error2afa": "خطأ في التوثيق بخطوتين",
+        "account_blocked": "تم حظر الحساب. يرجى المحاولة مرة أخرى بعد {{minutes}} دقيقة.",
+        "too_many_attempts": "محاولات كثيرة جدًا. تم حظر الحساب لمدة 15 دقيقة."
     },
     "Settings": {
         "title": "الإعدادات",
