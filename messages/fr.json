@@ -22,6 +22,10 @@
         "createdat": "Créé le",
         "emailsent": "Email envoyé",
         "login": "Connexion",
+        "2fa_required": "La vérification en deux étapes est requise",
+        "verificationemailsent": "Email de verification envoyé",
+        "resendthecode": "Renvoyer le code",
+        "mustwait1minutes": "Vous devez attendre 1 minutes",
         "loginsuccess": "Connexion avec succès",
         "register": "Inscription",
         "registersuccess": "Inscription avec succès",
@@ -29,6 +33,11 @@
         "dashboard": "Tableau de bord",
         "settings": "Paramètres",
         "logout": "Se deconnecter",
+        "backtologin": "Retour à la page de connexion",
+        "verificationcode": "Vérification requise",
+        "entercode": "Entrez le code que nous venons de vous envoyer à l'email :",
+        "newtotheplatform": "Nouveau sur la plateforme ?",
+        "haveanaccount": "Vous avez déjà un compte ?",
         "next": "Suivant",
         "reset": "Reinitialiser",
         "options": "Options",
@@ -57,7 +66,6 @@
         "document": "Document",
         "audio": "Audio",
         "other": "Autre",
-
         "number": "Nombre",
         "date": "Date",
         "time": "Heure",
@@ -74,7 +82,6 @@
         "email": "Email",
         "phone": "Numéro de téléphone",
         "url": "URL",
-
         "export": "Exporter",
         "exportall": "Exporter tout",
         "exportselected": "Exporter la selection",
@@ -83,9 +90,7 @@
         "exportPDF": "Exporter PDF",
         "exportHTML": "Exporter HTML",
         "exportHTML5": "Exporter HTML5",
-
         "mustrefreshtoseedata": "Veuillez actualiser la page pour voir les nouvelles données.",
-
         "confermationdelete": "Etes-vous absolument sur?",
         "confermationdeletemessage": "Cette action ne peut pas etre annulee. Cela supprimera definitivement vos donnees et supprimera vos donnees de nos serveurs.",
         "downloadjustselected": "Télécharger juste la selection",
@@ -146,7 +151,13 @@
         "newpassword": "Nouveau mot de passe",
         "confirmpassword": "Confirmer le mot de passe",
         "codeverification": "Code de vérification",
-        "forgetpassword": "Mot de passe oublié ?"
+        "forgetpassword": "Mot de passe oublié ?",
+        "personalinfo": "Informations personnelles",
+        "change info": "Changer les informations personnelles",
+        "emailorusername_required": "L'email ou le nom d'utilisateur est requis",
+        "selectnewpassword": "Définissez votre nouveau mot de passe sécurisé",
+        "youhavenotaccount": "Vous n'avez pas de compte ? Cliquez ici",
+        "youhaveaccount": "Vous avez un compte ? Cliquez ici"
     },
     "Sessions": {
         "title": "Sessions",
@@ -167,6 +178,19 @@
         "deletesession": "Supprimer la session",
         "deleteallsessions": "Supprimer toutes les sessions",
         "sessionnotfound": "Session introuvable"
+    },
+    "Login": {
+        "verification_pending": "Vérification en attente",
+        "verification_code_sent": "Un code de vérification a été envoyé à :",
+        "attempts_warning": "Tentative {attempts}/3 - Après 3 tentatives, votre compte sera bloqué pendant 15 minutes.",
+        "account_temporarily_blocked": "Compte temporairement bloqué",
+        "too_many_attempts": "Trop de tentatives. Veuillez réessayer dans {minutes} minute(s).",
+        "code_verification": "Code de vérification",
+        "did_not_receive_code": "Vous n'avez pas reçu le code ?",
+        "back_to_login": "← Retour à la connexion",
+        "resend_code": "Renvoyer le code",
+        "blocked": "Bloqué ({minutes}min)",
+        "confirm": "Confirmer"
     },
     "Roles": {
         "title": "Roles",
@@ -215,11 +239,10 @@
         "avatarinvalid": "L'avatar est invalide",
         "imagerequired": "L'image est requise",
         "onlyimagesallowed": "Seuls les images sont autorisées",
-
         "selectusers": "Sélectionner des utilisateurs",
         "deleteusers": "Supprimer des utilisateurs",
-        "confermationdelete" : "Etes-vous absolument sur?",
-        "confermationdeletemessage" : "Cette action ne peut pas etre annulee. Cela supprimera definitivement vos donnees et supprimera vos donnees de nos serveurs."
+        "confermationdelete": "Etes-vous absolument sur?",
+        "confermationdeletemessage": "Cette action ne peut pas etre annulee. Cela supprimera definitivement vos donnees et supprimera vos donnees de nos serveurs."
     },
     "Permissions": {
         "title": "Permissions",
@@ -248,6 +271,10 @@
         "region_create": "Créer une région",
         "region_update": "Mettre à jour la région",
         "region_delete": "Supprimer la région",
+        "entreprise_view": "Vue de l'entreprise",
+        "entreprise_create": "Créer une entreprise",
+        "entreprise_update": "Mettre à jour l'entreprise",
+        "entreprise_delete": "Supprimer l'entreprise",
         "vehicles_view": "Vue des véhicules",
         "vehicles_create": "Créer des véhicules",
         "vehicles_update": "Mettre à jour les véhicules",
@@ -266,7 +293,20 @@
         "voirlesvehiculespourlaregion": "Voir les véhicules pour la région",
         "clocking_view": "Vue des horaires",
         "clocking_create": "Créer un horaire",
-        "notifications_view" : "Vue des notifications"
+        "notifications_view": "Vue des notifications",
+        "dashboard": "Tableau de bord",
+        "users": "Utilisateurs",
+        "roles": "Rôles",
+        "park": "Station",
+        "files": "Fichiers",
+        "region": "Région",
+        "devices": "Appareils",
+        "vehicles": "Véhicules",
+        "vehicles_park": "Véhicules par station",
+        "vehicles_region": "Véhicules par région",
+        "clocking": "Pointage",
+        "notifications": "Notifications",
+        "entreprise": "Entreprise"
     },
     "Files": {
         "title": "Fichiers",
@@ -351,16 +391,14 @@
         "updatepark": "Mettre à jour le parc",
         "deletepark": "Supprimer le parc",
         "parknotfound": "Parc introuvable",
-        "regionnotexist" : "La région n'existe pas",
+        "regionnotexist": "La région n'existe pas",
         "namerequired": "Veuillez saisir un nom",
         "nameexists": "Le nom existe déjà",
         "required": "Ce champ est obligatoire",
-        
         "selectparks": "Sélectionner des parcs",
         "deleteparks": "Supprimer les parcs",
         "confermationdelete": "Etes-vous sûr de vouloir supprimer?",
         "confermationdeletemessage": "Cette action ne peut pas être annulée. Cela supprimera définitivement vos parcs et supprimera vos données de nos serveurs.",
-
         "name": "Nom",
         "description": "Description",
         "address": "Adresse",
@@ -390,14 +428,13 @@
         "updatedevice": "Mettre à jour l'appareil",
         "deletedevice": "Supprimer l'appareil",
         "devicenotfound": "Appareil introuvable",
-
         "coderequired": "Veuillez saisir un code",
         "codeexists": "Le code existe déjà",
         "required": "Ce champ est obligatoire",
         "park": "Station",
         "region": "Région",
         "code": "Code",
-        "username":"Nom d'utilisateur",
+        "username": "Nom d'utilisateur",
         "usernamerequired": "Veuillez saisir un nom d'utilisateur",
         "usernameexists": "Le nom d'utilisateur existe déjà",
         "password": "Mot de passe",
@@ -408,7 +445,6 @@
         "usernamecontainspace": "Le nom d'utilisateur ne peut pas contenir d'espaces",
         "selectpark": "Sélectionner une station",
         "selectregion": "Sélectionner une région",
-
         "selectdevices": "Sélectionner des appareils",
         "deletedevices": "Supprimer des appareils",
         "confermationdelete": "Etes-vous sûr de vouloir supprimer?",
@@ -478,7 +514,7 @@
         "parknotfound": "La station n'a pas été trouvée",
         "regionnotfound": "La region n'a pas été trouvée"
     },
-    "Notification":{
+    "Notification": {
         "title": "Notification"
     }
 }

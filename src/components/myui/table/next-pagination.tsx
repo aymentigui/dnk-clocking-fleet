@@ -33,7 +33,7 @@ const NextPagination = ({ page, setPage, count, pageSize, isLoading, searchQuery
             className={cn(pageSize === 0 ? "hidden" : "block",
                 page === Math.ceil(count / pageSize) ? "cursor-not-allowed" : "")}
             onClick={handleNextPage}
-            disabled={pageSize === 0 || page === Math.ceil(count / pageSize) || isLoading}
+            disabled={pageSize === 0 || page === Math.ceil(count / pageSize) || count===0 || isLoading}
         >
             {s("next")}
         </Button>

@@ -90,7 +90,13 @@ export const { handlers, auth, signIn, signOut } =
         const existingUser = await getUserByid(user.id);
         if (!existingUser)
           return false
-        if (existingUser.data.isTwoFactorEnabled) {
+
+        // Vérifier si le compte est verrouillé
+        if (existingUser.data.locked_until && new Date(existingUser.data.locked_until) > new Date()) {
+          throw new Error("ACCOUNT_LOCKED")
+        }
+
+        if (existingUser.data.is_two_factor_enabled) {
           const towFacorConfermation = await getTowFactorConfermationByUserId(user.id);
 
           if (!towFacorConfermation.data) {
@@ -143,10 +149,63 @@ export const { handlers, auth, signIn, signOut } =
           if (!user || !user.password) {
             return null
           }
+
+          if (user.locked_until && new Date(user.locked_until) > new Date()) {
+            throw new Error("ACCOUNT_LOCKED")
+          }
+
           const isValid = await bcrypt.compare(password, user.password)
+
           if (!isValid) {
+            // Incrémenter le compteur d'échecs
+            const updatedFailedAttempts = user.failed_login_attempts + 1;
+            let lockedUntil = null;
+
+            // Verrouiller après 5 tentatives échouées
+            if (updatedFailedAttempts >= 5) {
+              lockedUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+            }
+
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                failed_login_attempts: updatedFailedAttempts,
+                locked_until: lockedUntil
+              }
+            });
+
             return null
           }
+
+          // Réinitialiser le compteur d'échecs en cas de succès
+          if (user.failed_login_attempts > 0) {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                failed_login_attempts: 0,
+                locked_until: null
+              }
+            });
+          }
+
+          if (user.email_verified === null) {
+            return null
+          }
+
+          if (user.is_two_factor_enabled) {
+            const towFacorConfermation = await getTowFactorConfermationByUserId(user.id);
+            if (!towFacorConfermation.data) {
+              return null
+            }
+
+            if (towFacorConfermation.data.expiresAt > new Date()) {
+              await deleteTowFactorConfermationByUserId(user.id);
+              return null
+            }
+
+            await deleteTowFactorConfermationByUserId(user.id);
+          }
+
           const sessionId = uuidv4();
 
           return {

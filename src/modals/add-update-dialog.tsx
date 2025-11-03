@@ -161,12 +161,12 @@ export const AddUpdateUserDialog = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[70%] max-w-[70%] gb-r h-[80%] overflow-y-auto">
+      <DialogContent className="w-[70%] max-w-[70%] gb-r h-[80%] overflow-auto">
         <DialogHeader>
           <DialogTitle className="text-center">{isAdd ? u("adduser") : u("updateuser")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 overflow-auto p-2">
             <AvatarUploader name="image" image={image} />
             <div className="grid grid-cols-2 gap-4">
               {/* First Name */}

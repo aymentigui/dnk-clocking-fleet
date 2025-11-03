@@ -18,6 +18,7 @@ export async function createDevice(data: any) {
         password: z.string().min(6, u("password6")),
         park: z.string().optional(),
         region: z.string().optional(),
+        entreprise: z.string().optional(),
         type: z.number().optional(),
     });
 
@@ -36,8 +37,8 @@ export async function createDevice(data: any) {
         if (!result.success) {
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { code, username, password, park , type, region} = result.data;
-        console.log(type,region)
+        const { code, username, password, park, type, region, entreprise } = result.data;
+        console.log(type, region)
         const codeExists = await prisma.device.findFirst({ where: { code } });
         if (codeExists) {
             return { status: 400, data: { message: u("codeexists") } };
@@ -61,7 +62,7 @@ export async function createDevice(data: any) {
             return { status: 400, data: { message: u("usernameexists") } };
         }
 
-        if (park && park!=null && park!="null" && park != "" && park.trim() != ""){
+        if (park && park != null && park != "null" && park != "" && park.trim() != "") {
             const parkExists = await prisma.park.findFirst({ where: { id: park } });
 
             if (!parkExists) {
@@ -69,10 +70,18 @@ export async function createDevice(data: any) {
             }
         }
 
-        if (region && region!=null && region!="null" && region != "" && region.trim() != "") {
+        if (region && region != null && region != "null" && region != "" && region.trim() != "") {
             const regionExists = await prisma.region.findFirst({ where: { id: park } });
 
             if (!regionExists) {
+                return { status: 400, data: { message: u("regionnotexist") } };
+            }
+        }
+
+        if (entreprise && entreprise != null && entreprise != "null" && region != "" && entreprise.trim() != "") {
+            const entrepriseExists = await prisma.entreprise.findFirst({ where: { id: park } });
+
+            if (!entrepriseExists) {
                 return { status: 400, data: { message: u("regionnotexist") } };
             }
         }
@@ -105,7 +114,7 @@ export async function createDevice(data: any) {
             },
         });
 
-        if(park && park!=null && park!="null" && park != "" && park.trim() != ""  && device){
+        if (park && park != null && park != "null" && park != "" && park.trim() != "" && device) {
             await prisma.device.update({
                 where: {
                     id: device.id
@@ -120,7 +129,7 @@ export async function createDevice(data: any) {
             })
         }
 
-        if(region && region!=null && region!="null" && region != "" && region.trim() != "" && device){
+        if (region && region != null && region != "null" && region != "" && region.trim() != "" && device) {
             await prisma.device.update({
                 where: {
                     id: device.id
@@ -129,6 +138,21 @@ export async function createDevice(data: any) {
                     region: {
                         connect: {
                             id: region
+                        }
+                    }
+                }
+            })
+        }
+
+        if (entreprise && entreprise != null && entreprise != "null" && region != "" && entreprise.trim() != "" && device) {
+            await prisma.device.update({
+                where: {
+                    id: device.id
+                },
+                data: {
+                    entreprise: {
+                        connect: {
+                            id: entreprise
                         }
                     }
                 }
@@ -151,9 +175,10 @@ export async function createDevices(data: any) {
         code: z.string().min(1, u("coderequired")),
         username: z.string().min(1, u("usernamerequired")).refine(username => !username.includes(' '), {
             message: u("usernamecontainspace")
-        }),        password: z.string().min(6, u("password6")),
+        }), password: z.string().min(6, u("password6")),
         park: z.string().optional(),
         region: z.string().optional(),
+        entreprise: z.string().optional(),
         type: z.number().optional(),
     });
     try {
@@ -168,7 +193,7 @@ export async function createDevices(data: any) {
         }
 
         const devices = data.map(async (userData: any) => {
-            return await addDevice(userData, schema, session, u,s);
+            return await addDevice(userData, schema, session, u, s);
         })
 
         const devicesResuls = await Promise.all(devices);
@@ -181,7 +206,7 @@ export async function createDevices(data: any) {
     }
 }
 
-const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any) => {
+const addDevice = async (data: any, userSchema: any, session: any, u: any, s: any) => {
     try {
 
         const result = userSchema.safeParse({
@@ -190,6 +215,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
             password: String(data.password),
             park: String(data.park),
             region: String(data.region),
+            entreprise: String(data.entreprise),
             type: parseInt(String(data.type)) || 0,
         });
 
@@ -201,7 +227,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
             return { status: 400, data: { message: message, device: data } };
         }
 
-        const { code, username, password, park, type, region } = result.data;
+        const { code, username, password, park, type, region, entreprise } = result.data;
 
         const codeExists = await prisma.device.findFirst({ where: { code } });
         if (codeExists) {
@@ -225,9 +251,9 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
         if (emailExists) {
             return { status: 400, data: { device: data, message: u("usernameexists") } };
         }
-        
-        
-        if (park && park!=null && park!="null" && park != "" && park.trim() != "") {
+
+
+        if (park && park != null && park != "null" && park != "" && park.trim() != "") {
             const parkExists = await prisma.park.findFirst({ where: { name: park } });
 
             if (!parkExists) {
@@ -235,11 +261,19 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
             }
         }
 
-        
-        if (region && region!=null && region!="null" && region != "" && region.trim() != "") {
+
+        if (region && region != null && region != "null" && region != "" && region.trim() != "") {
             const regionExists = await prisma.region.findFirst({ where: { name: region } });
-            
+
             if (!regionExists) {
+                return { status: 400, data: { device: data, message: u("regionnotexist") } };
+            }
+        }
+
+        if (entreprise && entreprise != null && entreprise != "null" && region != "" && entreprise.trim() != "") {
+            const entrepriseExists = await prisma.entreprise.findFirst({ where: { name: entreprise } });
+
+            if (!entrepriseExists) {
                 return { status: 400, data: { device: data, message: u("regionnotexist") } };
             }
         }
@@ -272,7 +306,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
                 },
             },
         });
-        if(park && device && park.trim() != "" && park!=="null" ){
+        if (park && device && park.trim() != "" && park !== "null") {
             await prisma.device.update({
                 where: {
                     id: device.id
@@ -286,7 +320,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
                 }
             })
         }
-        if(region && device && region.trim() != "" && region!=="null" ){
+        if (region && device && region.trim() != "" && region !== "null") {
             await prisma.device.update({
                 where: {
                     id: device.id
@@ -301,6 +335,20 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s:any
             })
         }
 
+        if (entreprise && device && entreprise.trim() != "" && entreprise !== "null") {
+            await prisma.device.update({
+                where: {
+                    id: device.id
+                },
+                data: {
+                    region: {
+                        connect: {
+                            name: entreprise
+                        }
+                    }
+                }
+            })
+        }
 
         return { status: 200, data: data };
     } catch (error) {

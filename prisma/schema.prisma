@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
   // directUrl = env("DIRECT_URL")
 }
@@ -35,6 +35,14 @@ model user {
   public                           Boolean                    @default(true)
   // Optional for WebAuthn support
   // Authenticator                 Authenticator[]
+  failed_login_attempts            Int                        @default(0)
+  locked_until                     DateTime?
+  verification_attempts            Int                        @default(0)
+  last_verification_attempt        DateTime?
+  verification_blocked_until       DateTime?
+  two_factor_attempts              Int                        @default(0)
+  last_two_factor_attempt          DateTime?
+  two_factor_blocked_until         DateTime?
 
   created_at     DateTime         @default(now())
   updated_at     DateTime         @updatedAt
@@ -115,14 +123,16 @@ model twofactorconfermation {
 }
 
 model resetpasswordconfermation {
-  id         String   @id @default(cuid())
-  user_id    String
-  expired_at DateTime
-  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id            String    @id @default(cuid())
+  user_id       String
+  expired_at    DateTime
+  attempts      Int       @default(0) // Nombre de tentatives
+  last_attempt  DateTime  @default(now()) // Dernière tentative
+  blocked_until DateTime? // Bloqué jusqu'à cette date
+  user          user      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id])
 }
-
 model role {
   id          String     @id @default(cuid())
   name        String     @unique
@@ -191,6 +201,18 @@ model region {
   clocking     clocking[]
 }
 
+model entreprise {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  address     String?
+  phone       String?
+  created_at  DateTime  @default(now())
+  deleted_at  DateTime?
+  added_from  String?
+  device      device[]
+}
+
 model device {
   id       String  @id @default(cuid())
   code     String?
@@ -202,12 +224,14 @@ model device {
   user     user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   type     Int?
 
-  created_at DateTime   @default(now())
-  deleted_at DateTime?
-  added_from String?
-  clocking   clocking[]
-  region     region?    @relation(fields: [region_id], references: [id])
-  region_id  String?
+  created_at    DateTime    @default(now())
+  deleted_at    DateTime?
+  added_from    String?
+  clocking      clocking[]
+  region        region?     @relation(fields: [region_id], references: [id])
+  region_id     String?
+  entreprise    entreprise? @relation(fields: [entreprise_id], references: [id])
+  entreprise_id String?
 
   @@index([park_id])
 }
@@ -272,5 +296,5 @@ model notification {
   view_by    String?
   created_at DateTime @default(now())
   added_by   String?
-  user       user?     @relation(fields: [added_by], references: [id])
+  user       user?    @relation(fields: [added_by], references: [id])
 }

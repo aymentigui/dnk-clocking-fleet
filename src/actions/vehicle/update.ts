@@ -283,7 +283,7 @@ export async function UpdateVehiclesParcMatricule(vehicleMatriculesPark: { matri
                     where: {
                         name: {
                             equals: vehicleMatricule.park,
-                            mode: 'insensitive',
+                            // mode: 'insensitive',
                         },
                     },
                 });
@@ -333,7 +333,7 @@ export async function UpdateVehiclesRegionMatricules(vehicleMatriculesRegion: { 
                     where: {
                         name: {
                             equals: vehicleMatricule.region,
-                            mode: 'insensitive',
+                            // mode: 'insensitive',
                         },
                     },
                 });

@@ -19,6 +19,7 @@ export async function UpdateDevice(id: string, data: any) {
             }),            password: z.string().min(6, u("password6")),
             park: z.string().optional(),
             region: z.string().optional(),
+            entreprise: z.string().optional(),
             type: z.number().optional(),
         });
 
@@ -38,7 +39,7 @@ export async function UpdateDevice(id: string, data: any) {
             //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { code, username, password, park, type, region } = result.data;
+        const { code, username, password, park, type, region, entreprise } = result.data;
 
         const deviceExists = await prisma.device.findFirst({ where: { id } });
 
@@ -131,6 +132,38 @@ export async function UpdateDevice(id: string, data: any) {
                 },
                 data: {
                     region: {
+                        disconnect: true
+                    },
+                },
+            })
+        }
+
+        if (entreprise && entreprise!=null && entreprise!="null" && region != "" && entreprise.trim() != "")  {
+            const entrepriseExists = await prisma.entreprise.findFirst({ where: { id: entreprise } });
+
+            if (!entrepriseExists) {
+                return { status: 400, data: { message: u("regionnotexist") } };
+            }else{
+                await prisma.device.update({
+                    where: {
+                        id
+                    },
+                    data: {
+                        entreprise: {
+                            connect: {
+                                id: entreprise
+                            }
+                        }
+                    }
+                })
+            }
+        }else{
+            await prisma.device.update({
+                where: {
+                    id
+                },
+                data: {
+                    entreprise: {
                         disconnect: true
                     },
                 },

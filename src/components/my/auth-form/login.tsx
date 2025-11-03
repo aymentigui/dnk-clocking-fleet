@@ -4,145 +4,291 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
-    Form,
-    FormField,
-    FormControl,
-    FormItem,
-    FormLabel,
-    FormMessage,
+    Form, FormField, FormControl, FormItem, FormLabel, FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { loginUser } from '@/actions/auth/auth'
+import { loginUser, SendVerificationCode, SendVerificationCode2FA } from '@/actions/auth/auth'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { getConfirmationCodePasswordChange } from '@/actions/auth/password-change'
-import { useLocale, useTranslations } from 'next-intl'
-import { Eye, EyeOff } from 'lucide-react'  // Assurez-vous d'installer react-feather
+import { useTranslations } from 'next-intl'
+import { Eye, EyeOff, Loader2, Shield, Mail, Lock } from 'lucide-react'
+import { useSession } from '@/hooks/use-session'
+import Link from 'next/link'
+
+// --- Schéma de Validation ---
+const LoginSchema = (u: any) => z.object({
+    email: z.string({ required_error: u("emailrequired") }),
+    password: z.string({ required_error: u("passwordrequired") }).min(6, { message: u("password6") }),
+    code: z.string().optional(),
+});
+type LoginFormData = z.infer<ReturnType<typeof LoginSchema>>;
 
 const LoginForm = () => {
-    const [loading, setLoading] = useState(false)
-    const [twoFactorConfermation, setTwoFactorConfermation] = useState(false)
-    const [showPassword, setShowPassword] = useState(false)  // Pour gérer l'affichage du mot de passe
-    const router = useRouter()
-    const locale =useLocale()
+    const [loading, setLoading] = useState(false);
+    const [twoFactorConfirmation, setTwoFactorConfirmation] = useState(false);
+    const router = useRouter();
+    const [hidePassword, setHidePassword] = useState(true);
+    const { setSession } = useSession();
 
-    const t = useTranslations("Settings")
-    const s = useTranslations("System")
-    const u = useTranslations("Users")
+    const t = useTranslations("Settings");
+    const s = useTranslations("System");
+    const u = useTranslations("Users");
 
-    const LoginSchema = z.object({
-        email: z.string({ required_error: u("emailrequired") }).email({ message: u("emailinvalid") }),
-        password: z.string({ required_error: u("passwordrequired") }).min(6, { message: u("password6") }),
-        code: z.string().optional(),
+    const form = useForm<LoginFormData>({
+        resolver: zodResolver(LoginSchema(u)),
+        defaultValues: { email: "", password: "", code: "" },
     });
 
-    const form = useForm<z.infer<typeof LoginSchema>>({
-        resolver: zodResolver(LoginSchema),
-        defaultValues: {
-            email: "",
-            password: "",
-        },
-    })
-    
-    function onSubmit(values: z.infer<typeof LoginSchema>) {
-        setLoading(true)
-        loginUser(values).then((res) => {
-            if (res.status === 200) {
-                if (res.data.twoFactorConfermation) {
-                    setTwoFactorConfermation(true)
-                } else {
-                    router.push("/admin");
-                }
-            } else {
-                toast.error(res.data.message);
-            }
-        })
-        setLoading(false)
-    }
+    // --- Gestion du Soumission du Formulaire ---
+    const onSubmit = async (values: LoginFormData) => {
+        setLoading(true);
+        try {
+            const res = await loginUser(values);
 
-    const passwordForget = async () => {
-        if (!form.getValues().email) {
-            toast.error(t("emailorusername"))
-            return
-        }
-        getConfirmationCodePasswordChange(form.getValues().email).then((res) => {
             if (res.status === 200) {
-                router.push(`/auth/reset?email=${encodeURIComponent(form.getValues().email)}`)
+                toast.success(res.data.message || s("loginsuccess"));
+                setSession(res);
+                router.push("/");
+            } else if (res.status === 202 && res.data.twoFactorConfermation) {
+                toast(res.data.message || s("2fa_code_sent"), { icon: '🔑' });
+                setTwoFactorConfirmation(true);
+            } else if (res.status === 403 && res.data.emailNotVerified) {
+                await SendVerificationCode(values.email);
+                router.push(`/auth/confermation?email=${encodeURIComponent(values.email)}`);
+            } else if (res.status === 423) {
+                // Compte verrouillé
+                toast.error(res.data.message || s("account_locked"));
             } else {
-                toast.error(res.data.message)
+                toast.error(res.data.message || s("login_error"));
             }
-        })
-    }
+        } catch (error) {
+            toast.error(s("unexpected_error"));
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // --- Mot de passe oublié ---
+    const passwordForget = async () => {
+        const email = form.getValues().email;
+        if (!email) {
+            toast.error(t("emailorusername_required"));
+            return;
+        }
+        setLoading(true);
+        try {
+            const res = await getConfirmationCodePasswordChange(email);
+            if (res.status === 200) {
+                router.push(`/auth/reset?email=${encodeURIComponent(email)}`);
+            } else {
+                toast.error(res.data.message || s("password_reset_error"));
+            }
+        } catch (error) {
+            toast.error(s("unexpected_error"));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // --- Renvoyer le code 2FA/Vérification ---
+    const resendTheCode = async () => {
+        const email = form.getValues().email;
+        if (!email) {
+            toast.error(t("emailorusername_required"));
+            return;
+        }
+        setLoading(true);
+        try {
+            const res = await SendVerificationCode2FA(email);
+            if (res.status === 200) {
+                toast.success(s("verificationemailsent"));
+            } else if (res.status === 429) {
+                toast.error(res.data.message || s("twofactorblocked"));
+            } else {
+                toast.error(res.data.message || s("resend_code_error"));
+            }
+        } catch (error) {
+            toast.error(s("unexpected_error"));
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 text-black">
-                {!twoFactorConfermation && <>
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>{t("emailorusername")}</FormLabel>
-                                <FormControl>
-                                    <Input className='border-gray-200 focus:border-black' placeholder={t("emailorusername")} {...field} />
-                                </FormControl>
-                                <FormMessage className='font-bold' />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>{t("password")}</FormLabel>
-                                <FormControl>
-                                    <div className="relative">
-                                        <Input
-                                            type={showPassword ? "text" : "password"}  // Toggle du type du champ de mot de passe
-                                            className='border-gray-200 focus:border-black'
-                                            placeholder={t("password")}
-                                            {...field}
-                                        />
-                                        <Button
-                                            type="button"
-                                            className={"absolute p-3 bg-background hover:bg-border border top-0 "+(locale!=="ar" ? "right-0" : "left-0")}
-                                            onClick={() => setShowPassword(!showPassword)}  // Toggle pour l'icône
-                                        >
-                                            {showPassword ? <EyeOff className='text-foreground' size={20} /> : <Eye className='text-foreground' size={20} />}
-                                        </Button>
-                                    </div>
-                                </FormControl>
-                                <FormMessage className='font-bold' />
-                            </FormItem>
-                        )}
-                    />
-                </>}
-                {twoFactorConfermation && <>
-                    <FormField
-                        control={form.control}
-                        name="code"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>{t("codeverification")} </FormLabel>
-                                <FormControl>
-                                    <Input className='border-gray-200 focus:border-black' placeholder={t("codeverification")} {...field} />
-                                </FormControl>
-                                <FormMessage className='font-bold' />
-                            </FormItem>
-                        )}
-                    />
-                </>}
-                <Button variant='link' type='button' onClick={passwordForget} className='p-0 text-black'>{t("forgetpassword")}</Button>
-                <div className='pt-4'>
-                    <Button
-                        disabled={loading} className={cn('font-bold w-full bg-black hover:bg-gray-800 text-white', loading && 'cursor-wait')} type="submit">{twoFactorConfermation ? s("confirm") : s("login")}</Button>
+        <div className="w-full space-y-6">
+            {/* En-tête conditionnel pour 2FA */}
+            {twoFactorConfirmation && (
+                <div className="text-center p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                    <div className="flex items-center justify-center mb-2">
+                        <Shield className="w-6 h-6 text-yellow-400 mr-2" />
+                        <h3 className="text-lg font-semibold text-yellow-400">
+                            {s("2fa_required")}
+                        </h3>
+                    </div>
+                    <p className="text-yellow-300 text-sm">
+                        Un code de vérification a été envoyé à votre email
+                    </p>
                 </div>
-            </form>
-        </Form>
+            )}
+
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    {/* CHAMPS DE CONNEXION */}
+                    {!twoFactorConfirmation && (
+                        <>
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className='text-sm font-medium text-foreground/50'>
+                                            {t("emailorusername")}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground/70" />
+                                                <Input
+                                                    placeholder={t("emailorusername")}
+                                                    {...field}
+                                                    className="w-full pl-10 pr-4 py-3 bg-foreground/5 border border-foreground/10 text-foreground placeholder-foreground/70 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                                />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage className='text-xs font-semibold text-red-300' />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className='text-sm font-medium text-foreground/50'>
+                                            {t("password")}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <div className='relative'>
+                                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground/70" />
+                                                <Input
+                                                    type={hidePassword ? "password" : "text"}
+                                                    placeholder={t("password")}
+                                                    {...field}
+                                                    className="w-full pl-10 pr-12 py-3 bg-foreground/5 border border-foreground/10 text-foreground placeholder-foreground/70 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                                />
+                                                <div
+                                                    onClick={() => setHidePassword(!hidePassword)}
+                                                    className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-foreground/70 hover:text-foreground/40 transition-colors duration-200'
+                                                >
+                                                    {hidePassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                                </div>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage className='text-xs font-semibold text-red-300' />
+                                    </FormItem>
+                                )}
+                            />
+                        </>
+                    )}
+
+                    {/* CHAMP DE CODE 2FA */}
+                    {twoFactorConfirmation && (
+                        <FormField
+                            control={form.control}
+                            name="code"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className='text-sm font-medium text-foreground/40'>
+                                        {t("codeverification")}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <div className="relative">
+                                            <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground/70" />
+                                            <Input
+                                                placeholder={t("codeverification")}
+                                                {...field}
+                                                className="w-full pl-10 pr-4 py-3 bg-foreground/5 border border-foreground/10 text-foreground placeholder-foreground/70 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-center text-lg tracking-widest"
+                                            />
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage className='text-xs font-semibold text-red-300' />
+                                </FormItem>
+                            )}
+                        />
+                    )}
+
+                    {/* ACTIONS SECONDAIRES */}
+                    <div className='flex justify-between items-center pt-2'>
+                        <Button
+                            variant='link'
+                            type='button'
+                            onClick={passwordForget}
+                            className='p-0 text-sm text-blue-700 hover:text-blue-400 transition duration-150'
+                            disabled={loading || twoFactorConfirmation}
+                        >
+                            {t("forgetpassword")}
+                        </Button>
+                        {twoFactorConfirmation && (
+                            <Button
+                                variant='link'
+                                type='button'
+                                onClick={resendTheCode}
+                                className='p-0 text-sm text-blue-700 hover:text-blue-400 transition duration-150'
+                                disabled={loading}
+                            >
+                                {s("resendthecode")}
+                            </Button>
+                        )}
+                    </div>
+
+                    {/* BOUTON PRINCIPAL */}
+                    <div className='pt-3'>
+                        <Button
+                            disabled={loading}
+                            type="submit"
+                            className={cn(
+                                'w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white/80 font-bold rounded-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all duration-300 transform hover:scale-[1.02] shadow-lg',
+                                loading && 'opacity-70 cursor-not-allowed hover:scale-100',
+                            )}
+                        >
+                            {loading ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : twoFactorConfirmation ? (
+                                <Shield className="mr-2 h-4 w-4" />
+                            ) : (
+                                <Mail className="mr-2 h-4 w-4" />
+                            )}
+                            {twoFactorConfirmation ? s("confirm") : s("login")}
+                        </Button>
+                    </div>
+                </form>
+
+                {/* LIEN D'INSCRIPTION */}
+                <div className="mt-6 text-center">
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-foreground/10"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-transparent text-foreground/70">
+                                {s("newtotheplatform")}
+                            </span>
+                        </div>
+                    </div>
+                    <Link href="/auth/register" passHref className="mt-4 block">
+                        <Button 
+                            variant='outline' 
+                            className='w-full py-3 border-foreground/20 text-foreground hover:bg-foreground/10 hover:text-foreground transition-all duration-200 rounded-xl'
+                        >
+                            {t("youhavenotaccount")}
+                        </Button>
+                    </Link>
+                </div>
+            </Form>
+        </div>
     )
 }
 
