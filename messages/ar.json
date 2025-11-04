@@ -546,7 +546,7 @@
         "entry_exit": "دخول/خروج",
         "controller": "جهاز تحكم",
         "total_clockings": "إجمالي التوقيتات",
-        "today_clockings": "توقيتات اليوم",
+        "today_clockings": "عدد تسجيل خروج الحافلات",
         "filter_by_date": "تصفية حسب التاريخ",
         "all_dates": "جميع التواريخ"
     },

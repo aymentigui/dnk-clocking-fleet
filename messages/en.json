@@ -548,7 +548,7 @@
         "entry_exit": "Entry/Exit",
         "controller": "Controller",
         "total_clockings": "Total Clockings",
-        "today_clockings": "Today's Clockings",
+        "today_clockings": "Number of buses exiting",
         "filter_by_date": "Filter by date",
         "all_dates": "All dates"
     },

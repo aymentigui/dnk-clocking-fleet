@@ -547,7 +547,7 @@
         "entry_exit": "Entrée/Sortie",
         "controller": "Contrôleur",
         "total_clockings": "Total des pointages",
-        "today_clockings": "Pointages d'aujourd'hui",
+        "today_clockings": "Nombre de bus sortant",
         "filter_by_date": "Filtrer par date",
         "all_dates": "Toutes les dates"
     },
