@@ -164,28 +164,21 @@ export function ParksTable({
                         <div className="flex flex-wrap gap-2">
                             {/* Bouton Ajouter */}
                             {(session?.user?.permissions.includes("park_create") || session?.user?.is_admin) && (
-                                <Link href="/admin/parks/add">
-                                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                                        <Plus className="w-4 h-4 mr-2" />
-                                        {t("addpark")}
-                                    </Button>
-                                </Link>
+                                <>
+                                    <Link href="/admin/parks/add">
+                                        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                                            <Plus className="w-4 h-4 mr-2" />
+                                            {t("addpark")}
+                                        </Button>
+                                    </Link>
+                                    {/* Boutons Export */}
+                                    <ExportButton
+                                        all={true}
+                                        handleExportCSV={() => exportAll(1)}
+                                        handleExportXLSX={() => exportAll(2)}
+                                    />
+                                </>
                             )}
-
-                            {/* Bouton Importer */}
-                            <Link href="/admin/sheetimport">
-                                <Button variant="outline">
-                                    <Upload className="w-4 h-4 mr-2" />
-                                    {s("import")}
-                                </Button>
-                            </Link>
-
-                            {/* Boutons Export */}
-                            <ExportButton
-                                all={true}
-                                handleExportCSV={() => exportAll(1)}
-                                handleExportXLSX={() => exportAll(2)}
-                            />
 
                             {selectedIds.length > 0 && (
                                 <ExportButton
@@ -249,9 +242,12 @@ export function ParksTable({
 
                     {/* Tableau */}
                     {isLoading ? (
-                        <div className="h-64 flex items-center justify-center">
-                            <Loading />
+                        <div className="flex justify-center items-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                         </div>
+                        // <div className="h-64 flex items-center justify-center">
+                        //     <Loading />
+                        // </div>
                     ) : (
                         <div className="border rounded-lg overflow-hidden">
                             <table className="w-full">
