@@ -14,7 +14,7 @@ export const POST= withAuth(async (request, { user }) => {
     console.log("Received clocking data:", data);
     const res = await createClocking({ matricule: data.matricule, type: data.type, conducteur_id: data.conducteur_id });
     console.log("Clocking creation response:", res);
-    return NextResponse.json({ data: res }, { status: 200 });
+    return NextResponse.json({ data: res.data }, { status: res.status });
 });
 
 // export async function OPTIONS() {
