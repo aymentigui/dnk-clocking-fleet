@@ -37,15 +37,13 @@ export function ClockingsTable({ clockings, loading }: ClockingsTableProps) {
         }
     };
 
-    const getStatusColor = (status: string): string => {
-        switch (status?.toLowerCase()) {
-            case "success":
-            case "completed":
+    const getStatusColor = (status: any): string => {
+        switch (status) {
+            case 1:
                 return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-            case "pending":
-                return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-            case "error":
-            case "failed":
+            // case "pending":
+            //     return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+            case 0:
                 return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
             default:
                 return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
@@ -120,9 +118,9 @@ export function ClockingsTable({ clockings, loading }: ClockingsTableProps) {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${clocking.deviceType === 0 ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" :
-                                        clocking.deviceType === 1 ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200" :
-                                            clocking.deviceType === 2 ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" :
-                                                "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                    clocking.deviceType === 1 ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200" :
+                                        clocking.deviceType === 2 ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" :
+                                            "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                                     }`}>
                                     {getDeviceTypeLabel(clocking.deviceType)}
                                 </span>
