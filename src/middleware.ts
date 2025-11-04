@@ -8,34 +8,34 @@ const { auth } = NextAuth(authConfig);
 
 // Autoriser une liste d’origines (séparées par des virgules dans l’ENV)
 // ex: API_CORS_AUTORIZED="http://localhost:3001,https://app.example.com"
-// function applyCors(res: NextResponse, req: Request) {
-//   const allowlist = (process.env.API_CORS_AUTORIZED ?? "http://localhost:3001")
-//     .split(",")
-//     .map(s => s.trim());
+function applyCors(res: NextResponse, req: Request) {
+  const allowlist = ("*")
+    .split(",")
+    .map(s => s.trim());
 
-//   const origin = req.headers.get("origin");
-//   const allowedOrigin = origin && allowlist.includes(origin) ? origin : allowlist[0];
+  const origin = req.headers.get("origin");
+  const allowedOrigin = origin && allowlist.includes(origin) ? origin : allowlist[0];
 
-//   res.headers.set("Access-Control-Allow-Origin", allowedOrigin);
-//   res.headers.set("Vary", "Origin"); // important pour les CDN
-//   res.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-//   res.headers.set("Access-Control-Allow-Headers", "X-CSRF-Token, X-Requested-With, Accept, Content-Type, Authorization");
-//   res.headers.set("Access-Control-Allow-Credentials", "true");
-// }
+  res.headers.set("Access-Control-Allow-Origin", allowedOrigin);
+  res.headers.set("Vary", "Origin"); // important pour les CDN
+  res.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  res.headers.set("Access-Control-Allow-Headers", "X-CSRF-Token, X-Requested-With, Accept, Content-Type, Authorization");
+  res.headers.set("Access-Control-Allow-Credentials", "true");
+}
 
 export default auth(async (req) => {
   const { cookies, nextUrl, method } = req;
 
   // 1) Réponse immédiate aux preflights OPTIONS (avant toute auth)
-  // if (method === "OPTIONS") {
-  //   const preflight = new NextResponse(null, { status: 204 });
-  //   applyCors(preflight, req);
-  //   return preflight;
-  // }
+  if (method === "OPTIONS") {
+    const preflight = new NextResponse(null, { status: 204 });
+    applyCors(preflight, req);
+    return preflight;
+  }
 
   // 2) Réponse “par défaut”
   const response = NextResponse.next();
-  // applyCors(response, req);
+  applyCors(response, req);
 
   // --- ton code existant, inchangé, mais on réutilise `response` et on applique CORS sur tout retour ---
 
@@ -63,7 +63,7 @@ export default auth(async (req) => {
       }
       const redirectRes = NextResponse.redirect(`${domainUrl}/admin`);
       redirectRes.cookies.set("lang", lang);
-      // applyCors(redirectRes, req);
+      applyCors(redirectRes, req);
       return redirectRes;
     }
     return response;
@@ -76,7 +76,7 @@ export default auth(async (req) => {
     }
     const redirectRes = NextResponse.redirect(`${domainUrl}/auth/login`);
     redirectRes.cookies.set("lang", lang);
-    // applyCors(redirectRes, req);
+    applyCors(redirectRes, req);
     return redirectRes;
   }
 
