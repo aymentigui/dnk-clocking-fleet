@@ -4,17 +4,17 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { withAuthorizationPermission, verifySession } from "../permissions";
 
-export async function getClockings(page: number, pageSize: number, searchDate?: string): Promise<{ status: number, data: any, count: number }> {
+export async function getClockings(page: number, pageSize: number, searchDate?: string): Promise<{ status: number, data: any, count: number, countExit:number }> {
     const e = await getTranslations('Error');
     try {
         const session = await verifySession();
         if (!session?.data?.user) {
-            return { status: 401, data: { message: e("unauthorized") }, count: 0 };
+            return { status: 401, data: { message: e("unauthorized") }, count: 0, countExit:0 };
         }
         const hasPermission = await withAuthorizationPermission(['clocking_view'], session.data.user.id);
 
         if (hasPermission.status != 200 || !hasPermission.data.hasPermission) {
-            return { status: 403, data: { message: e('forbidden') }, count: 0 };
+            return { status: 403, data: { message: e('forbidden') }, count: 0, countExit:0 };
         }
 
         // Build where condition for date filter
@@ -60,17 +60,6 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
                     vehicle: {
                         select: {
                             matricule: true,
-                            vehicle_park: {
-                                orderBy: {
-                                    added_at: "desc",
-                                },
-                                take: 1,
-                                include: {
-                                    park: {
-                                        select: { name: true }
-                                    },
-                                },
-                            },
                         },
                     },
                     device: {
@@ -113,10 +102,16 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
             };
         });
 
-        return { status: 200, data: clockingFormatted, count: totalCount };
+        whereCondition.deviceType = 0; 
+
+        const countExit = await prisma.clocking.count({
+            where: whereCondition
+        })
+
+        return { status: 200, data: clockingFormatted, count: totalCount, countExit:countExit };
     } catch (error) {
         console.error("An error occurred in getClockings:", error);
-        return { status: 500, data: { message: e("error") }, count: 0 };
+        return { status: 500, data: { message: e("error") }, count: 0, countExit:0 };
     }
 }
 

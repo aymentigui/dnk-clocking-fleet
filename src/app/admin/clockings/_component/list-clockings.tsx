@@ -32,6 +32,7 @@ export default function ClockingsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
+    const [totalCountExit, setTotalCountExit] = useState(0);
 
     const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -47,6 +48,7 @@ export default function ClockingsPage() {
             if (response.status === 200) {
                 setClockings(response.data);
                 setTotalCount(response.count);
+                setTotalCountExit(response.countExit);
             } else {
                 console.error("Error loading clockings:", response.data);
             }
@@ -105,7 +107,7 @@ export default function ClockingsPage() {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-green-100 text-sm font-medium">{t("today_clockings")}</p>
-                            <p className="text-3xl font-bold mt-2">{todayClockings}</p>
+                            <p className="text-3xl font-bold mt-2">{totalCountExit}</p>
                             <p className="text-green-100 text-xs mt-1">Today</p>
                         </div>
                         <div className="bg-green-400/20 p-3 rounded-full">
