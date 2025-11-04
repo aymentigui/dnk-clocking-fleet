@@ -83,7 +83,7 @@ export async function createClocking(data: any) {
         if (status == 0) {
             const emails = await prisma.user.findMany({ where: { is_admin: true } })
 
-            await Promise.all(
+            Promise.all(
                 emails.map(async (email) => {
                     if (email.email) {
                         try {
@@ -98,7 +98,7 @@ export async function createClocking(data: any) {
                     }
                 })
             )
-            await prisma.notification.create({
+            prisma.notification.create({
                 data: {
                     title: "un mauvais pointage d'une véhicule",
                     contenu: "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehicle?.park?.name + " et station :" + existingVehicle?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la station " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région"),

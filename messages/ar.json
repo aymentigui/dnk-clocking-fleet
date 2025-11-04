@@ -97,7 +97,8 @@
         "count": "عدد",
         "actions": "إجراءات",
         "displayed": "معروض",
-        "of_total": "من إجمالي"
+        "of_total": "من إجمالي",
+        "items": "عنصر"
     },
     "Menu": {
         "title": "القائمة",
@@ -404,6 +405,7 @@
     },
     "Park": {
         "title": "الحظيرة",
+        "subtitle": "إدارة جميع المتنزهات في النظام",
         "addpark": "إضافة حظيرة",
         "updatepark": "تحديث الحظيرة",
         "deletepark": "حذف الحظيرة",
@@ -418,8 +420,21 @@
         "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
         "name": "إسم",
         "description": "الوصف",
+        "actions": "الإجراءات",
         "address": "العنوان",
-        "parksvehcilescount": "عدد السيارات في الحظيرة"
+        "parksvehcilescount": "عدد السيارات في الحظيرة",
+        "delete": "حذف",
+        "edit": "تعديل",
+        "confirmDelete": "هل أنت متأكد من رغبتك في حذف المتنزهات المحددة؟",
+        "nameRequired": "الاسم مطلوب",
+        "addparkDescription": "إضافة متنزه جديد إلى النظام",
+        "updateparkDescription": "تحديث معلومات المتنزه",
+        "namePlaceholder": "أدخل اسم المتنزه",
+        "addressPlaceholder": "أدخل عنوان المتنزه",
+        "descriptionPlaceholder": "أدخل وصف المتنزه",
+        "confirmDeleteSingle": "هل أنت متأكد من أنك تريد حذف هذا المتنزه؟",
+        "parkInformation": "معلومات المتنزه",
+        "editParkInformation": "تعديل معلومات المتنزه"
     },
     "Region": {
         "title": "المنطقة",

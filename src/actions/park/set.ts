@@ -111,23 +111,6 @@ export async function createParks(data: any) {
         })
 
         const parksResuls = await Promise.all(parks);
-        
-        const userName = (await getUserName(session.data.user.id)).data
-        prisma.notification.create({
-            data: {
-                title: "nouveaux parcs",
-                contenu: "Des nouveaux parcs ont éte ajouté par " + userName
-                + parks.map((park: any) => {
-                    return "\n Nom du parc : " + park.data.name + " Description : " + park.data.description + " Adresse : " + park.data.address
-                })
-                ,
-                user: {
-                    connect: {
-                        id: session.data.user.id
-                    }
-                }
-            }
-        })
 
         return { status: 200, data: { message: s("createsuccess") , parks: parksResuls } };
     } catch (error) {
@@ -139,9 +122,8 @@ export async function createParks(data: any) {
 
 const addPark = async (data: any, userSchema: any, session: any, u:any, s:any) => {
     try {
-
         const result = userSchema.safeParse({
-            name: String(data.name).trim(),
+            name: data.name?String(data.name).trim():null,
             description: String(data.description),
             address: String(data.address),
         });

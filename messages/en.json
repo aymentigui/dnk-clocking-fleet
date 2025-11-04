@@ -96,7 +96,8 @@
         "count": "Count",
         "actions": "Actions",
         "displayed": "displayed",
-        "of_total": "of total"
+        "of_total": "of total",
+        "items": "items"
     },
     "Menu": {
         "title": "Menu",
@@ -407,6 +408,8 @@
     },
     "Park": {
         "title": "Station",
+        "subtitle": "Manage all parks in the system",
+        "actions": "Actions",
         "addpark": "Add Station",
         "updatepark": "Update Station",
         "deletepark": "Delete Station",
@@ -421,7 +424,19 @@
         "name": "Name",
         "description": "Description",
         "address": "Address",
-        "parksvehcilescount": "Vehicles count in station"
+        "parksvehcilescount": "Vehicles count in station",
+        "delete": "Delete",
+        "edit": "Edit",
+        "confirmDelete": "Are you sure you want to delete the selected parks?",
+        "nameRequired": "Name is required",
+        "addparkDescription": "Add a new park to the system",
+        "updateparkDescription": "Update park information",
+        "namePlaceholder": "Enter park name",
+        "addressPlaceholder": "Enter park address",
+        "descriptionPlaceholder": "Enter park description",
+        "confirmDeleteSingle": "Êtes-vous sûr de vouloir supprimer ce parc ?",
+        "parkInformation": "Informations du Parc",
+        "editParkInformation": "Modifier les Informations du Parc"
     },
     "Region": {
         "title": "Region",

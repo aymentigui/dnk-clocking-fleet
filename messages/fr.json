@@ -97,7 +97,8 @@
         "count": "Nombre",
         "actions": "Actions",
         "displayed": "affichés",
-        "of_total": "sur un total de"
+        "of_total": "sur un total de",
+        "items": "éléments"
     },
     "Menu": {
         "title": "Menu",
@@ -405,6 +406,7 @@
     },
     "Park": {
         "title": "Parc",
+        "subtitle": "Gérez tous les parcs du système",
         "addpark": "Ajouter un parc",
         "updatepark": "Mettre à jour le parc",
         "deletepark": "Supprimer le parc",
@@ -419,8 +421,21 @@
         "confermationdeletemessage": "Cette action ne peut pas être annulée. Cela supprimera définitivement vos parcs et supprimera vos données de nos serveurs.",
         "name": "Nom",
         "description": "Description",
+        "actions": "Actions",
         "address": "Adresse",
-        "parksvehcilescount": "Nombre de vehicules dans le parc"
+        "parksvehcilescount": "Nombre de vehicules dans le parc",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer les parcs sélectionnés ?",
+        "nameRequired": "Le nom est requis",
+        "addparkDescription": "Ajouter un nouveau parc au système",
+        "updateparkDescription": "Modifier les informations du parc",
+        "namePlaceholder": "Entrez le nom du parc",
+        "addressPlaceholder": "Entrez l'adresse du parc",
+        "descriptionPlaceholder": "Entrez la description du parc",
+        "confirmDeleteSingle": "Are you sure you want to delete this park?",
+        "parkInformation": "Park Information",
+        "editParkInformation": "Edit Park Information"
     },
     "Region": {
         "title": "Région",

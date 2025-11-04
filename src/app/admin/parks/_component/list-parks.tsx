@@ -1,191 +1,97 @@
-"use client"
-import { DataTable } from "./data-table/data-table-park";
+"use client";
+
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import Loading from "@/components/myui/loading";
-import { useEffect, useState } from "react";
-import { useOrigin } from "@/hooks/use-origin";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useImportSheetsStore } from "@/hooks/use-import-csv";
-import toast from "react-hot-toast";
+import { ParksTable } from "../_component/ParkTable";
 import { useSession } from "@/hooks/use-session";
-import ConfirmDialogDelete from "@/components/myui/shadcn-dialog-confirm";
-import { generateFileClient } from "@/actions/util/export-data/export-client";
-import ExportButton from "@/components/my/export-button";
-import { getParks, getParksWithIds } from "@/actions/park/get";
-import { getColumns } from "@/actions/util/sheet-columns/park";
-import { createParks } from "@/actions/park/set";
+import { useOrigin } from "@/hooks/use-origin";
+import { getParks } from "@/actions/park/get";
 import { deletePark } from "@/actions/park/delete";
+import toast from "react-hot-toast";
 
-const selectors = [
-  { title: "id", selector: "id" },  
-  { title: "name", selector: "name" },
-  { title: "description", selector: "description" },
-  { title: "address", selector: "address" },
-];
+interface Park {
+  id: string;
+  name: string;
+  address?: string;
+  description?: string;
+}
 
-export default function ListParks() {
-  const translate = useTranslations("Park")
-
-  const translateSystem = useTranslations("System");
-  const translateErrors = useTranslations("Error")
-
-  const origin = useOrigin()
-  const { session } = useSession()
-  const { data: sheetData, setColumns, setData: setSheetData } = useImportSheetsStore();
-
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  const [open, setOpen] = useState(false); // for confirm delete
-
-  const [parkSheetNotCreated, setParkSheetNotCreated] = useState<any>([])
-  const [parkSheetCreated, setParkSheetCreated] = useState(false)
-
-  const [data, setData] = useState<any[]>([]);
-  const columnsSheet = getColumns()
+export default function ParksListPage() {
+  const t = useTranslations("Park");
+  const s = useTranslations("System");
+  const e = useTranslations("Error");
+  
+  const { session } = useSession();
+  const origin = useOrigin();
+  
+  const [parks, setParks] = useState<Park[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    setMounted(true);
-    setColumns(columnsSheet);
-  }, []);
-
-  useEffect(() => {
-    fetchParks()
+    fetchParks();
   }, [origin]);
 
-  // pour la creation depuis les sheet
-  useEffect(() => {
-    if (sheetData && sheetData.length > 0) {
-      createParks(sheetData).then((res) => {
-        if (res.status === 200) {
-          if (res.data.parks) {
-            res.data.parks.forEach((park) => {
-              if (park.status !== 200) {
-                setParkSheetNotCreated((prev: any) => [...prev, park.data])
-              } else {
-                setParkSheetCreated(true)
-              }
-            })
-          }
-        } else {
-          toast.error(res.data.message);
-        }
-      }).catch((error) => {
-        toast.error(translateSystem("errorcreate"));
-      }).finally(() => {
-        setSheetData([]); // Mettre à jour le tableau avec les données créées
-      });
-    }
-  }, [sheetData]);
-
   const fetchParks = async () => {
-    setData([]);
     try {
-      if (!origin) return
+      if (!origin) return;
       setIsLoading(true);
       const response = await getParks();
       if (response.status === 200) {
-        setData(response.data);
+        setParks(response.data);
       }
-
     } catch (error) {
-      console.log("Error fetching parks:", error);
+      console.error("Error fetching parks:", error);
+      toast.error(e("fetchError"));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const exportSelected = async (type: number = 1) => {
-
-    const res = await getParksWithIds(selectedIds)
-
-    if (res.status !== 200) {
-      toast.error(translateErrors("badrequest"))
-      return
+  const handleDeletePark = async (parkId: string) => {
+    if (!confirm(t("confirmDeleteSingle"))) return;
+    
+    try {
+      const response = await deletePark([parkId]);
+      if (response.status === 200) {
+        toast.success(response.data.message);
+        fetchParks(); // Rafraîchir la liste
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      toast.error(e("deleteError"));
     }
-
-    const users = res.data
-    generateFileClient(selectors, users, type);
-
   };
 
-  const exportAll = async (type: number = 1) => {
-    generateFileClient(selectors, data, type);
-
-  };
-
-  if (!mounted) {
-    return (
-      <div className="h-[300px] flex items-center justify-center">
-        <Loading />
-      </div>
-    );
-  }
+  const filteredParks = parks.filter(park =>
+    park.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    park.address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    park.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="py-10">
-      <h1 className="text-2xl font-bold mb-4">{translate("title")}</h1>
-      {parkSheetCreated && (
-        <div className="bg-blue-500 text-white p-4 mb-4 rounded">
-          {translateSystem("mustrefreshtoseedata")}
-        </div>
-      )}
-      {parkSheetNotCreated && parkSheetNotCreated.length > 0 && (
-        <div className="max-h-48 my-2 overflow-auto">
-          {parkSheetNotCreated.map((data: any, index: any) => (
-            <div key={index} className="mt-4 p-4 bg-red-200 text-red-700 rounded">
-              <h2 className="font-bold">{translateErrors("errors")}</h2>
-              <ul className="list-disc pl-5">
-                <li>
-                  {
-                    (data.message ? data.message + " : " : "") + " " + (data.park.name ?? "") + " " + (data.park.address ?? "") + " " + (data.park.description ?? "") 
-                  }
-                </li>
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-      <div className="flex gap-2 justify-between items-center">
-        <div className="flex gap-2">
-          <Link href="/admin/sheetimport">
-            <Button>{translateSystem('import')}</Button>
-          </Link>
-          <ExportButton all={true} handleExportCSV={() => exportAll(1)} handleExportXLSX={() => exportAll(2)} />
-          {selectedIds.length > 0 && <ExportButton all={false} handleExportCSV={() => exportSelected(1)} handleExportXLSX={() => exportSelected(2)} />}
-          {(session?.user?.permissions.find((permission: string) => permission === "park_delete") ?? false) || session?.user?.is_admin
-            &&
-            selectedIds.length > 0
-            &&
-            <ConfirmDialogDelete
-              open={open}
-              setOpen={setOpen}
-              selectedIds={selectedIds}
-              textToastSelect={translate("selectparks")}
-              triggerText={translate("deleteparks")}
-              titleText={translate("confermationdelete")}
-              descriptionText={translate("confermationdeletemessage")}
-              deleteAction={deletePark}
-            />
-          }
-        </div>
+    <div className="container mx-auto py-8 space-y-6">
+      {/* En-tête de page */}
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          {t("title")}
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          {t("subtitle")}
+        </p>
       </div>
-      <DataTable
-        data={data}
+
+      {/* Tableau des parcs */}
+      <ParksTable
+        parks={filteredParks}
         selectedIds={selectedIds}
-        setSelectedIds={setSelectedIds}
+        onSelectionChange={setSelectedIds}
         isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        // debouncedSearchQuery={debouncedSearchQuery}
-        // setDebouncedSearchQuery={setDebouncedSearchQuery}
-        // page={page}
-        // setPage={setPage}
-        // pageSize={pageSize}
-        // count={count}
-        // showPagination
-        // showSearch
+        onDelete={handleDeletePark}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
       />
     </div>
   );
