@@ -89,6 +89,7 @@
     "react-select": "^5.10.0",
     "recharts": "^2.15.3",
     "sharp": "^0.33.5",
+    "swr": "^2.3.6",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "tinymce": "^7.6.1",

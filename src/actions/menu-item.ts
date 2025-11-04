@@ -1,5 +1,5 @@
 "use server"
-import { Bell, BusFront, CalendarCheck, CircleEllipsis, Download, File, FileSpreadsheet, Home, Map, Newspaper, Plus, ScanQrCode, Settings, UserRoundCog, Users, Warehouse } from "lucide-react";
+import { Bell, BusFront, CalendarCheck, CircleEllipsis, ContactRound, Download, File, FileSpreadsheet, Home, Map, Newspaper, Plus, ScanQrCode, Settings, UserRoundCog, Users, Warehouse } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getUserPermissions, verifySession } from "./permissions";
 
@@ -58,6 +58,13 @@ const itemsMenu = async () => {
         //         },
         //     ],
         // },
+        {
+            title: Menu("conducteurs"),
+            url: "/admin/conducteurs",
+            icon: ContactRound,
+            admin: false,
+            permissions: ["conducteur_view"],
+        },
         {
             title: Menu("parks"),
             url: "/admin/parks",

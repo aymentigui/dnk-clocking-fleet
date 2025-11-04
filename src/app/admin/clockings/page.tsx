@@ -1,5 +1,4 @@
 import { accessPage, withAuthorizationPermission } from "@/actions/permissions";
-import { getVehicle } from "@/actions/vehicle/get";
 import { Card } from "@/components/ui/card";
 import { getTranslations } from "next-intl/server";
 import ClockingList from "./_component/list-clockings";

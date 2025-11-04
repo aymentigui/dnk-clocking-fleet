@@ -145,16 +145,16 @@ const LoginForm = () => {
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className='text-sm font-medium text-foreground/50'>
+                                        <FormLabel className='text-sm font-medium text-black/50'>
                                             {t("emailorusername")}
                                         </FormLabel>
                                         <FormControl>
                                             <div className="relative">
-                                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground/70" />
+                                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-black/70" />
                                                 <Input
                                                     placeholder={t("emailorusername")}
                                                     {...field}
-                                                    className="w-full pl-10 pr-4 py-3 bg-foreground/5 border border-foreground/10 text-foreground placeholder-foreground/70 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                                    className="w-full pl-10 pr-4 py-3 bg-black/5 border border-black/10 text-black placeholder-black/70 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                 />
                                             </div>
                                         </FormControl>
@@ -167,21 +167,21 @@ const LoginForm = () => {
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className='text-sm font-medium text-foreground/50'>
+                                        <FormLabel className='text-sm font-medium text-black/50'>
                                             {t("password")}
                                         </FormLabel>
                                         <FormControl>
                                             <div className='relative'>
-                                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground/70" />
+                                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-black/70" />
                                                 <Input
                                                     type={hidePassword ? "password" : "text"}
                                                     placeholder={t("password")}
                                                     {...field}
-                                                    className="w-full pl-10 pr-12 py-3 bg-foreground/5 border border-foreground/10 text-foreground placeholder-foreground/70 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                                    className="w-full pl-10 pr-12 py-3 bg-black/5 border border-black/10 text-black placeholder-black/70 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                                 />
                                                 <div
                                                     onClick={() => setHidePassword(!hidePassword)}
-                                                    className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-foreground/70 hover:text-foreground/40 transition-colors duration-200'
+                                                    className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-black/70 hover:text-black/40 transition-colors duration-200'
                                                 >
                                                     {hidePassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                                 </div>
@@ -201,16 +201,16 @@ const LoginForm = () => {
                             name="code"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className='text-sm font-medium text-foreground/40'>
+                                    <FormLabel className='text-sm font-medium text-black/40'>
                                         {t("codeverification")}
                                     </FormLabel>
                                     <FormControl>
                                         <div className="relative">
-                                            <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground/70" />
+                                            <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-black/70" />
                                             <Input
                                                 placeholder={t("codeverification")}
                                                 {...field}
-                                                className="w-full pl-10 pr-4 py-3 bg-foreground/5 border border-foreground/10 text-foreground placeholder-foreground/70 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-center text-lg tracking-widest"
+                                                className="w-full pl-10 pr-4 py-3 bg-black/5 border border-black/10 text-black placeholder-black/70 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-center text-lg tracking-widest"
                                             />
                                         </div>
                                     </FormControl>
@@ -270,10 +270,10 @@ const LoginForm = () => {
                 <div className="mt-6 text-center">
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-foreground/10"></div>
+                            <div className="w-full border-t border-black/10"></div>
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-transparent text-foreground/70">
+                            <span className="px-2 bg-transparent text-black/70">
                                 {s("newtotheplatform")}
                             </span>
                         </div>
@@ -281,7 +281,7 @@ const LoginForm = () => {
                     <Link href="/auth/register" passHref className="mt-4 block">
                         <Button 
                             variant='outline' 
-                            className='w-full py-3 border-foreground/20 text-foreground hover:bg-foreground/10 hover:text-foreground transition-all duration-200 rounded-xl'
+                            className='w-full py-3 border-black/20 text-white hover:bg-black/10 hover:text-black transition-all duration-200 rounded-xl'
                         >
                             {t("youhavenotaccount")}
                         </Button>

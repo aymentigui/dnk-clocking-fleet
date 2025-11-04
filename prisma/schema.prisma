@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
   // directUrl = env("DIRECT_URL")
 }
@@ -133,6 +133,7 @@ model resetpasswordconfermation {
 
   @@unique([user_id])
 }
+
 model role {
   id          String     @id @default(cuid())
   name        String     @unique
@@ -213,6 +214,18 @@ model entreprise {
   device      device[]
 }
 
+model conducteur {
+  id         String     @id @default(cuid())
+  matricule  String     @unique
+  firstname  String?
+  lastname   String?
+  phone      String?
+  created_at DateTime   @default(now())
+  deleted_at DateTime?
+  added_from String?
+  clocking   clocking[]
+}
+
 model device {
   id       String  @id @default(cuid())
   code     String?
@@ -275,18 +288,20 @@ model vehicle_region {
 }
 
 model clocking {
-  id         String   @id @default(cuid())
-  vehicle_id String
-  vehicle    vehicle  @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
-  device_id  String
-  device     device   @relation(fields: [device_id], references: [id], onDelete: Cascade)
-  created_at DateTime @default(now())
-  park_id    String?
-  park       park?    @relation(fields: [park_id], references: [id])
-  type       Int?
-  status     Int?
-  region     region?  @relation(fields: [regionId], references: [id])
-  regionId   String?
+  id            String      @id @default(cuid())
+  vehicle_id    String
+  vehicle       vehicle     @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
+  device_id     String
+  device        device      @relation(fields: [device_id], references: [id], onDelete: Cascade)
+  created_at    DateTime    @default(now())
+  park_id       String?
+  park          park?       @relation(fields: [park_id], references: [id])
+  conducteur_id String?
+  conducteur    conducteur? @relation(fields: [conducteur_id], references: [id])
+  type          Int?
+  status        Int?
+  region        region?     @relation(fields: [regionId], references: [id])
+  regionId      String?
 }
 
 model notification {

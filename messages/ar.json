@@ -94,7 +94,8 @@
         "confermationdelete": "  هل انت متأكد تماما؟",
         "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
         "downloadjustselected": "تحميل المحدد",
-        "count": "عدد"
+        "count": "عدد",
+        "actions": "إجراءات"
     },
     "Menu": {
         "title": "القائمة",
@@ -117,6 +118,7 @@
         "logout": "تسجيل الخروج",
         "clockings": "التسجيلات",
         "notifications": "الاشعارات",
+        "conducteurs": "السائقين",
         "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
@@ -250,7 +252,12 @@
         "selectusers": "اختر مستخدم واحد او اكثر",
         "deleteusers": "حذف المستخدمين",
         "confermationdelete": "هل انت متاكد؟",
-        "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا."
+        "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
+        "invalidcredentials": "بيانات اعتماد غير صالحة",
+        "accountlocked": "تم قفل الحساب بعد عدة محاولات تسجيل دخول فاشلة. يرجى المحاولة مرة أخرى بعد 15 دقيقة.",
+        "remainingattempts": "المحاولات المتبقية: ",
+        "accountlocked2": "تم قفل حسابك مؤقتًا. يرجى المحاولة مرة أخرى بعد ",
+        "twofactorblocked": "تم قفل التوثيق بخطوتين مؤقتًا. يرجى المحاولة مرة أخرى بعد "
     },
     "Permissions": {
         "title": "الصلاحيات",
@@ -521,6 +528,31 @@
         "vehiclenotfound": "لم يتم العثور على المركبة",
         "parknotfound": "لم يتم العثور على الحظيرة",
         "regionnotfound": "لم يتم العثور على المنطقة"
+    },
+    "Conducteur": {
+        "title": "السائقون",
+        "description": "إدارة جميع السائقين في نظامك",
+        "create": "إضافة سائق",
+        "create_description": "إضافة سائق جديد إلى النظام",
+        "edit": "تعديل السائق",
+        "edit_description": "تحديث معلومات السائق",
+        "search": "البحث حسب الاسم أو الرقم أو الهاتف...",
+        "no_data": "لم يتم العثور على أي سائقين",
+        "delete": "حذف",
+        "delete_title": "حذف السائق(ين)",
+        "delete_one_desc": "هل أنت متأكد من رغبتك في حذف هذا السائق؟ لا يمكن التراجع عن هذا الإجراء.",
+        "delete_many_desc": "هل أنت متأكد من رغبتك في حذف {count} سائق(ين)؟ لا يمكن التراجع عن هذا الإجراء.",
+        "name": "الاسم",
+        "name_placeholder": "أدخل اسم السائق",
+        "matricule": "رقم التسجيل",
+        "matricule_placeholder": "أدخل رقم التسجيل",
+        "matricule_description": "رقم التعريف الفريد للسائق",
+        "firstname": "الاسم الأول",
+        "firstname_placeholder": "أدخل الاسم الأول",
+        "lastname": "اسم العائلة",
+        "lastname_placeholder": "أدخل اسم العائلة",
+        "phone": "الهاتف",
+        "phone_placeholder": "أدخل رقم الهاتف"
     },
     "Notification": {
         "title": "الاشعارات"

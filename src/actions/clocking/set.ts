@@ -74,7 +74,18 @@ export async function createClocking(data: any) {
             take: 1,
         });
 
-        const status = data.type !== 3 ?
+        const existingConducteur = await prisma.conducteur.findFirst({
+            where: { id: data.conducteur_id },
+        });
+
+        if (!existingConducteur) return {
+            status: 404, data: {
+                message: "Conducteur not found"
+                // message: u("conducteurnotfound")
+            }
+        };
+
+        const status = data.type !== 3 && data.type !== 4 ?
             (existingVehiclePark && existingDevice.park_id && existingVehiclePark.park_id == existingDevice.park_id ? 1 : 0)
             : (existingVehicleRegion && existingDevice.region_id && existingVehicleRegion.region_id == existingDevice.region_id ? 1 : 0)
 
@@ -86,6 +97,7 @@ export async function createClocking(data: any) {
                 regionId: existingDevice.region_id ?? null,
                 type: data.type ?? 0,
                 status: status,
+                conducteur_id: existingConducteur.id,
             },
         });
 

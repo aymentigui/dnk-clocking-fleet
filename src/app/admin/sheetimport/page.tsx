@@ -8,6 +8,8 @@ import { useTranslations } from "next-intl";
 import ImportSheetsStructure from "@/components/myui/import-sheets-structure";
 import { parseSheetFile } from "@/actions/util/importSheets";
 import { useImportSheetsStore } from "@/hooks/use-import-csv";
+import ExportButton from "@/components/my/export-button";
+import { generateFileClient } from "@/actions/util/export-data/export-client";
 
 export default function ImportPage() {
     const [file, setFile] = useState<File | null>(null);
@@ -41,6 +43,12 @@ export default function ImportPage() {
     const handleConfirm = () => {
         setData(previewData);
         router.back();
+    };
+
+    const exportAll = async (type: number = 1) => {
+        const selectors = columns.map(col => ({ title: col.title, selector: col.title || "" }));
+        generateFileClient(selectors, [], type);
+
     };
 
     return (
@@ -78,6 +86,7 @@ export default function ImportPage() {
                             <Button variant={"primary"} onClick={handleConfirm} className="mt-4 text-white font-bold">{s("confirm")}</Button>
                         </div>
                     )}
+                    <ExportButton all={true} handleExportCSV={() => exportAll(1)} handleExportXLSX={() => exportAll(2)} />
                 </div>
                 <ImportSheetsStructure data={previewData} columns={columns} />
             </div>

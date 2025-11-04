@@ -94,7 +94,8 @@
         "confermationdelete": "Etes-vous absolument sur?",
         "confermationdeletemessage": "Cette action ne peut pas etre annulee. Cela supprimera definitivement vos donnees et supprimera vos donnees de nos serveurs.",
         "downloadjustselected": "Télécharger juste la selection",
-        "count": "Nombre"
+        "count": "Nombre",
+        "actions": "Actions"
     },
     "Menu": {
         "title": "Menu",
@@ -117,6 +118,7 @@
         "devices": "Dispositifs",
         "clockings": "Pointages",
         "notifications": "Notifications",
+        "conducteurs": "Conducteurs",
         "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
@@ -251,7 +253,12 @@
         "selectusers": "Sélectionner des utilisateurs",
         "deleteusers": "Supprimer des utilisateurs",
         "confermationdelete": "Etes-vous absolument sur?",
-        "confermationdeletemessage": "Cette action ne peut pas etre annulee. Cela supprimera definitivement vos donnees et supprimera vos donnees de nos serveurs."
+        "confermationdeletemessage": "Cette action ne peut pas etre annulee. Cela supprimera definitivement vos donnees et supprimera vos donnees de nos serveurs.",
+        "invalidcredentials": "Identifiants invalides",
+        "accountlocked": "Compte verrouillé pour 15 minutes en raison de trop nombreuses tentatives de connexion infructueuses",
+        "remainingattempts": "tentatives restantes : ",
+        "accountlocked2": "Votre compte est temporairement verrouillé. Réessayez dans ",
+        "twofactorblocked": "La vérification 2FA est temporairement bloquée. Veuillez réessayer dans"
     },
     "Permissions": {
         "title": "Permissions",
@@ -522,6 +529,31 @@
         "vehiclenotfound": "Le véhicule n'a pas été trouvé",
         "parknotfound": "La station n'a pas été trouvée",
         "regionnotfound": "La region n'a pas été trouvée"
+    },
+    "Conducteur": {
+        "title": "Conducteurs",
+        "description": "Gérez tous les conducteurs de votre système",
+        "create": "Ajouter un Conducteur",
+        "create_description": "Ajouter un nouveau conducteur au système",
+        "edit": "Modifier le Conducteur",
+        "edit_description": "Mettre à jour les informations du conducteur",
+        "search": "Rechercher par nom, matricule ou téléphone...",
+        "no_data": "Aucun conducteur trouvé",
+        "delete": "Supprimer",
+        "delete_title": "Supprimer le(s) Conducteur(s)",
+        "delete_one_desc": "Êtes-vous sûr de vouloir supprimer ce conducteur ? Cette action ne peut pas être annulée.",
+        "delete_many_desc": "Êtes-vous sûr de vouloir supprimer {count} conducteur(s) ? Cette action ne peut pas être annulée.",
+        "name": "Nom",
+        "name_placeholder": "Entrez le nom du conducteur",
+        "matricule": "Matricule",
+        "matricule_placeholder": "Entrez le numéro de matricule",
+        "matricule_description": "Numéro d'identification unique du conducteur",
+        "firstname": "Prénom",
+        "firstname_placeholder": "Entrez le prénom",
+        "lastname": "Nom de Famille",
+        "lastname_placeholder": "Entrez le nom de famille",
+        "phone": "Téléphone",
+        "phone_placeholder": "Entrez le numéro de téléphone"
     },
     "Notification": {
         "title": "Notification"
