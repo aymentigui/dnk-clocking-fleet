@@ -75,7 +75,7 @@ export async function createClocking(data: any) {
         });
 
         const existingConducteur = await prisma.conducteur.findFirst({
-            where: { id: data.conducteur_id },
+            where: { matricule: data.conducteur_matricule },
         });
 
         if (!existingConducteur) return {
