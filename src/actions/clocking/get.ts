@@ -71,6 +71,7 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
                 vehicle: clocking.vehicle.matricule,
                 device: clocking.device,
                 deviceType: clocking.type,
+                conducteur: clocking.conducteur,
                 status: clocking.status,
                 park: clocking.park && clocking.type!==3 ? clocking.park.name : clocking.region ? clocking.region.name : "",
             };
@@ -170,6 +171,7 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
                 device: clocking.device,
                 deviceType: clocking.type,
                 status: clocking.status,
+                conducteur: clocking.conducteur,
                 park: clocking.park && clocking.type!==3 ? clocking.park.name : clocking.region ? clocking.region.name : "",
             };
         });
