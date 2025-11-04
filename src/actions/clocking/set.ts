@@ -44,35 +44,13 @@ export async function createClocking(data: any) {
 
         const existingVehicle = await prisma.vehicle.findFirst({
             where: { matricule: data.matricule },
+            include: {
+                park: true,
+                region: true,
+            }
         });
 
         if (!existingVehicle) return { status: 404, data: { message: u("vehiclenotfound") } };
-
-        const existingVehiclePark = await prisma.vehicle_park.findFirst({
-            where: {
-                vehicle_id: existingVehicle.id,
-            },
-            include: {
-                park: true
-            },
-            orderBy: {
-                added_at: "desc",
-            },
-            take: 1,
-        });
-
-        const existingVehicleRegion = await prisma.vehicle_region.findFirst({
-            where: {
-                vehicle_id: existingVehicle.id,
-            },
-            include: {
-                region: true
-            },
-            orderBy: {
-                added_at: "desc",
-            },
-            take: 1,
-        });
 
         const existingConducteur = await prisma.conducteur.findFirst({
             where: { matricule: data.conducteur_matricule },
@@ -85,9 +63,10 @@ export async function createClocking(data: any) {
             }
         };
 
-        const status = data.type !== 3 && data.type !== 4 ?
-            (existingVehiclePark && existingDevice.park_id && existingVehiclePark.park_id == existingDevice.park_id ? 1 : 0)
-            : (existingVehicleRegion && existingDevice.region_id && existingVehicleRegion.region_id == existingDevice.region_id ? 1 : 0)
+        const status = (data.type === 3 || data.type === 4) ?
+            (existingVehicle.region_id && existingDevice.region_id && existingVehicle.region_id == existingDevice.region_id ? 1 : 0)
+            : (existingVehicle.park_id && existingDevice.park_id && existingVehicle.park_id == existingDevice.park_id ? 1 : 0)
+
 
         await prisma.clocking.create({
             data: {
@@ -111,7 +90,7 @@ export async function createClocking(data: any) {
                             await sendEmail(
                                 email.email,
                                 "un mauvais pointage d'une véhicule",
-                                "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehiclePark?.park?.name + " et station :" + existingVehicleRegion?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la station " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région")
+                                "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehicle?.park?.name + " et station :" + existingVehicle?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la station " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région")
                             )
                         } catch (erreur) {
                             console.log("error sendig mail analyse to" + email.email)
@@ -122,7 +101,7 @@ export async function createClocking(data: any) {
             await prisma.notification.create({
                 data: {
                     title: "un mauvais pointage d'une véhicule",
-                    contenu: "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehiclePark?.park?.name + " et station :" + existingVehicleRegion?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la station " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région"),
+                    contenu: "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehicle?.park?.name + " et station :" + existingVehicle?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la station " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région"),
                     user: {
                         connect: {
                             id: session.data.user.id
