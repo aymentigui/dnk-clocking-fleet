@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
@@ -17,71 +17,105 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
             return { status: 403, data: { message: e('forbidden') }, count: 0 };
         }
 
-        let start = new Date();
-        let end = new Date();
+        // Build where condition for date filter
+        const whereCondition: any = {};
+        
         if (searchDate) {
-            start = new Date(searchDate);
+            const start = new Date(searchDate);
             start.setHours(0, 0, 0, 0);
 
-            end = new Date(searchDate);
+            const end = new Date(searchDate);
             end.setHours(23, 59, 59, 999);
+
+            whereCondition.created_at = {
+                gte: start,
+                lte: end,
+            };
         }
 
-        const clockings = await prisma.clocking.findMany({
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-            orderBy: {
-                created_at: "desc",
-            },
-            where: searchDate ? {
-                created_at: {
-                    gte: start,
-                    lte: end,
+        // Get clockings with pagination
+        const [clockings, totalCount] = await Promise.all([
+            prisma.clocking.findMany({
+                skip: (page - 1) * pageSize,
+                take: pageSize,
+                orderBy: {
+                    created_at: "desc",
                 },
-            } : {},
-            include: {
-                park: true,
-                region: true,
-                conducteur: true,
-                vehicle: {
-                    include: {
-                        vehicle_park: {
-                            orderBy: {
-                                added_at: "desc",
+                where: whereCondition,
+                include: {
+                    park: {
+                        select: { name: true }
+                    },
+                    region: {
+                        select: { name: true }
+                    },
+                    conducteur: {
+                        select: { 
+                            id: true,
+                            firstname: true,
+                            lastname: true,
+                            matricule: true 
+                        }
+                    },
+                    vehicle: {
+                        select: {
+                            matricule: true,
+                            vehicle_park: {
+                                orderBy: {
+                                    added_at: "desc",
+                                },
+                                take: 1,
+                                include: {
+                                    park: {
+                                        select: { name: true }
+                                    },
+                                },
                             },
-                            take: 1,
-                            include: {
-                                park: true,
+                        },
+                    },
+                    device: {
+                        select: {
+                            code: true,
+                            park: {
+                                select: { name: true }
                             },
                         },
                     },
                 },
-                device: {
-                    include: {
-                        park: true,
-                    },
-                },
-            },
-        });
+            }),
+            prisma.clocking.count({
+                where: whereCondition
+            })
+        ]);
 
+        // Format clockings data
         const clockingFormatted = clockings.map((clocking) => {
+            const date = new Date(clocking.created_at);
+            const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+            
+            // Determine location based on device type
+            let location = "";
+            if (clocking.type !== 3 && clocking.park) {
+                location = clocking.park.name;
+            } else if (clocking.region) {
+                location = clocking.region.name;
+            }
+
             return {
                 id: clocking.id,
-                created_at: clocking.created_at.getDate() + "/" + (clocking.created_at.getMonth() + 1) + "/" + clocking.created_at.getFullYear() + " " + clocking.created_at.getHours() + ":" + clocking.created_at.getMinutes(),
+                created_at: formattedDate,
                 vehicle: clocking.vehicle.matricule,
                 device: clocking.device,
                 deviceType: clocking.type,
                 conducteur: clocking.conducteur,
                 status: clocking.status,
-                park: clocking.park && clocking.type!==3 ? clocking.park.name : clocking.region ? clocking.region.name : "",
+                park: location,
             };
         });
 
-        const vehicleClockingsCount = await prisma.clocking.count();
-
-        return { status: 200, data: clockingFormatted, count: vehicleClockingsCount };
+        return { status: 200, data: clockingFormatted, count: totalCount };
     } catch (error) {
-        console.log("An error occurred in getClockings" + error);
+        console.error("An error occurred in getClockings:", error);
         return { status: 500, data: { message: e("error") }, count: 0 };
     }
 }

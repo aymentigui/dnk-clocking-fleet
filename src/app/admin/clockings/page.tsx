@@ -1,25 +1,239 @@
-import { accessPage, withAuthorizationPermission } from "@/actions/permissions";
-import { Card } from "@/components/ui/card";
-import { getTranslations } from "next-intl/server";
-import ClockingList from "./_component/list-clockings";
+"use client";
 
-export default async function Vehicle() {
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { Card, CardContent } from "@/components/ui/card";
+import { Calendar, Clock, Car, User } from "lucide-react";
+import { ClockingsFilters } from "./_component/ClockingsFilters";
+import { ClockingsTable } from "./_component/ClockingsTable";
+import { getClockings } from "@/actions/clocking/get";
 
-    const translate = await getTranslations("Vehicle");
+interface Clocking {
+    id: string;
+    created_at: string;
+    vehicle: string;
+    device: any;
+    deviceType: number;
+    conducteur: any;
+    status: string;
+    park: string;
+}
 
+export default function ClockingsPage() {
+    const t = useTranslations("Clocking");
+    const s = useTranslations("System");
+    const e = useTranslations("Error");
 
-    const hasPermission = await withAuthorizationPermission(['clocking_view']);
+    const [clockings, setClockings] = useState<Clocking[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [searchDate, setSearchDate] = useState("");
 
-    if (hasPermission.status != 200 || !hasPermission.data.hasPermission) {
-        return (
-            <>
-            </>
-        );
-    }
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    useEffect(() => {
+        loadClockings();
+    }, [currentPage, pageSize, searchDate]);
+
+    const loadClockings = async () => {
+        setLoading(true);
+        try {
+            const response = await getClockings(currentPage, pageSize, searchDate || undefined);
+
+            if (response.status === 200) {
+                setClockings(response.data);
+                setTotalCount(response.count);
+            } else {
+                console.error("Error loading clockings:", response.data);
+            }
+        } catch (error) {
+            console.error("Error loading clockings:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDateChange = (date: string) => {
+        setSearchDate(date);
+        setCurrentPage(1);
+    };
+
+    const resetFilters = () => {
+        setSearchDate("");
+        setCurrentPage(1);
+    };
+
+    // Stats calculation
+    const today = new Date().toISOString().split('T')[0];
+    const todayClockings = clockings.filter(clocking =>
+        clocking.created_at.includes(new Date().getDate() + "/" + (new Date().getMonth() + 1))
+    ).length;
+
+    const uniqueVehicles = new Set(clockings.map(clocking => clocking.vehicle)).size;
+    const uniqueConductors = new Set(
+        clockings
+            .map(clocking => clocking.conducteur?.id)
+            .filter(id => id)
+    ).size;
+
+    // Stats Cards Component
+    const StatsCards = () => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Total Clockings */}
+            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg">
+                <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-blue-100 text-sm font-medium">{t("total_clockings")}</p>
+                            <p className="text-3xl font-bold mt-2">{totalCount.toLocaleString()}</p>
+                            <p className="text-blue-100 text-xs mt-1">{s("total")}</p>
+                        </div>
+                        <div className="bg-blue-400/20 p-3 rounded-full">
+                            <Calendar className="h-8 w-8" />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Today's Clockings */}
+            <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg">
+                <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-green-100 text-sm font-medium">{t("today_clockings")}</p>
+                            <p className="text-3xl font-bold mt-2">{todayClockings}</p>
+                            <p className="text-green-100 text-xs mt-1">Today</p>
+                        </div>
+                        <div className="bg-green-400/20 p-3 rounded-full">
+                            <Clock className="h-8 w-8" />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Unique Vehicles */}
+            <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg">
+                <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-orange-100 text-sm font-medium">{t("vehicle")}</p>
+                            <p className="text-3xl font-bold mt-2">{uniqueVehicles}</p>
+                            <p className="text-orange-100 text-xs mt-1">Unique</p>
+                        </div>
+                        <div className="bg-orange-400/20 p-3 rounded-full">
+                            <Car className="h-8 w-8" />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Unique Conductors */}
+            <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg">
+                <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-purple-100 text-sm font-medium">{t("conducteur")}</p>
+                            <p className="text-3xl font-bold mt-2">{uniqueConductors}</p>
+                            <p className="text-purple-100 text-xs mt-1">Unique</p>
+                        </div>
+                        <div className="bg-purple-400/20 p-3 rounded-full">
+                            <User className="h-8 w-8" />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
 
     return (
-        <Card className='mb-2 px-2 py-4'>
-            <ClockingList />
-        </Card>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                {t("title")}
+                            </h1>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                {t("list")}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Stats Cards */}
+                <StatsCards />
+
+                {/* Filters */}
+                <ClockingsFilters
+                    searchDate={searchDate}
+                    onDateChange={handleDateChange}
+                    onReset={resetFilters}
+                    totalCount={totalCount}
+                    displayedCount={clockings.length}
+                />
+
+                {/* Clockings Table */}
+                <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    <ClockingsTable
+                        clockings={clockings}
+                        loading={loading}
+                    />
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                                {s("pagesize")}:
+                            </span>
+                            <select
+                                value={pageSize}
+                                onChange={(e) => {
+                                    setPageSize(Number(e.target.value));
+                                    setCurrentPage(1);
+                                }}
+                                className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm dark:bg-gray-700 dark:text-white"
+                            >
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+
+                        <div className="flex items-center space-x-6">
+                            <div className="text-sm text-gray-700 dark:text-gray-300">
+                                {s("page")} {currentPage} {s("of")} {totalPages} • {clockings.length} {s("displayed")}
+                                {s("of_total")} {totalCount}
+                            </div>
+
+                            <div className="flex space-x-1">
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
+                                >
+                                    {s("back")}
+                                </button>
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages}
+                                    className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
+                                >
+                                    {s("next")}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
     );
 }
