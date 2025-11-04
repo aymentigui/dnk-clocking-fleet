@@ -25,13 +25,15 @@ export function ClockingsTable({ clockings, loading }: ClockingsTableProps) {
     const getDeviceTypeLabel = (type: number): string => {
         switch (type) {
             case 0:
-                return t("entry");
-            case 1:
                 return t("exit");
+            case 1:
+                return t("entry");
             case 2:
                 return t("entry_exit");
             case 3:
-                return t("controller");
+                return t("controller") + t("exit");;
+            case 4:
+                return t("controller") + t("entry");;
             default:
                 return "Unknown";
         }
@@ -126,7 +128,7 @@ export function ClockingsTable({ clockings, loading }: ClockingsTableProps) {
                                 </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                {clocking.conducteur?.name || clocking.conducteur?.matricule || "-"}
+                                {clocking.conducteur?.firstname + clocking.conducteur?.lastname + clocking.conducteur?.matricule || "-"}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(clocking.status)}`}>

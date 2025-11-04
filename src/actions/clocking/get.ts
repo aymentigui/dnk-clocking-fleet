@@ -95,7 +95,7 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
             
             // Determine location based on device type
             let location = "";
-            if (clocking.type !== 3 && clocking.park) {
+            if (clocking.type !== 3 && clocking.type !== 4 && clocking.park) {
                 location = clocking.park.name;
             } else if (clocking.region) {
                 location = clocking.region.name;
