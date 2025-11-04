@@ -95,7 +95,9 @@
         "confermationdeletemessage": "Cette action ne peut pas etre annulee. Cela supprimera definitivement vos donnees et supprimera vos donnees de nos serveurs.",
         "downloadjustselected": "Télécharger juste la selection",
         "count": "Nombre",
-        "actions": "Actions"
+        "actions": "Actions",
+        "displayed": "affichés",
+        "of_total": "sur un total de"
     },
     "Menu": {
         "title": "Menu",
@@ -488,7 +490,7 @@
         "type_info": "Information sur les types de devices",
         "type_entree_info": "Les devices d'entrée requièrent une station",
         "type_sortie_info": "Les devices de sortie requièrent une station",
-        "type_entree_sortie_info": "Les devices entrée/sortie requièrent une station", 
+        "type_entree_sortie_info": "Les devices entrée/sortie requièrent une station",
         "type_controller_info": "Les devices contrôleur requièrent une région"
     },
     "Vehicle": {

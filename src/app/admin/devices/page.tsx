@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl"; import { getParksAdmin } from "@/actions/park/get";
+import { useTranslations } from "next-intl";
+import { getParksAdmin } from "@/actions/park/get";
 import { getRegionsAdmin } from "@/actions/region/get";
 import { getCountDevices, getDevices, getDevicesAll, getDevicesWithIds } from "@/actions/device/get";
 import { deleteDevices } from "@/actions/device/delete";
@@ -17,8 +18,8 @@ import { useImportSheetsStore } from "@/hooks/use-import-csv";
 import { getColumns } from "@/actions/util/sheet-columns/device";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-;
-
+import { Card, CardContent } from "@/components/ui/card";
+import { Users, Cpu, Building, MapPin } from "lucide-react";
 
 interface Device {
   id: string;
@@ -38,7 +39,6 @@ const selectors = [
   { title: "username", selector: "username" },
   { title: "password", selector: "password" },
 ];
-
 
 export default function DevicesPage() {
   const t = useTranslations("Device");
@@ -66,6 +66,17 @@ export default function DevicesPage() {
   const [parks, setParks] = useState<any[]>([]);
   const [regions, setRegions] = useState<any[]>([]);
 
+  // Stats
+  const [stats, setStats] = useState({
+    total: 0,
+    byType: {
+      entry: 0,
+      exit: 0,
+      entryExit: 0,
+      controller: 0
+    }
+  });
+
   const totalPages = Math.ceil(totalCount / pageSize);
 
   const { data: sheetData, setColumns, setData: setSheetData } = useImportSheetsStore();
@@ -85,6 +96,22 @@ export default function DevicesPage() {
     loadDevices();
     loadFiltersData();
   }, [currentPage, pageSize, searchQuery, searchPark, searchRegion]);
+
+  // Calculate stats when devices change
+  useEffect(() => {
+    if (devices.length > 0) {
+      const statsData = {
+        total: totalCount,
+        byType: {
+          entry: devices.filter(device => device.type === 0).length,
+          exit: devices.filter(device => device.type === 1).length,
+          entryExit: devices.filter(device => device.type === 2).length,
+          controller: devices.filter(device => device.type === 3).length
+        }
+      };
+      setStats(statsData);
+    }
+  }, [devices, totalCount]);
 
   // pour la creation depuis les sheet
   useEffect(() => {
@@ -244,9 +271,7 @@ export default function DevicesPage() {
     setCurrentPage(1);
   };
 
-
   const exportSelected = async (type: number = 1) => {
-
     const res = await getDevicesWithIds(selectedDevices)
 
     if (res.status !== 200) {
@@ -256,7 +281,6 @@ export default function DevicesPage() {
 
     const users = res.data
     generateFileClient(selectors, users, type);
-
   };
 
   const exportAll = async (type: number = 1) => {
@@ -268,8 +292,128 @@ export default function DevicesPage() {
     }
 
     generateFileClient(selectors, res.data, type);
-
   };
+
+  // Stats Cards Component
+  const StatsCards = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* Total Devices Card */}
+      <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-100 text-sm font-medium">{t("title")}</p>
+              <p className="text-3xl font-bold mt-2">{totalCount.toLocaleString()}</p>
+              <p className="text-blue-100 text-xs mt-1">{s("total")}</p>
+            </div>
+            <div className="bg-blue-400/20 p-3 rounded-full">
+              <Cpu className="h-8 w-8" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Entry Devices Card */}
+      <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-green-100 text-sm font-medium">{t("deviceentree")}</p>
+              <p className="text-3xl font-bold mt-2">{stats.byType.entry}</p>
+              <p className="text-green-100 text-xs mt-1">Devices</p>
+            </div>
+            <div className="bg-green-400/20 p-3 rounded-full">
+              <MapPin className="h-8 w-8" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Exit Devices Card */}
+      <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-orange-100 text-sm font-medium">{t("devicesortie")}</p>
+              <p className="text-3xl font-bold mt-2">{stats.byType.exit}</p>
+              <p className="text-orange-100 text-xs mt-1">Devices</p>
+            </div>
+            <div className="bg-orange-400/20 p-3 rounded-full">
+              <MapPin className="h-8 w-8" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Controller Devices Card */}
+      <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-purple-100 text-sm font-medium">{t("devicecontroller")}</p>
+              <p className="text-3xl font-bold mt-2">{stats.byType.controller}</p>
+              <p className="text-purple-100 text-xs mt-1">Devices</p>
+            </div>
+            <div className="bg-purple-400/20 p-3 rounded-full">
+              <Building className="h-8 w-8" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  // Simple Stats Bar (Alternative)
+  const SimpleStatsBar = () => (
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+      <div className="flex flex-col sm:flex-row items-center justify-between">
+        <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+          <div className="flex items-center space-x-2">
+            <Cpu className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <span className="text-lg font-semibold text-gray-900 dark:text-white">
+              {totalCount.toLocaleString()}
+            </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {t("title")}
+            </span>
+          </div>
+
+          <div className="h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
+
+          <div className="flex items-center space-x-4 text-sm">
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-gray-600 dark:text-gray-300">
+                {t("deviceentree")}: {stats.byType.entry}
+              </span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+              <span className="text-gray-600 dark:text-gray-300">
+                {t("devicesortie")}: {stats.byType.exit}
+              </span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span className="text-gray-600 dark:text-gray-300">
+                {t("devicesortieentree")}: {stats.byType.entryExit}
+              </span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span className="text-gray-600 dark:text-gray-300">
+                {t("devicecontroller")}: {stats.byType.controller}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {s("page")} {currentPage} {s("of")} {totalPages} • {devices.length} {s("displayed")}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
@@ -312,6 +456,14 @@ export default function DevicesPage() {
             </div>
           </div>
         </div>
+
+        {/* Stats Section - Choose one of the following: */}
+
+        {/* Option 1: Beautiful Stats Cards */}
+        <StatsCards />
+
+        {/* Option 2: Simple Stats Bar (uncomment to use instead) */}
+        {/* <SimpleStatsBar /> */}
 
         {/* Filters */}
         <DeviceFilters

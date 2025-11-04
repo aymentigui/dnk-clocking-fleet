@@ -95,7 +95,9 @@
         "confermationdeletemessage": "هذه العملية لا يمكن تراجعها. سوف تحذف بياناتك بشكل دائم ويتم ازالة بياناتك من خوادمنا.",
         "downloadjustselected": "تحميل المحدد",
         "count": "عدد",
-        "actions": "إجراءات"
+        "actions": "إجراءات",
+        "displayed": "معروض",
+        "of_total": "من إجمالي"
     },
     "Menu": {
         "title": "القائمة",

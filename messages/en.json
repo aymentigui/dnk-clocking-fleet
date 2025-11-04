@@ -94,7 +94,9 @@
         "confermationdeletemessage": "This action cannot be undone. This will permanently delete your data and remove your data from our servers.",
         "downloadjustselected": "Download just selected",
         "count": "Count",
-        "actions": "Actions"
+        "actions": "Actions",
+        "displayed": "displayed",
+        "of_total": "of total"
     },
     "Menu": {
         "title": "Menu",
@@ -488,7 +490,7 @@
         "export": "Export Devices",
         "type_info": "Device Type Information",
         "type_entree_info": "Entry devices require a station",
-        "type_sortie_info": "Exit devices require a station", 
+        "type_sortie_info": "Exit devices require a station",
         "type_entree_sortie_info": "Entry/Exit devices require a station",
         "type_controller_info": "Controller devices require a region"
     },
