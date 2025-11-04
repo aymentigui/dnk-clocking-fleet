@@ -280,7 +280,7 @@ const LoginForm = () => {
                     </div>
                     <Link href="/auth/register" passHref className="mt-4 block">
                         <Button 
-                            variant='outline' 
+                            variant='default' 
                             className='w-full py-3 border-black/20 text-white hover:bg-black/10 hover:text-black transition-all duration-200 rounded-xl'
                         >
                             {t("youhavenotaccount")}
