@@ -39,7 +39,7 @@ export async function AppSidebar() {
                       <div className="px-0">
                         <div className="flex w-full justify-between items-center hover:bg-sidebar-accent py-1 rounded">
                           {item.url && item.url !== ""
-                            ? <Link href={item.url}>
+                            ? <a href={item.url}>
                               <div className="flex items-center gap-2 px-2">
                                 {item.icon && <item.icon size={18} />}
                                 <span>
@@ -53,7 +53,7 @@ export async function AppSidebar() {
                                   </TooltipProvider>
                                 </span>
                               </div>
-                            </Link>
+                            </a>
                             : <div className="flex items-center gap-2 px-2">
                               {item.icon && <item.icon size={18} />}
                               <span>
@@ -79,7 +79,7 @@ export async function AppSidebar() {
                         {item.subItems.map((subItem: any) => (
                           <SidebarMenuItem key={subItem.title} className="pl-8" >
                             <SidebarMenuButton asChild>
-                              <Link href={subItem.url}>
+                              <a href={subItem.url}>
                                 {subItem.icon && <subItem.icon />}
                                 <span>
                                   <TooltipProvider>
@@ -91,7 +91,7 @@ export async function AppSidebar() {
                                     </Tooltip>
                                   </TooltipProvider>
                                 </span>
-                              </Link>
+                              </a>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
                         ))}
@@ -100,7 +100,7 @@ export async function AppSidebar() {
                   </Collapsible>
                   : <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <Link href={item.url}>
+                      <a href={item.url}>
                         <item.icon />
                         <span>
                           <TooltipProvider>
@@ -112,7 +112,7 @@ export async function AppSidebar() {
                             </Tooltip>
                           </TooltipProvider>
                         </span>
-                      </Link>
+                      </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
               ))}

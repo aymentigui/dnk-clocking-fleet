@@ -160,12 +160,12 @@ export default function ConducteursPage() {
                 <div className="mb-8">
                     <div className="flex items-center justify-between mb-2">
                         <h1 className="text-4xl font-bold text-foreground">{t("Conducteur.title")}</h1>
-                        <Link href="/admin/conducteurs/create">
+                        <a href="/admin/conducteurs/create">
                             <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
                                 <Plus size={20} />
                                 {t("Conducteur.create")}
                             </Button>
-                        </Link>
+                        </a>
                     </div>
                     <p className="text-muted-foreground">{t("Conducteur.description")}</p>
                 </div>
@@ -193,9 +193,9 @@ export default function ConducteursPage() {
                 )}
                 <div className="flex gap-2 justify-between items-center">
                     <div className="flex gap-2">
-                        <Link href="/admin/sheetimport">
+                        <a href="/admin/sheetimport">
                             <Button>{t('System.import')}</Button>
-                        </Link>
+                        </a>
                         <ExportButton all={true} handleExportCSV={() => exportAll(1)} handleExportXLSX={() => exportAll(2)} />
                         {selectedIds.length > 0 && <ExportButton all={false} handleExportCSV={() => exportSelected(1)} handleExportXLSX={() => exportSelected(2)} />}
                     </div>

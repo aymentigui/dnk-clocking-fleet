@@ -22,7 +22,7 @@ export default function EditConducteurPage() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/admin/conducteurs">
+          <a href="/admin/conducteurs">
             <Button
               variant="outline"
               className="gap-2 mb-4 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 bg-transparent"
@@ -30,7 +30,7 @@ export default function EditConducteurPage() {
               <ArrowLeft size={20} />
               {t("System.back")}
             </Button>
-          </Link>
+          </a>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white">{t("Conducteur.edit")}</h1>
           <p className="text-gray-600 dark:text-slate-400 mt-2">{t("Conducteur.edit_description")}</p>
         </div>

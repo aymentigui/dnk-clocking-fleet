@@ -11,8 +11,9 @@ import { NextResponse } from "next/server";
 
 export const POST= withAuth(async (request, { user }) => {
     const data = await request.json();
+    console.log("Received clocking data:", data);
     const res = await createClocking({ matricule: data.matricule, type: data.type, conducteur_id: data.conducteur_id });
-
+    console.log("Clocking creation response:", res);
     return NextResponse.json({ data: res }, { status: 200 });
 });
 
