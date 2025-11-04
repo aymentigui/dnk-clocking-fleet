@@ -62,13 +62,19 @@ export function DataTable() {
 
             // Modifier l'appel API pour inclure la date si elle est sélectionnée
             const response = await getClockings(
-                page, 
-                pageSize, 
+                page,
+                pageSize,
                 searchDate ? new Date(searchDate).toISOString() : undefined
             );
 
             if (response.status === 200) {
-                setData(response.data);
+                const filtredData = response.data.map((item: any) => {
+                    return {
+                        ...item,
+                        conducteur_name: item.conducteur ? `${item.conducteur.matricule} ${item.conducteur.firstname} ${item.conducteur.lastname}` : s("notassigned"),
+                    }
+                });
+                setData(filtredData);
                 setCount(response.count);
             }
         } catch (error) {
@@ -117,7 +123,7 @@ export function DataTable() {
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <TableRow key={headerGroup.id}>
                                     {headerGroup.headers.map((header, index) => (
-                                        <TableHead 
+                                        <TableHead
                                             key={index}
                                             className={`${selectedLanguage == "ar" ? "text-right " : ""}`}
                                         >
@@ -152,16 +158,16 @@ export function DataTable() {
                     </Table>
                 </div>
             )}
-            
+
             {/* Pagination */}
             {!isLoading && (
-                <TablePagination 
-                    page={page} 
-                    setPage={setPage} 
-                    count={count} 
-                    pageSize={pageSize} 
-                    isLoading={isLoading} 
-                    debouncedSearchQuery={""} 
+                <TablePagination
+                    page={page}
+                    setPage={setPage}
+                    count={count}
+                    pageSize={pageSize}
+                    isLoading={isLoading}
+                    debouncedSearchQuery={""}
                 />
             )}
         </div>

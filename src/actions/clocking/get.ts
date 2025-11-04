@@ -42,6 +42,7 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
             include: {
                 park: true,
                 region: true,
+                conducteur: true,
                 vehicle: {
                     include: {
                         vehicle_park: {
@@ -129,6 +130,7 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
             include: {
                 park: true,
                 region: true,
+                conducteur: true,
                 vehicle: {
                     include: {
                         vehicle_park: {

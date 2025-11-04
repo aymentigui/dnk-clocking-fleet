@@ -138,6 +138,12 @@ export const columns: ColumnDef<Columns>[] = [
     cell: ({ row }) => (row.getValue("park")),
     enableSorting: true,
   },
+  {
+    accessorKey: "conducteur",
+    header: ({ column }) => parkHeader(column),
+    cell: ({ row }) => (row.getValue("conducteur")),
+    enableSorting: true,
+  },
 ];
 
 
