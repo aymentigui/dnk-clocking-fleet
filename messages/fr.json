@@ -537,6 +537,7 @@
         "date": "Date & Heure",
         "vehicle": "Véhicule",
         "device": "Appareil",
+        "Type": "Entrée/Sortie",
         "device_type": "Type d'appareil",
         "conducteur": "Conducteur",
         "status": "Statut",

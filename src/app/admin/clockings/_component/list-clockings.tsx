@@ -14,6 +14,7 @@ interface Clocking {
     vehicle: string;
     device: any;
     deviceType: number;
+    type: number;
     conducteur: any;
     status: string;
     park: string;

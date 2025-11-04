@@ -65,8 +65,9 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
                     device: {
                         select: {
                             code: true,
+                            type: true,
                             park: {
-                                select: { name: true }
+                                select: { name: true, }
                             },
                         },
                     },
@@ -95,7 +96,8 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
                 created_at: formattedDate,
                 vehicle: clocking.vehicle.matricule,
                 device: clocking.device,
-                deviceType: clocking.type,
+                deviceType: clocking.device.type,
+                type: clocking.type,
                 conducteur: clocking.conducteur,
                 status: clocking.status,
                 park: location,

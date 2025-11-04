@@ -537,6 +537,7 @@
         "vehicle": "المركبة",
         "device": "الجهاز",
         "device_type": "نوع الجهاز",
+        "type": "الدخول/الخروج",
         "conducteur": "السائق",
         "status": "الحالة",
         "location": "الموقع",
