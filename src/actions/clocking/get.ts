@@ -102,7 +102,7 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
             };
         });
 
-        whereCondition.deviceType = 0; 
+        whereCondition.type = 0; 
 
         const countExit = await prisma.clocking.count({
             where: whereCondition
