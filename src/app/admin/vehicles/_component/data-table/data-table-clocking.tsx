@@ -71,7 +71,13 @@ export function DataTable({
             const response = await getClockingsVehicle(id, page, pageSize,searchDate ? new Date(searchDate).toISOString() : undefined);
 
             if (response.status === 200) {
-                setData(response.data);
+                const filtredData = response.data.map((item: any) => {
+                    return {
+                        ...item,
+                        conducteur_name: item.conducteur ? `${item.conducteur.matricule} ${item.conducteur.firstname} ${item.conducteur.lastname}` : s("notassigned"),
+                    }
+                });
+                setData(filtredData);
                 setCount(response.count);
             }
 

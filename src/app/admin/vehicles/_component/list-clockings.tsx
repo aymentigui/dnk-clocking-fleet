@@ -6,8 +6,8 @@ import { DataTable } from "./data-table/data-table-clocking";
 
 
 export default function ClockingList({ id }: { id: string }) {
-  const translate = useTranslations("Vehicle")
-  const systemTranslate = useTranslations("System")
+  // const translate = useTranslations("Vehicle")
+  // const systemTranslate = useTranslations("System")
 
 
   return (
