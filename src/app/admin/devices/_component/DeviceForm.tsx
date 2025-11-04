@@ -278,9 +278,9 @@ export function DeviceForm({ device, parks, regions, onSubmit, onCancel, loading
                             Information sur les types de devices:
                         </h4>
                         <ul className="text-xs text-blue-700 dark:text-blue-400 space-y-1">
-                            <li>• <strong>{t("deviceentree")}</strong> : Requiert une station (parc)</li>
-                            <li>• <strong>{t("devicesortie")}</strong> : Requiert une station (parc)</li>
-                            <li>• <strong>{t("devicesortieentree")}</strong> : Requiert une station (parc)</li>
+                            <li>• <strong>{t("deviceentree")}</strong> : Requiert une parc</li>
+                            <li>• <strong>{t("devicesortie")}</strong> : Requiert une parc </li>
+                            <li>• <strong>{t("devicesortieentree")}</strong> : Requiert une parc </li>
                             <li>• <strong>{t("devicecontroller")}</strong> : Requiert une région</li>
                         </ul>
                     </div>
