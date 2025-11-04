@@ -70,11 +70,6 @@ export default function ClockingsPage() {
         setCurrentPage(1);
     };
 
-    // Stats calculation
-    const today = new Date().toISOString().split('T')[0];
-    const todayClockings = clockings.filter(clocking =>
-        clocking.created_at.includes(new Date().getDate() + "/" + (new Date().getMonth() + 1))
-    ).length;
 
     const uniqueVehicles = new Set(clockings.map(clocking => clocking.vehicle)).size;
     const uniqueConductors = new Set(
