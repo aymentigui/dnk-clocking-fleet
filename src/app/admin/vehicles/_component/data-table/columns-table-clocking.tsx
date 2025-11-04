@@ -87,7 +87,7 @@ const remarqueCell = (column: any) => {
           :
           <ArrowLeftToLine className="text-red-500" />)
         :
-        type === 3 ?
+        type === 3 || type === 4 ?
           (status === 1 ?
             <CircleCheckBig className="text-green-500" />
             :
