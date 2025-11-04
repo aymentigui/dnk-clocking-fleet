@@ -128,7 +128,7 @@ export function ClockingsTable({ clockings, loading }: ClockingsTableProps) {
                                 </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                {clocking.conducteur?.firstname + clocking.conducteur?.lastname + clocking.conducteur?.matricule || "-"}
+                                {clocking.conducteur?.firstname + " " + clocking.conducteur?.lastname + " " + clocking.conducteur?.matricule || "-"}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(clocking.status)}`}>

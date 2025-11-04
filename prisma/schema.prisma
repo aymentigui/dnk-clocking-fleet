@@ -187,6 +187,7 @@ model park {
   device       device[]
   vehicle_park vehicle_park[]
   clocking     clocking[]
+  vehicle      vehicle[]
 }
 
 model region {
@@ -200,6 +201,7 @@ model region {
   device       device[]
   vehicle_park vehicle_region[]
   clocking     clocking[]
+  vehicle      vehicle[]
 }
 
 model entreprise {
@@ -256,6 +258,11 @@ model vehicle {
   model     String?
   year      Int?
   brand     String?
+
+  region_id String?
+  region    region? @relation(fields: [region_id], references: [id])
+  park_id   String?
+  park      park?   @relation(fields: [park_id], references: [id])
 
   created_at     DateTime         @default(now())
   deleted_at     DateTime?
