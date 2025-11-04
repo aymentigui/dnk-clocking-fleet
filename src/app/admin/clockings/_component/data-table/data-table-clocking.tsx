@@ -71,7 +71,7 @@ export function DataTable() {
                 const filtredData = response.data.map((item: any) => {
                     return {
                         ...item,
-                        conducteur_name: item.conducteur ? `${item.conducteur.matricule} ${item.conducteur.firstname} ${item.conducteur.lastname}` : s("notassigned"),
+                        conducteur: item.conducteur ? `${item.conducteur.matricule} ${item.conducteur.firstname} ${item.conducteur.lastname}` : s("notassigned"),
                     }
                 });
                 setData(filtredData);

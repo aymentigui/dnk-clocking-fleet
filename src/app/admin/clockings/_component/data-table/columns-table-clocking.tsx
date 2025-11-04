@@ -37,7 +37,24 @@ const parkHeader = (column: any) => {
       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       className="w-3/6 flex justify-between"
     >
-      {t("park")}
+      Conducteurs
+      <ArrowUpDown className="ml-2 h-4 w-4" />
+    </Button>
+  );
+}
+
+const conducteurHeader = (column: any) => {
+
+  const t = useTranslations("Vehicle");
+
+  return (
+    <Button
+      variant="ghost"
+      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      className="w-3/6 flex justify-between"
+    >
+      {/* {t("park")} */}
+      Conducteurs
       <ArrowUpDown className="ml-2 h-4 w-4" />
     </Button>
   );
@@ -107,8 +124,8 @@ const remarqueCell = (column: any) => {
             <CircleCheckBig className="text-green-500" />
             :
             <CircleCheckBig className="text-red-500" />)
-            :
-            <CircleAlert className="text-red-500" />
+          :
+          <CircleAlert className="text-red-500" />
   );
 }
 
@@ -140,7 +157,7 @@ export const columns: ColumnDef<Columns>[] = [
   },
   {
     accessorKey: "conducteur",
-    header: ({ column }) => parkHeader(column),
+    header: ({ column }) => conducteurHeader(column),
     cell: ({ row }) => (row.getValue("conducteur")),
     enableSorting: true,
   },
