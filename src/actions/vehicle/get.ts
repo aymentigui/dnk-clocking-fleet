@@ -25,34 +25,28 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
             // @ts-ignore
             searchConditions.OR = [
                 { matricule: { contains: searchQuery } },
-                { vin: { contains: searchQuery,
-                    //  mode: "insensitive" 
-                    } },
-                { brand: { contains: searchQuery,
-                    // mode: "insensitive" 
-                } },
-                { model: { contains: searchQuery,
-                    //  mode: "insensitive"
-                     } },
-                // { year: { contains: Number(searchQuery) } },
+                {
+                    vin: {
+                        contains: searchQuery,
+                    }
+                },
+                {
+                    brand: {
+                        contains: searchQuery,
+                    }
+                },
+                {
+                    model: {
+                        contains: searchQuery,
+                    }
+                },
             ]
 
         if ((searchPark && searchPark !== "" && searchPark !== "0"))
             // @ts-ignore
             searchConditions.AND = [
                 {
-                    vehicle_park: {
-                        every: {
-                            park: {
-                                id: searchPark,
-                            }
-                        },
-                        some: {
-                            park: {
-                                id: searchPark,
-                            }
-                        }
-                    }
+                    park_id: searchPark
                 }
             ]
         if ((searchRegion && searchRegion !== "" && searchRegion !== "0")) {
@@ -63,18 +57,7 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
             // @ts-ignore
             searchConditions.AND.push(
                 {
-                    vehicle_region: {
-                        every: {
-                            region: {
-                                id: searchRegion,
-                            }
-                        },
-                        some: {
-                            region: {
-                                id: searchRegion,
-                            }
-                        }
-                    }
+                    region_id: searchRegion
                 }
             )
         }
@@ -84,24 +67,8 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
             take: pageSize === 0 ? undefined : pageSize, // Nombre d'éléments à prendre
             where: searchConditions,
             include: {
-                vehicle_park: {
-                    orderBy: {
-                        added_at: 'desc',
-                    },
-                    include: {
-                        park: true,
-                    },
-                    take: 1,
-                },
-                vehicle_region: {
-                    orderBy: {
-                        added_at: 'desc',
-                    },
-                    include: {
-                        region: true,
-                    },
-                    take: 1,
-                },
+                region: true,
+                park: true,
             }
         });
 
@@ -113,10 +80,10 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
                 brand: vehicle.brand,
                 model: vehicle.model,
                 year: vehicle.year,
-                park: vehicle.vehicle_park && vehicle.vehicle_park[0] && vehicle.vehicle_park[0].park ? vehicle.vehicle_park[0].park.name : "",
-                parkId: vehicle.vehicle_park && vehicle.vehicle_park[0] && vehicle.vehicle_park[0].park ? vehicle.vehicle_park[0].park.id : "",
-                region: vehicle.vehicle_region && vehicle.vehicle_region[0] && vehicle.vehicle_region[0].region ? vehicle.vehicle_region[0].region.name : "",
-                regionId: vehicle.vehicle_region && vehicle.vehicle_region[0] && vehicle.vehicle_region[0].region ? vehicle.vehicle_region[0].region.id : "",
+                park: vehicle.park ? vehicle.park.name : "",
+                parkId: vehicle.park ? vehicle.park.id : "",
+                region: vehicle.region ? vehicle.region.name : "",
+                regionId: vehicle.region ? vehicle.region.id : "",
             }
         })
 
@@ -133,56 +100,32 @@ export async function getCountVehicles(searchQuery?: string, searchPark?: string
         // @ts-ignore
         searchConditions.OR = [
             { matricule: { contains: searchQuery } },
-            { vin: { contains: searchQuery, 
-                // mode: "insensitive"
-             } },
-            { brand: { contains: searchQuery
-                // ,mode: "insensitive" 
-            } },
-            { model: { contains: searchQuery
-                // ,mode: "insensitive" 
-            } },
+            {
+                vin: {
+                    contains: searchQuery,
+                }
+            },
+            {
+                brand: {
+                    contains: searchQuery
+                }
+            },
+            {
+                model: {
+                    contains: searchQuery
+                }
+            },
         ]
     if ((searchPark && searchPark !== "" && searchPark !== "0"))
         // @ts-ignore
-        searchConditions.AND = [
-            {
-                vehicle_park: {
-                    every: {
-                        park: {
-                            id: searchPark,
-                        }
-                    },
-                    some: {
-                        park: {
-                            id: searchPark,
-                        }
-                    }
-                }
-            }
-        ]
-    if((searchRegion && searchRegion !== "" && searchRegion !== "0")) {
+        searchConditions.AND = [{ park_id: searchPark }]
+    if ((searchRegion && searchRegion !== "" && searchRegion !== "0")) {
         // @ts-ignore
         if (!searchConditions.AND)
             // @ts-ignore
             searchConditions.AND = []
         // @ts-ignore
-        searchConditions.AND.push(
-            {
-                vehicle_region: {
-                    every: {
-                        region: {
-                            id: searchRegion,
-                        }
-                    },
-                    some: {
-                        region: {
-                            id: searchRegion,
-                        }
-                    }
-                }
-            }
-        )
+        searchConditions.AND.push({ region_id: searchRegion })
     }
 
     const e = await getTranslations('Error');
@@ -190,24 +133,8 @@ export async function getCountVehicles(searchQuery?: string, searchPark?: string
         const vehicles = await prisma.vehicle.findMany({
             where: searchConditions,
             include: {
-                vehicle_park: {
-                    orderBy: {
-                        added_at: 'desc',
-                    },
-                    include: {
-                        park: true,
-                    },
-                    take: 1,
-                },
-                vehicle_region: {
-                    orderBy: {
-                        added_at: 'desc',
-                    },
-                    include: {
-                        region: true,
-                    },
-                    take: 1,
-                },
+                park: true,
+                region: true,
             }
         });
 
@@ -217,6 +144,7 @@ export async function getCountVehicles(searchQuery?: string, searchPark?: string
         return { status: 500, data: null };
     }
 }
+
 export async function getVehiclesAll(): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
     try {
@@ -383,7 +311,7 @@ export async function getVehicleParks(id: string, page: number, pageSize: number
         if (!vehicle) {
             return { status: 404, data: null, count: 0 };
         }
-        
+
 
         const vehicleParks = await prisma.vehicle_park.findMany({
             skip: (page - 1) * pageSize,
