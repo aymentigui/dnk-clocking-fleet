@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useSession } from "@/hooks/use-session";
-import { useOrigin } from "@/hooks/use-origin";
 import Cookies from 'js-cookie';
 import Link from "next/link";
 import {
@@ -11,11 +10,6 @@ import {
     Plus,
     Trash2,
     Edit,
-    Download,
-    Upload,
-    Loader2,
-    ChevronLeft,
-    ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/myui/loading";
 import ExportButton from "@/components/my/export-button";
 import ConfirmDialogDelete from "@/components/myui/shadcn-dialog-confirm";
-import { getParks, getParksWithIds } from "@/actions/park/get";
+import { getParksWithIds } from "@/actions/park/get";
 import { deletePark } from "@/actions/park/delete";
 import { generateFileClient } from "@/actions/util/export-data/export-client";
 import { getColumns } from "@/actions/util/sheet-columns/park";
