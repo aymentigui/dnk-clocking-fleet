@@ -158,7 +158,12 @@ export async function getVehiclesAll(): Promise<{ status: number, data: any }> {
             return { status: 403, data: { message: e('forbidden') } };
         }
 
-        const devices = await prisma.vehicle.findMany();
+        const devices = await prisma.vehicle.findMany({
+            include: {
+                park: true,
+                region: true,
+            }
+        });
 
         return { status: 200, data: devices };
     } catch (error) {
@@ -261,6 +266,10 @@ export async function getVehiclesWithIds(vehicleIds: string[]): Promise<{ status
 
         const devices = await prisma.vehicle.findMany({
             where: { id: { in: vehicleIds, } },
+            include: {
+                park: true,
+                region: true,
+            }
         });
 
         return { status: 200, data: devices };

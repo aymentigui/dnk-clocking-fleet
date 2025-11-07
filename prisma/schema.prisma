@@ -5,14 +5,13 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
   // directUrl = env("DIRECT_URL")
 }
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["prismaSchemaFolder"]
+  provider = "prisma-client-js"
 }
 
 model user {
@@ -205,15 +204,53 @@ model region {
 }
 
 model entreprise {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  description String?
-  address     String?
-  phone       String?
-  created_at  DateTime  @default(now())
-  deleted_at  DateTime?
-  added_from  String?
-  device      device[]
+  id               String             @id @default(cuid())
+  name             String             @unique
+  description      String?
+  address          String?
+  phone            String?
+  created_at       DateTime           @default(now())
+  deleted_at       DateTime?
+  added_from       String?
+  device           device[]
+  entreprise_route entreprise_route[]
+}
+
+model entreprise_route {
+  id                        String                      @id @default(cuid())
+  entreprise_id             String
+  entreprise                entreprise                  @relation(fields: [entreprise_id], references: [id], onDelete: Cascade)
+  distance                  Float?
+  region_depart             String?
+  region_arrive             String?
+  added_at                  DateTime                    @default(now())
+  updated_at                DateTime                    @updatedAt
+  added_from                String?
+  entreprise_route_planning entreprise_route_planning[]
+}
+
+model entreprise_route_planning {
+  id                                     String                                   @id @default(cuid())
+  entreprise_route_id                    String
+  entreprise_route                       entreprise_route                         @relation(fields: [entreprise_route_id], references: [id], onDelete: Cascade)
+  day_of_week                            Int // 0 = Sunday, 1 = Monday, ..., 6 = Saturday        // Dates to exclude
+  departure_time                         String? // Format "HH:MM"
+  arrival_time                           String? // Format "HH:MM"
+  vehicle_id                             String?
+  vehicle                                vehicle?                                 @relation(fields: [vehicle_id], references: [id])
+  created_at                             DateTime                                 @default(now())
+  updated_at                             DateTime                                 @updatedAt
+  added_from                             String?
+  entreprise_route_planning_exluded_date entreprise_route_planning_exluded_date[]
+}
+
+model entreprise_route_planning_exluded_date {
+  id                           String                    @id @default(cuid())
+  entreprise_route_planning_id String
+  entreprise_route_planning    entreprise_route_planning @relation(fields: [entreprise_route_planning_id], references: [id], onDelete: Cascade)
+  excluded_date                DateTime
+  created_at                   DateTime                  @default(now())
+  added_from                   String?
 }
 
 model conducteur {
@@ -226,6 +263,7 @@ model conducteur {
   deleted_at DateTime?
   added_from String?
   clocking   clocking[]
+  course     course[]
 }
 
 model device {
@@ -264,12 +302,17 @@ model vehicle {
   park_id   String?
   park      park?   @relation(fields: [park_id], references: [id])
 
-  created_at     DateTime         @default(now())
-  deleted_at     DateTime?
-  added_from     String?
-  vehicle_park   vehicle_park[]
-  clocking       clocking[]
-  vehicle_region vehicle_region[]
+  in_park Boolean @default(true)
+  status  String?
+
+  created_at                DateTime                    @default(now())
+  deleted_at                DateTime?
+  added_from                String?
+  vehicle_park              vehicle_park[]
+  clocking                  clocking[]
+  vehicle_region            vehicle_region[]
+  rotation                  course[]
+  entreprise_route_planning entreprise_route_planning[]
 }
 
 model vehicle_park {
@@ -295,20 +338,22 @@ model vehicle_region {
 }
 
 model clocking {
-  id            String      @id @default(cuid())
-  vehicle_id    String
-  vehicle       vehicle     @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
-  device_id     String
-  device        device      @relation(fields: [device_id], references: [id], onDelete: Cascade)
-  created_at    DateTime    @default(now())
-  park_id       String?
-  park          park?       @relation(fields: [park_id], references: [id])
-  conducteur_id String?
-  conducteur    conducteur? @relation(fields: [conducteur_id], references: [id])
-  type          Int?
-  status        Int?
-  region        region?     @relation(fields: [regionId], references: [id])
-  regionId      String?
+  id                   String      @id @default(cuid())
+  vehicle_id           String
+  vehicle              vehicle     @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
+  device_id            String
+  device               device      @relation(fields: [device_id], references: [id], onDelete: Cascade)
+  created_at           DateTime    @default(now())
+  park_id              String?
+  park                 park?       @relation(fields: [park_id], references: [id])
+  conducteur_id        String?
+  conducteur           conducteur? @relation(fields: [conducteur_id], references: [id])
+  conducteur_matricule String?
+  conducteur_name      String?
+  type                 Int?
+  status               Int?
+  region               region?     @relation(fields: [regionId], references: [id])
+  regionId             String?
 }
 
 model notification {
@@ -319,4 +364,21 @@ model notification {
   created_at DateTime @default(now())
   added_by   String?
   user       user?    @relation(fields: [added_by], references: [id])
+}
+
+model course {
+  id                   String     @id @default(cuid())
+  vehicle_id           String
+  vehicle              vehicle    @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
+  conducteur_id        String
+  conducteur           conducteur @relation(fields: [conducteur_id], references: [id])
+  conducteur_name      String
+  conducteur_matricule String
+  start_date           DateTime
+  end_date             DateTime?
+  waiting              Boolean    @default(false)
+  start_station        String?
+  end_station          String?
+  created_at           DateTime   @default(now())
+  updated_at           DateTime   @updatedAt
 }

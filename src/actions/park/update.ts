@@ -58,34 +58,6 @@ export async function UpdatePark(id: string, data: any) {
             },
         })
 
-        const userName = (await getUserName(session.data.user.id)).data
-        await prisma.notification.create({
-            data: {
-                title: "mise à jour parc",
-                contenu: "Un parc a été mise à jour par " + userName + "\n Nom du parc : " + name + "\n Description : " + description + "\n Adresse : " + address + "\n Ancien parc : " + park.name + "\n Ancienne description : " + park.description + "\n Ancienne adresse : " + park.address,
-                user: {
-                    connect: {
-                        id: session.data.user.id
-                    }
-                }
-            }
-        })
-        const emails = await prisma.user.findMany({ where: { is_admin: true } })
-        await Promise.all(
-            emails.map(async (email) => {
-                if (email.email) {
-                    try {
-                        await sendEmail(
-                            email.email,
-                            "mise à jour parc",
-                            "Un parc a été mise à jour par " + userName + "\n Nom du parc : " + name + "\n Description : " + description + "\n Adresse : " + address + "\n Ancien parc : " + park.name + "\n Ancienne description : " + park.description + "\n Ancienne adresse : " + park.address,
-                        )
-                    } catch (erreur) {
-                        console.log("error sendig mail analyse to" + email.email)
-                    }
-                }
-            })
-        )
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {

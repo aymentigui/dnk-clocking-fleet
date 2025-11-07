@@ -7,8 +7,8 @@ export async function POST(request: NextRequest) {
 
     const data = await request.json();
     const { email, password } = data;
-
-    const token = await loginUser({ email, password});
+    
+    const token = await loginUser({ email, password });
     if (!token || token.status !== 200) {
         return NextResponse.json({ message: "login failed" }, {
             status: 400,

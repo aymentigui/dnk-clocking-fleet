@@ -48,36 +48,6 @@ export async function createPark(data: any) {
             },
         });
 
-        const userName = (await getUserName(session.data.user.id)).data
-        await prisma.notification.create({
-            data: {
-                title: "nouveau parc",
-                contenu: "Un nouveau parc a été ajouté par " + userName + "\n Nom du parc : " + name + "\n Description : " + description + "\n Adresse : " + address,
-                user: {
-                    connect: {
-                        id: session.data.user.id
-                    }
-                }
-            }
-        })
-
-        const emails = await prisma.user.findMany({ where: { is_admin: true } })
-        await Promise.all(
-            emails.map(async (email) => {
-                if (email.email) {
-                    try {
-                        await sendEmail(
-                            email.email,
-                            "nouveau parc",
-                            "Un nouveau parc a été ajouté par " + userName + "\n Nom du parc : " + name + "\n Description : " + description + "\n Adresse : " + address,
-                        )
-                        } catch (erreur) {
-                        console.log("error sendig mail analyse to" + email.email)
-                    }
-                }
-            })
-        )
-
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
         console.log("An error occurred in createPark" + error);

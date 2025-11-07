@@ -47,35 +47,6 @@ export async function createRegion(data: any) {
                 added_from: session.data.user.id,
             },
         });
-        const userName = (await getUserName(session.data.user.id)).data
-        await prisma.notification.create({
-            data: {
-                title: "nouvelle region",
-                contenu: "Une nouvelle region a été ajouté par " + userName + "\n Nom du region : " + name + "\n Description : " + description + "\n Adresse : " + address,
-                user: {
-                    connect: {
-                        id: session.data.user.id
-                    }
-                }
-            }
-        })
-
-        const emails = await prisma.user.findMany({ where: { is_admin: true } })
-        await Promise.all(
-            emails.map(async (email) => {
-                if (email.email) {
-                    try {
-                        await sendEmail(
-                            email.email,
-                            "nouvelle region",
-                            "Une nouvelle region a été ajouté par " + userName + "\n Nom du region : " + name + "\n Description : " + description + "\n Adresse : " + address,
-                        )
-                    } catch (erreur) {
-                        console.log("error sendig mail analyse to" + email.email)
-                    }
-                }
-            })
-        )
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
@@ -110,22 +81,6 @@ export async function createRegions(data: any) {
         })
 
         const regionsResuls = await Promise.all(regions);
-        const userName = (await getUserName(session.data.user.id)).data
-        prisma.notification.create({
-            data: {
-                title: "nouvelles regions",
-                contenu: "Des nouvelles regions ont éte ajouté par " + userName
-                    + regions.map((region: any) => {
-                        return "\n Nom du region : " + region.data.name + " Description : " + region.data.description + " Adresse : " + region.data.address
-                    })
-                ,
-                user: {
-                    connect: {
-                        id: session.data.user.id
-                    }
-                }
-            }
-        })
 
         return { status: 200, data: { message: s("createsuccess"), regions: regionsResuls } };
     } catch (error) {

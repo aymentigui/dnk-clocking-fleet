@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/myui/loading";
 import ExportButton from "@/components/my/export-button";
 import ConfirmDialogDelete from "@/components/myui/shadcn-dialog-confirm";
-import { getParksWithIds } from "@/actions/park/get";
+import { getParksAdmin, getParksWithIds } from "@/actions/park/get";
 import { deletePark } from "@/actions/park/delete";
 import { generateFileClient } from "@/actions/util/export-data/export-client";
 import { getColumns } from "@/actions/util/sheet-columns/park";
@@ -142,6 +142,11 @@ export function ParksTable({
     };
 
     const exportAll = async (type: number = 1) => {
+        const res= await getParksAdmin();
+        if (res.status !== 200) {
+            return;
+        }
+        const parks = res.data;
         generateFileClient(selectors, parks, type);
     };
 
@@ -165,15 +170,17 @@ export function ParksTable({
                                             {t("addpark")}
                                         </Button>
                                     </Link>
-                                    {/* Boutons Export */}
-                                    <ExportButton
-                                        all={true}
-                                        handleExportCSV={() => exportAll(1)}
-                                        handleExportXLSX={() => exportAll(2)}
-                                    />
+                                    <Link href="/admin/sheetimport">
+                                        <Button>{s('import')}</Button>
+                                    </Link>
                                 </>
                             )}
-
+                            {/* Boutons Export */}
+                            <ExportButton
+                                all={true}
+                                handleExportCSV={() => exportAll(1)}
+                                handleExportXLSX={() => exportAll(2)}
+                            />
                             {selectedIds.length > 0 && (
                                 <ExportButton
                                     all={false}

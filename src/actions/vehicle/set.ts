@@ -96,6 +96,11 @@ async function assignVehiclePark(
     const parkExists = await prisma.park.findFirst({ where: { id: parkId } });
     if (!parkExists) return;
 
+    await prisma.vehicle.update({
+        where: { id: vehicleId },
+        data: { park_id: parkId },
+    });
+
     await prisma.vehicle_park.create({
         data: {
             vehicle_id: vehicleId,
@@ -122,6 +127,11 @@ async function assignVehicleRegion(
 
     const regionExists = await prisma.region.findFirst({ where: { id: regionId } });
     if (!regionExists) return;
+
+    await prisma.vehicle.update({
+        where: { id: vehicleId },
+        data: { region_id: regionId },
+    });
 
     await prisma.vehicle_region.create({
         data: {
@@ -181,7 +191,7 @@ async function addSingleVehicle(
 
         // Create vehicle
         const vehicle = await createVehicleRecord(
-            { matricule, model, year, vin, brand, park, region },
+            { matricule, model, year, vin, brand },
             session.data.user.id
         );
 
@@ -198,6 +208,10 @@ async function addSingleVehicle(
                             added_from: session.data.user.id,
                         },
                     });
+                    await prisma.vehicle.update({
+                        where: { id: vehicle.id },
+                        data: { park_id: parkExists.id }
+                    })
                 }
             }
         }
@@ -216,6 +230,10 @@ async function addSingleVehicle(
                         },
                     });
                 }
+                await prisma.vehicle.update({
+                    where: { id: vehicle.id },
+                    data: { region_id: region.id }
+                })
             }
         }
 

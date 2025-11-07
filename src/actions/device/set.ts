@@ -71,18 +71,18 @@ export async function createDevice(data: any) {
         }
 
         if (region && region != null && region != "null" && region != "" && region.trim() != "") {
-            const regionExists = await prisma.region.findFirst({ where: { id: park } });
+            const regionExists = await prisma.region.findFirst({ where: { id: region } });
 
             if (!regionExists) {
                 return { status: 400, data: { message: u("regionnotexist") } };
             }
         }
 
-        if (entreprise && entreprise != null && entreprise != "null" && region != "" && entreprise.trim() != "") {
-            const entrepriseExists = await prisma.entreprise.findFirst({ where: { id: park } });
+        if (entreprise && entreprise != null && entreprise != "null" && entreprise != "" && entreprise.trim() != "") {
+            const entrepriseExists = await prisma.entreprise.findFirst({ where: { id: entreprise } });
 
             if (!entrepriseExists) {
-                return { status: 400, data: { message: u("regionnotexist") } };
+                return { status: 400, data: { message: "Entreprise not found" } };
             }
         }
 

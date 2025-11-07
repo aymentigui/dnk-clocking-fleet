@@ -36,6 +36,11 @@ export const permissions = [
     { name: "entreprise_update", group: "entreprise" },
     { name: "entreprise_delete", group: "entreprise" },
 
+    { name: "entreprise_route_view", group: "entreprise_route" },
+    { name: "entreprise_route_create", group: "entreprise_route" },
+    { name: "entreprise_route_update", group: "entreprise_route" },
+    { name: "entreprise_route_delete", group: "entreprise_route" },
+
     { name: "vehicles_view", group: "vehicles" },
     { name: "vehicles_create", group: "vehicles" },
     { name: "vehicles_update", group: "vehicles" },

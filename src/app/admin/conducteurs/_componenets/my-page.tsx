@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card"
 import { deleteConducteur } from "@/actions/conducteur/delete"
 import ConducteurTable from "./conducteur-table"
 import DeleteConfirmDialog from "./delete-conducteur"
-import { getConducteurs } from "@/actions/conducteur/get"
+import { getConducteurs, getConducteursAdmin } from "@/actions/conducteur/get"
 import { getColumns } from "@/actions/util/sheet-columns/conducteur";
 import { useEffect } from "react"
 import { useImportSheetsStore } from "@/hooks/use-import-csv"
@@ -24,9 +24,9 @@ import Link from "next/link"
 const selectors = [
     { title: "id", selector: "id" },
     { title: "matricule", selector: "matricule" },
-    { title: "firstname", selector: "Nom" },
-    { title: "lastname", selector: "prenom" },
-    { title: "phone", selector: "telephone" },
+    { title: "firstname", selector: "firstname" },
+    { title: "lastname", selector: "lastname" },
+    { title: "phone", selector: "phone" },
 ];
 
 export default function ConducteursPage() {
@@ -89,6 +89,14 @@ export default function ConducteursPage() {
     };
 
     const exportAll = async (type: number = 1) => {
+        const res = await getConducteursAdmin()
+
+        if (res.status !== 200) {
+            toast.error(t("Errors.badrequest"))
+            return
+        }
+
+        const data = res.data
         generateFileClient(selectors, data, type);
 
     };

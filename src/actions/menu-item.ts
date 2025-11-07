@@ -1,5 +1,5 @@
 "use server"
-import { Bell, BusFront, CalendarCheck, CircleEllipsis, ContactRound, Download, File, FileSpreadsheet, Home, Map, Newspaper, Plus, ScanQrCode, Settings, UserRoundCog, Users, Warehouse } from "lucide-react";
+import { Bell, Building, BusFront, CalendarCheck, CircleEllipsis, ContactRound, Download, File, FileSpreadsheet, Home, Map, Newspaper, Plus, Route, ScanQrCode, Settings, UserRoundCog, Users, Warehouse } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getUserPermissions, verifySession } from "./permissions";
 
@@ -92,6 +92,27 @@ const itemsMenu = async () => {
             icon: CalendarCheck,
             admin: false,
             permissions: ["clocking_view"],
+        },
+        {
+            title: Menu("clockings_statistics"),
+            url: "/admin/clockings-statistics",
+            icon: CalendarCheck,
+            admin: false,
+            permissions: ["clocking_view"],
+        },
+        {
+            title: Menu("entreprises"),
+            url: "/admin/companies",
+            icon: Building,
+            admin: false,
+            permissions: ["entreprise_view"],
+        },
+        {
+            title: Menu("entreprise_routes"),
+            url: "/admin/company-routes",
+            icon: Route,
+            admin: false,
+            permissions: ["entreprise_route_view"],
         },
         {
             title: Menu("devices"),

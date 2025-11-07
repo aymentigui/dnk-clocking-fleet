@@ -49,9 +49,9 @@ export function ClockingsTable({ clockings, loading }: ClockingsTableProps) {
             case 2:
                 return t("entry_exit");
             case 3:
-                return t("controller") + t("exit");;
+                return t("controller") + " " + t("exit");;
             case 4:
-                return t("controller") + t("entry");
+                return t("controller") + " " + t("entry");
             default:
                 return "Unknown";
         }
@@ -163,7 +163,7 @@ export function ClockingsTable({ clockings, loading }: ClockingsTableProps) {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(clocking.status)}`}>
-                                    {clocking.status || "Unknown"}
+                                    {clocking.status ?? "Unknown"}
                                 </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">

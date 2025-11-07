@@ -35,6 +35,7 @@ const selectors = [
   { title: "brand", selector: "brand" },
   { title: "model", selector: "model" },
   { title: "year", selector: "year" },
+  { title: "park", selector: "park" },
 ];
 
 export default function ListVehicles() {
@@ -215,8 +216,16 @@ export default function ListVehicles() {
       return
     }
 
-    const users = res.data
-    generateFileClient(selectors, users, type);
+    const data = res.data.map((vehicle: any) => ({
+      matricule: vehicle.matricule,
+      vin: vehicle.vin,
+      brand: vehicle.brand,
+      model: vehicle.model,
+      year: vehicle.year,
+      park: vehicle.park ? vehicle.park.name : "",
+    }))
+
+    generateFileClient(selectors, data, type);
 
   };
 
@@ -229,8 +238,16 @@ export default function ListVehicles() {
       return
     }
 
-    const users = res.data
-    generateFileClient(selectors, users, type);
+    const data = res.data.map((vehicle: any) => ({
+      matricule: vehicle.matricule,
+      vin: vehicle.vin,
+      brand: vehicle.brand,
+      model: vehicle.model,
+      year: vehicle.year,
+      park: vehicle.park ? vehicle.park.name : "",
+    }))
+
+    generateFileClient(selectors, data, type);
 
   };
 

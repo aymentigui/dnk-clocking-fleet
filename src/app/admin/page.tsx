@@ -1,105 +1,98 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import { useTranslations } from 'next-intl';
-import { Card } from '@/components/ui/card';
-import { BusFront, ScanQrCode, Users, Warehouse } from 'lucide-react';
-import Loading from '@/components/myui/loading';
-import { getDevicesCount, getParksCount, getParkVehiclesCount, getUsersCount, getVehiclesCount } from '@/actions/statistic/statistic';
-import CardStatic from '@/components/my/admin/card-static';
-import { BarChartPark } from '@/components/my/admin/bar-chart-park';
+// app/dashboard/statistics/page.tsx
+'use client';
 
-const AdminPage = () => {
-  const t = useTranslations('Index');
-  const v = useTranslations('Vehicle');
-  const d = useTranslations('Device');
-  const u = useTranslations('Users');
+import { useEffect, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import StatisticsClient from '@/components/my/admin/statistic-page';
+import { getDevicesCount, getParksCount, getParkVehiclesCount, getUsersCount, getVehiclesCount, getVehiclesNoParkCount } from '@/actions/statistic/statistic';
 
-  const [vehcileCount, setVehcileCount] = useState(0);
-  const [isLoadinVehcileCount, setIsLoadinVehcileCount] = useState(true);
-
-  const [parkCount, setParkCount] = useState(0)
-  const [isLoadingParkCount, setIsLoadinParkCount] = useState(true);
-
-  const [deviceCount, setDeviceCount] = useState(0);
-  const [isLoadingDeviceCount, setIsLoadingDeviceCount] = useState(true);
-
-  const [userCount, setUserCount] = useState(0);
-  const [isLoadingUserCount, setIsLoadingUserCount] = useState(true);
-
-  const [parkVehicleCount, setParkVehicleCount] = useState([]);
-  const [isLoadingParkVehicleCount, setIsLoadingParkVehicleCount] = useState(true);
-
-  useEffect(() => {
-    getVehiclesCount().then((res) => {
-      if (res.status === 200) {
-        setVehcileCount(res.data);
-        setIsLoadinVehcileCount(false);
-      } else {
-        setIsLoadinVehcileCount(false);
-      }
-    })
-
-    getParksCount().then((res) => {
-      if (res.status === 200) {
-        setParkCount(res.data);
-        setIsLoadinParkCount(false);
-      } else {
-        setIsLoadinParkCount(false);
-      }
-    })
-
-    getDevicesCount().then((res) => {
-      if (res.status === 200) {
-        setDeviceCount(res.data);
-        setIsLoadingDeviceCount(false);
-      } else {
-        setIsLoadingDeviceCount(false);
-      }
-    })
-
-    getUsersCount().then((res) => {
-      if (res.status === 200) {
-        setUserCount(res.data);
-        setIsLoadingUserCount(false);
-      } else {
-        setIsLoadingUserCount(false);
-      }
-    })
-
-    getParkVehiclesCount().then((res) => {
-      if (res.status === 200) {
-        const newData = res.data.map((item: any) => ({
-          name: item.name,
-          count: item.count,
-          mobile: item.count,
-        }))
-        setParkVehicleCount(newData)
-        setIsLoadingParkVehicleCount(false);
-      } else {
-        setIsLoadingParkVehicleCount(false);
-      }
-    })
-
-  }, [])
-
-  return (
-    <Card className='p-4 flex flex-col gap-4'>
-      <div className='flex flex-wrap gap-4'>
-        <CardStatic Icon={BusFront} title={v("title")} data={vehcileCount} isLoading={isLoadinVehcileCount}></CardStatic>
-        <CardStatic Icon={Warehouse} title={v("park")} data={parkCount} isLoading={isLoadingParkCount}></CardStatic>
-        <CardStatic Icon={ScanQrCode} title={d("title")} data={deviceCount} isLoading={isLoadingDeviceCount}></CardStatic>
-        <CardStatic Icon={Users} title={u("title")} data={userCount} isLoading={isLoadingUserCount}></CardStatic>
-      </div>
-      <div>
-        {isLoadingParkVehicleCount
-          ? <div className='flex justify-center items-center p-4 h-72 w-full'>
-            <Loading></Loading>
-          </div>
-          : <BarChartPark chartData={parkVehicleCount}></BarChartPark>
-          }
-      </div>
-    </Card >
-  )
+interface StatsData {
+  vehicles: number;
+  parks: number;
+  devices: number;
+  users: number;
+  vehiclesNoPark: number;
+  parkVehicles: Array<{ name: string; count: number }>;
 }
 
-export default AdminPage
+export default function StatisticsPage() {
+  const t = useTranslations('Statistics');
+  const s = useTranslations('System');
+  const [statsData, setStatsData] = useState<StatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const [
+          vehiclesRes,
+          parksRes,
+          devicesRes,
+          usersRes,
+          noParkVehiclesRes,
+          parkVehiclesRes
+        ] = await Promise.all([
+          getVehiclesCount(),
+          getParksCount(),
+          getDevicesCount(),
+          getUsersCount(),
+          getVehiclesNoParkCount(),
+          getParkVehiclesCount()
+        ]);
+
+
+
+        setStatsData({
+          vehicles: vehiclesRes.data || 0,
+          parks: parksRes.data || 0,
+          devices: devicesRes.data || 0,
+          users: usersRes.data || 0,
+          vehiclesNoPark: noParkVehiclesRes.data || 0,
+          parkVehicles: parkVehiclesRes.data || []
+        });
+      } catch (error) {
+        console.error('Error fetching statistics:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchStats();
+  }, []);
+
+  const translations = {
+    title: s('dashboard'),
+    vehicles: t('vehicles'),
+    parks: t('parks'),
+    devices: t('devices'),
+    users: t('users'),
+    vehiclesNoPark: t('vehiclesNoPark'),
+    distribution: t('distribution'),
+    statistics: t('overview'),
+    total: s('total'),
+    vehiclesByStation: t('vehiclesByStation'),
+    loading: s('loading'),
+    attentionRequired: t('attentionRequired'),
+    unassignedVehicles: (count: number) => t('unassignedVehicles', { count }),
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!statsData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-red-600 dark:text-red-400">
+          Error loading statistics
+        </div>
+      </div>
+    );
+  }
+
+  return <StatisticsClient statsData={statsData} translations={translations} />;
+}

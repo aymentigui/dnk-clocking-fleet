@@ -179,7 +179,7 @@ export function DataTable<TData extends RoleData, TValue>({
                                 <TableRow>
                                     <TableCell colSpan={columns.length} className="h-40 text-center text-muted-foreground">
                                         <AlertTriangle className="h-6 w-6 mx-auto mb-2 text-primary" />
-                                        {r("no_roles_found")}
+                                        {t("noresults")}
                                     </TableCell>
                                 </TableRow>
                             ) : isFilteredEmpty ? (

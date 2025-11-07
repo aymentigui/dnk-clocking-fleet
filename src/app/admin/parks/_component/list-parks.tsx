@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { ParksTable } from "../_component/ParkTable";
-import { useSession } from "@/hooks/use-session";
 import { useOrigin } from "@/hooks/use-origin";
 import { getParks } from "@/actions/park/get";
 import { deletePark } from "@/actions/park/delete";
@@ -18,10 +17,8 @@ interface Park {
 
 export default function ParksListPage() {
   const t = useTranslations("Park");
-  const s = useTranslations("System");
   const e = useTranslations("Error");
   
-  const { session } = useSession();
   const origin = useOrigin();
   
   const [parks, setParks] = useState<Park[]>([]);
