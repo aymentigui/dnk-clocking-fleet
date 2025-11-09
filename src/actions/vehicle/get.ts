@@ -152,20 +152,14 @@ export async function getVehiclesAll(): Promise<{ status: number, data: any }> {
         if (!session?.data?.user) {
             return { status: 401, data: { message: e("unauthorized") } };
         }
-        const hasPermission = await withAuthorizationPermission(['vehicles_view'], session.data.user.id);
-
-        if (hasPermission.status != 200 || !hasPermission.data.hasPermission) {
-            return { status: 403, data: { message: e('forbidden') } };
-        }
-
-        const devices = await prisma.vehicle.findMany({
+        const vehicles = await prisma.vehicle.findMany({
             include: {
                 park: true,
                 region: true,
             }
         });
 
-        return { status: 200, data: devices };
+        return { status: 200, data: vehicles };
     } catch (error) {
         console.log("An error occurred in getVehiclesAll");
         return { status: 500, data: { message: e("error") } };

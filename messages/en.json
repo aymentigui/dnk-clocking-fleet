@@ -126,6 +126,7 @@
         "clockings_statistics": "Statistics",
         "entreprises": "Companies",
         "entreprise_routes": "Company Routes",
+        "courses": "Courses",
         "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
@@ -135,6 +136,7 @@
         "getInfo": "Error in getinfo",
         "unauthorized": "Unauthorized",
         "forbidden": "Forbidden",
+        "not_found": "Not found",
         "usernotfound": "User not found",
         "verificationtokennotfound": "Verification token not found",
         "invalidcode": "Invalid code",
@@ -321,6 +323,8 @@
         "clocking_view": "Clocking View",
         "clocking_create": "Clocking Create",
         "notifications_view": "Notifications View",
+        "course_view": "Course View",
+        "course": "Course",
         "dashboard": "Dashboard",
         "users": "Users",
         "roles": "Roles",
@@ -729,5 +733,48 @@
         "create_multiple_description": "Create multiple company routes at once",
         "route": "Route",
         "add_another_entreprise": "Add another company"
+    },
+    "courses":{
+        "title": "Course Management",
+        "subtitle": "Manage and track all courses",
+        "stats": {
+            "total": "Total Courses",
+            "completed": "Completed",
+            "pending": "Pending",
+            "rotations": "Total Rotations"
+        },
+        "filters": {
+            "vehicle": "Vehicle",
+            "departureRegion": "Departure Region",
+            "arrivalRegion": "Arrival Region",
+            "enterprise": "Enterprise",
+            "date": "Date",
+            "conductor": "Conductor",
+            "completed": "Show Completed",
+            "rotation": "With Rotation",
+            "enableAll": "Enable All Directions",
+            "search": "Search courses...",
+            "apply": "Apply Filters",
+            "reset": "Reset"
+        },
+        "table": {
+            "vehicle": "Vehicle",
+            "conductor": "Conductor",
+            "startStation": "Start Station",
+            "endStation": "End Station",
+            "startDate": "Start Date",
+            "endDate": "End Date",
+            "status": "Status",
+            "rotation": "Rotation"
+        },
+        "pagination": {
+            "rowsPerPage": "Rows per page",
+            "page": "Page",
+            "of": "of"
+        },
+        "status": {
+            "completed": "Completed",
+            "pending": "Pending"
+        }
     }
 }

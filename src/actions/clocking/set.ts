@@ -2,7 +2,6 @@
 import { prisma } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { verifySession } from "../permissions";
-import { sendEmail } from "../email";
 
 export async function createClocking(data: any) {
     const u = await getTranslations("Clocking");
@@ -161,34 +160,14 @@ export async function createClocking(data: any) {
         }
 
         if (status == 0) {
-            const emails = await prisma.user.findMany({ where: { is_admin: true } })
-
-            Promise.all(
-                emails.map(async (email) => {
-                    if (email.email) {
-                        try {
-                            await sendEmail(
-                                email.email,
-                                "un mauvais pointage d'une véhicule",
-                                "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehicle?.park?.name + " et parc :" + existingVehicle?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la parc " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région")
-                            )
-                        } catch (erreur) {
-                            // console.log("error sendig mail analyse to" + email.email)
-                        }
-                    }
-                })
+            fetch('/api/admin/clocking/notification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ existingVehicle : existingVehicle }),
+            }
             )
-            prisma.notification.create({
-                data: {
-                    title: "un mauvais pointage d'une véhicule",
-                    contenu: "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehicle?.park?.name + " et parc :" + existingVehicle?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la parc " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région"),
-                    user: {
-                        connect: {
-                            id: session.data.user.id
-                        }
-                    }
-                }
-            })
         }
 
         const conducteur_name = `${existingConducteur?.firstname ?? ''} ${existingConducteur?.lastname ?? ''}`.trim();
@@ -199,5 +178,56 @@ export async function createClocking(data: any) {
     } catch (error) {
         // console.log("An error occurred in createColocking" + error);
         return { status: 500, data: { message: "حدث مشكل" } };
+    }
+}
+
+
+export async function createNotificationBadClocking(existingVehicle: any) {
+    try {
+        const session = await verifySession()
+        if (!session || session.status != 200) {
+            return { status: 401, data: { message: "غير مصرح لك" } }
+        }
+
+
+        const existingDevice = await prisma.device.findFirst({
+            where: { user_id: session.data.user.id },
+            include: { park: true, region: true },
+        });
+
+        if (!existingDevice) return { status: 404, data: { message: "لم يتم التعرف على جهازك" } };
+
+        if (!existingDevice.park_id && !existingDevice.region_id) return { status: 404, data: { message: "لم يتم تكوين جهازك" } };
+
+        // const emails = await prisma.user.findMany({ where: { is_admin: true } })
+
+        // Promise.all(
+        //     emails.map(async (email) => {
+        //         if (email.email) {
+        //             try {
+        //                 await sendEmail(
+        //                     email.email,
+        //                     "un mauvais pointage d'une véhicule",
+        //                     "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehicle?.park?.name + " et parc :" + existingVehicle?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la parc " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région")
+        //                 )
+        //             } catch (erreur) {
+        //                 // console.log("error sendig mail analyse to" + email.email)
+        //             }
+        //         }
+        //     })
+        // )
+        prisma.notification.create({
+            data: {
+                title: "un mauvais pointage d'une véhicule",
+                contenu: "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehicle?.park?.name + " et parc :" + existingVehicle?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la parc " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région"),
+                user: {
+                    connect: {
+                        id: session.data.user.id
+                    }
+                }
+            }
+        })
+    } catch (error) {
+
     }
 }

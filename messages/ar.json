@@ -127,6 +127,7 @@
         "clockings_statistics": "الاحصائيات",
         "entreprises": "الشركات",
         "entreprise_routes": "طرق الشركات",
+        "courses": "المسارات",
         "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
@@ -137,6 +138,7 @@
         "unauthorized": "غير مصرح",
         "forbidden": "ممنوع",
         "usernotfound": "المستخدم غير موجود",
+        "not_found": "غير موجود",
         "verificationtokennotfound": "لم يتم العثور على رمز التحقق",
         "invalidcode": "رمز غير صحيح",
         "codeexpired": "انتهت صلاحية الرمز",
@@ -321,6 +323,8 @@
         "clocking_view": "عرض ساعات العمل",
         "clocking_create": "انشاء ساعات العمل",
         "notifications_view": "عرض الاشعارات",
+        "course_view": "عرض الطريق",
+        "course": "الطريق",
         "dashboard": "لوحة التحكم",
         "files": "الملفات",
         "users": "المستخدمون",
@@ -727,5 +731,48 @@
         "create_multiple_description": "إنشاء عدة طرق للشركة المحددة",
         "route": "الطريق",
         "add_another_entreprise": "إضافة شركة أخرى"
+    },
+    "courses":{
+        "title": "إدارة الرحلات",
+        "subtitle": "إدارة وتتبع جميع الرحلات",
+        "stats": {
+            "total": "إجمالي الرحلات",
+            "completed": "مكتملة",
+            "pending": "قيد الانتظار",
+            "rotations": "إجمالي الدورات"
+        },
+        "filters": {
+            "vehicle": "المركبة",
+            "departureRegion": "منطقة المغادرة",
+            "arrivalRegion": "منطقة الوصول",
+            "enterprise": "الشركة",
+            "date": "التاريخ",
+            "conductor": "السائق",
+            "completed": "إظهار المكتملة",
+            "rotation": "مع الدوران",
+            "enableAll": "تفعيل جميع الاتجاهات",
+            "search": "البحث عن الرحلات...",
+            "apply": "تطبيق المرشحات",
+            "reset": "إعادة تعيين"
+        },
+        "table": {
+            "vehicle": "المركبة",
+            "conductor": "السائق",
+            "startStation": "محطة البداية",
+            "endStation": "محطة النهاية",
+            "startDate": "تاريخ البداية",
+            "endDate": "تاريخ النهاية",
+            "status": "الحالة",
+            "rotation": "الدورة"
+        },
+        "pagination": {
+            "rowsPerPage": "عدد الصفوف في الصفحة",
+            "page": "الصفحة",
+            "of": "من"
+        },
+        "status": {
+            "completed": "مكتملة",
+            "pending": "قيد الانتظار"
+        }
     }
 }

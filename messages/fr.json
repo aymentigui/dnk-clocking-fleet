@@ -127,6 +127,7 @@
         "clockings_statistics": "Statistiques",
         "entreprises": "Entreprises",
         "entreprise_routes": "Routes d'entreprise",
+        "courses": "Courses",
         "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
@@ -137,6 +138,7 @@
         "unauthorized": "Non autorisé",
         "forbidden": "Interdit",
         "usernotfound": "Utilisateur non trouvé",
+        "not_found": "Non trouvé",
         "verificationtokennotfound": "Le token de verification n'a pas été trouvé",
         "invalidcode": "Le code fourni est invalide",
         "codeexpired": "Le code fourni a expiré",
@@ -322,6 +324,8 @@
         "clocking_view": "Vue des horaires",
         "clocking_create": "Créer un horaire",
         "notifications_view": "Vue des notifications",
+        "course_view": "Vue des courses",
+        "course": "Course",
         "dashboard": "Tableau de bord",
         "users": "Utilisateurs",
         "roles": "Rôles",
@@ -728,5 +732,48 @@
         "create_multiple_description": "Créer plusieurs routes pour une entreprise",
         "route": "Route",
         "add_another_entreprise": "Ajouter une autre entreprise"
+    },
+    "courses":{
+        "title": "Gestion des Courses",
+        "subtitle": "Gérer et suivre toutes les courses",
+        "stats": {
+            "total": "Total des Courses",
+            "completed": "Terminées",
+            "pending": "En attente",
+            "rotations": "Total des Rotations"
+        },
+        "filters": {
+            "vehicle": "Véhicule",
+            "departureRegion": "Région de Départ",
+            "arrivalRegion": "Région d'Arrivée",
+            "enterprise": "Entreprise",
+            "date": "Date",
+            "conductor": "Conducteur",
+            "completed": "Afficher les Terminées",
+            "rotation": "Avec Rotation",
+            "enableAll": "Activer Toutes les Directions",
+            "search": "Rechercher des courses...",
+            "apply": "Appliquer les Filtres",
+            "reset": "Réinitialiser"
+        },
+        "table": {
+            "vehicle": "Véhicule",
+            "conductor": "Conducteur",
+            "startStation": "Station de Départ",
+            "endStation": "Station d'Arrivée",
+            "startDate": "Date de Départ",
+            "endDate": "Date d'Arrivée",
+            "status": "Statut",
+            "rotation": "Rotation"
+        },
+        "pagination": {
+            "rowsPerPage": "Lignes par page",
+            "page": "Page",
+            "of": "de"
+        },
+        "status": {
+            "completed": "Terminée",
+            "pending": "En attente"
+        }
     }
 }

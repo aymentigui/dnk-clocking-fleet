@@ -1,5 +1,5 @@
 "use server"
-import { Bell, Building, BusFront, CalendarCheck, CircleEllipsis, ContactRound, Download, File, FileSpreadsheet, Home, Map, Newspaper, Plus, Route, ScanQrCode, Settings, UserRoundCog, Users, Warehouse } from "lucide-react";
+import { Bell, Building, BusFront, CalendarCheck, CircleEllipsis, ContactRound, Download, File, FileSpreadsheet, Home, Map, Newspaper, Plus, Redo, Route, ScanQrCode, Settings, UserRoundCog, Users, Warehouse } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getUserPermissions, verifySession } from "./permissions";
 
@@ -87,18 +87,11 @@ const itemsMenu = async () => {
             permissions: ["vehicles_view"],
         },
         {
-            title: Menu("clockings"),
-            url: "/admin/clockings",
-            icon: CalendarCheck,
+            title: Menu("devices"),
+            url: "/admin/devices",
+            icon: ScanQrCode,
             admin: false,
-            permissions: ["clocking_view"],
-        },
-        {
-            title: Menu("clockings_statistics"),
-            url: "/admin/clockings-statistics",
-            icon: CalendarCheck,
-            admin: false,
-            permissions: ["clocking_view"],
+            permissions: ["devices_view"],
         },
         {
             title: Menu("entreprises"),
@@ -115,11 +108,25 @@ const itemsMenu = async () => {
             permissions: ["entreprise_route_view"],
         },
         {
-            title: Menu("devices"),
-            url: "/admin/devices",
-            icon: ScanQrCode,
+            title: Menu("clockings"),
+            url: "/admin/clockings",
+            icon: CalendarCheck,
             admin: false,
-            permissions: ["devices_view"],
+            permissions: ["clocking_view"],
+        },
+        {
+            title: Menu("clockings_statistics"),
+            url: "/admin/clockings-statistics",
+            icon: CalendarCheck,
+            admin: false,
+            permissions: ["clocking_view"],
+        },
+        {
+            title: Menu("courses"),
+            url: "/admin/courses",
+            icon: Redo,
+            admin: false,
+            permissions: ["course_view"],
         },
         {
             title: Menu("notifications"),
