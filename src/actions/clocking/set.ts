@@ -51,25 +51,6 @@ export async function createClocking(data: any) {
 
         if (!existingVehicle) return { status: 404, data: { message: "الحافلة غير موجودة" } };
 
-        if (existingVehicle.in_park && (data.type === 1 || data.type === 3 || data.type === 4)) {
-            return {
-                status: 400, data: {
-                    message: "المركبة موجودة في موقف الحافلات"
-                }
-            }
-
-        } else if ((data.type === 0)) {
-            await prisma.vehicle.update({
-                where: { id: existingVehicle.id },
-                data: { in_park: false },
-            });
-        } else if (data.type === 1) {
-            await prisma.vehicle.update({
-                where: { id: existingVehicle.id },
-                data: { in_park: true },
-            });
-        }
-
         const existingConducteur = await prisma.conducteur.findFirst({
             where: { matricule: data.conducteur_matricule },
         });
@@ -81,13 +62,76 @@ export async function createClocking(data: any) {
             }
         };
 
+        // Vérifier si un scan similaire existe dans les 3 dernières minutes
+        const threeMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+        const justScanned = await prisma.clocking.findFirst({
+            where: {
+                vehicle_id: existingVehicle.id,
+                conducteur_id: existingConducteur.id,
+                device_id: existingDevice.id,
+                created_at: {
+                    gte: threeMinutesAgo
+                }
+            },
+            orderBy: {
+                created_at: 'desc'
+            }
+        });
+
+        if (justScanned && justScanned.type === data.type) {
+            return {
+                status: 409, data: {
+                    message: "تم بالفعل تسجيل هذا المسح في آخر 3 دقائق"
+                }
+            };
+        }
+
+        // if (existingVehicle.in_park && (data.type === 1 || data.type === 3 || data.type === 4)) {
+        //     // return {
+        //     //     status: 400, data: {
+        //     //         message: "المركبة موجودة في موقف الحافلات"
+        //     //     }
+        //     // }
+        // } else 
+        if (data.type === 0 || data.type === 3|| data.type === 4) {
+            await prisma.vehicle.update({
+                where: { id: existingVehicle.id },
+                data: { in_park: false },
+            });
+        } else if (data.type === 1) {
+            await prisma.vehicle.update({
+                where: { id: existingVehicle.id },
+                data: { in_park: true },
+            });
+        }
+
 
         const status = (data.type === 3 || data.type === 4) ?
-            (existingVehicle.region_id && existingDevice.region_id && existingVehicle.region_id == existingDevice.region_id ? 1 : 0)
+            (
+                (
+                    existingVehicle.region_id
+                    &&
+                    existingDevice.region_id
+                    &&
+                    existingVehicle.region_id == existingDevice.region_id
+                )
+                    ||
+                    (
+                        existingVehicle.region_id2
+                        &&
+                        existingDevice.region_id
+                        &&
+                        existingVehicle.region_id2 == existingDevice.region_id
+                    )
+                    ?
+                    1
+                    :
+                    0
+            )
             : (existingVehicle.park_id && existingDevice.park_id && existingVehicle.park_id == existingDevice.park_id ? 1 : 0)
 
 
-        await prisma.clocking.create({
+        const clocking = await prisma.clocking.create({
             data: {
                 vehicle_id: existingVehicle.id,
                 device_id: existingDevice.id,
@@ -133,7 +177,7 @@ export async function createClocking(data: any) {
                         vehicle_id: existingVehicle.id,
                         end_date: null,
                         start_date: {
-                            lte: date
+                            lte: new Date
                         }
                     },
                 });
@@ -141,6 +185,7 @@ export async function createClocking(data: any) {
                     await prisma.course.update({
                         where: { id: course.id },
                         data: {
+                            clocking_end: clocking.id,
                             end_date: date,
                         },
                     });
@@ -152,6 +197,7 @@ export async function createClocking(data: any) {
                             conducteur_matricule: existingConducteur.matricule,
                             conducteur_name: `${existingConducteur.firstname} ${existingConducteur.lastname}`,
                             start_date: date,
+                            clocking_start: clocking.id,
                             start_station: existingDevice.region_id,
                         },
                     });
@@ -165,7 +211,7 @@ export async function createClocking(data: any) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ existingVehicle : existingVehicle }),
+                body: JSON.stringify({ existingVehicle: existingVehicle }),
             }
             )
         }

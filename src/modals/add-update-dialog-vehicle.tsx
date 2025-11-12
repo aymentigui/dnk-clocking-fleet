@@ -52,6 +52,7 @@ export const AddUpdateDialogVehicle = () => {
     vin: z.string().optional(),
     park: z.string().optional(),
     region: z.string().optional(),
+    region2: z.string().optional(),
   });
 
   type formValues = z.infer<typeof schema>;
@@ -65,6 +66,8 @@ export const AddUpdateDialogVehicle = () => {
       brand: "",
       vin: "",
       park: "",
+      region:"",
+      region2: ""
     },
   });
 
@@ -90,6 +93,7 @@ export const AddUpdateDialogVehicle = () => {
       form.setValue("vin", vehicle.vin ?? "");
       form.setValue("park", vehicle.parkId);
       form.setValue("region", vehicle.regionId);
+      form.setValue("region2", vehicle.regionId2);
     }
   }, [vehicle])
 
@@ -298,6 +302,38 @@ export const AddUpdateDialogVehicle = () => {
                 {hasPermissionAffectation2 && <FormField
                   control={form.control}
                   name="region"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{v("region")}</FormLabel>
+                      <FormControl>
+                        <Select
+                          options={
+                            regions?.map((p) => ({
+                              value: p.id,
+                              label: p.name,
+                            }))
+                          }
+                          value={
+                            {
+                              value: field.value,
+                              label: regions?.find((p) => p.id === field.value)?.name,
+                            }
+                          }
+                          onChange={(selectedOptions) => {
+                            field.onChange(
+                              selectedOptions ? selectedOptions.value : ""
+                            );
+                          }}
+                          placeholder={v("selectregion")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />}
+                {hasPermissionAffectation2 && <FormField
+                  control={form.control}
+                  name="region2"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{v("region")}</FormLabel>

@@ -28,16 +28,23 @@ export default function ClockingsPage() {
 
     const [clockings, setClockings] = useState<Clocking[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchDate, setSearchDate] = useState("");
+    const [searchDate, setSearchDate] = useState<string>(() => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    });
 
-    // Pagination
+    // Filtres
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
     const [totalScannBusHaveExistedParkAndNotEntredRegion, setTotalScannBusHaveExistedParkAndNotEntredRegion] = useState(0);
     const [totalCountExit, setTotalCountExit] = useState(0);
+    const [uniqueConductors, setUniqueConductors] = useState(0);
+    const [uniqueVehicles, setUniqueVehicles] = useState(0);
     const [parks, setParks] = useState<any[]>([]);
     const [parkFilter, setParkFilter] = useState("");
+    const [typeFilter, setTypeFilter] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
 
     const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -51,18 +58,27 @@ export default function ClockingsPage() {
 
     useEffect(() => {
         loadClockings();
-    }, [currentPage, pageSize, searchDate, parkFilter]);
+    }, [currentPage, pageSize, searchDate, parkFilter, typeFilter, statusFilter]);
 
     const loadClockings = async () => {
         setLoading(true);
         try {
-            const response = await getClockings(currentPage, pageSize, searchDate || undefined, parkFilter || undefined);
+            const response = await getClockings(
+                currentPage,
+                pageSize,
+                searchDate ? searchDate : undefined,
+                parkFilter || undefined,
+                typeFilter? Number(typeFilter): undefined,
+                statusFilter? Number(statusFilter): undefined
+            );
 
             if (response.status === 200) {
                 setClockings(response.data);
                 setTotalCount(response.total_clockings);
                 setTotalScannBusHaveExistedParkAndNotEntredRegion(response.totalScannBusHaveExistedParkAndNotEntredRegion);
                 setTotalCountExit(response.countExit);
+                setUniqueConductors(response.uniqueConducteurs);
+                setUniqueVehicles(response.uniqueVehicles);
             } else {
                 console.error("Error loading clockings:", response.data);
             }
@@ -78,6 +94,16 @@ export default function ClockingsPage() {
         setCurrentPage(1);
     }
 
+    const handleTypeChange = (type: string) => {
+        setTypeFilter(type);
+        setCurrentPage(1);
+    }
+
+    const handleStatusChange = (status: string) => {
+        setStatusFilter(status);
+        setCurrentPage(1);
+    }
+
     const handleDateChange = (date: string) => {
         setSearchDate(date);
         setCurrentPage(1);
@@ -85,16 +111,11 @@ export default function ClockingsPage() {
 
     const resetFilters = () => {
         setSearchDate("");
+        setParkFilter("");
+        setTypeFilter("");
+        setStatusFilter("");
         setCurrentPage(1);
     };
-
-
-    const uniqueVehicles = new Set(clockings.map(clocking => clocking.vehicle)).size;
-    const uniqueConductors = new Set(
-        clockings
-            .map(clocking => clocking.conducteur?.id)
-            .filter(id => id)
-    ).size;
 
     // Stats Cards Component
     const StatsCards = () => (
@@ -162,7 +183,6 @@ export default function ClockingsPage() {
                     </div>
                 </CardContent>
             </Card>
-
             {/* Today's Clockings */}
             <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg">
                 <CardContent className="p-6">
@@ -212,6 +232,12 @@ export default function ClockingsPage() {
                     selectedPark={parkFilter}
                     onParkChange={handleParkChange}
                     onParkReset={() => handleParkChange("")}
+                    selectedType={typeFilter}
+                    onTypeChange={handleTypeChange}
+                    onTypeReset={() => handleTypeChange("")}
+                    selectedStatus={statusFilter}
+                    onStatusChange={handleStatusChange}
+                    onStatusReset={() => handleStatusChange("")}
                 />
 
                 {/* Clockings Table */}

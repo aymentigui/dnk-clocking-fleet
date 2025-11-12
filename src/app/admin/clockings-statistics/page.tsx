@@ -46,7 +46,6 @@ type Clocking = {
 };
 
 type NowStats = {
-    clockings: Clocking[];
     countClockings: number;
     countExitParcClockings: number;
     countEnterParcClockings: number;
@@ -57,114 +56,6 @@ type NowStats = {
 };
 
 type Park = { id: string; name: string };
-
-/*** i18n (EN/FR/AR) ***/
-// const dict = {
-//     en: {
-
-//     },
-//     fr: {
-//         title: "Statistiques PCC en direct",
-//         subtitle: "Vue d'ensemble opérationnelle (actualisation auto toutes les 10 min)",
-//         global: "Global",
-//         byPark: "Par Parc",
-//         park: "Parc",
-//         region: "Région",
-//         all: "Tous",
-//         manualRefresh: "Actualiser",
-//         nextIn: "Prochaine mise à jour dans",
-//         updatedAt: "Mis à jour à",
-//         metrics: {
-//             clockings: "Scans (Aujourd'hui)",
-//             exitPark: "Sorties Parc",
-//             enterPark: "Entrées Parc",
-//             enterRegion: "Entrées Région",
-//             exitRegion: "Sorties Région",
-//             exitedNotEnteredRegion: "Sortis du Parc • Non Entrés Région",
-//             totalVehicles: "Véhicules Totaux",
-//         },
-//         charts: {
-//             flow: "Flux Parc / Région",
-//             distribution: "Répartition",
-//         },
-//         table: {
-//             recent: "Scans Récents",
-//             vehicle: "Véhicule",
-//             when: "Date & Heure",
-//             type: "Type",
-//             location: "Emplacement",
-//             conductor: "Conducteur",
-//             search: "Rechercher…",
-//         },
-//         types: {
-//             0: "Sortie Parc",
-//             1: "Entrée Parc",
-//             3: "Entrée Région",
-//             4: "Sortie Région",
-//         },
-//         theme: "Thème",
-//         language: "Langue",
-//     },
-//     ar: {
-//         title: "إحصائيات مركز القيادة الحية",
-//         subtitle: "نظرة تشغيلية فورية (تحديث تلقائي كل 10 دقائق)",
-//         global: "شامل",
-//         byPark: "حسب الحظيرة",
-//         park: "الحظيرة",
-//         region: "المنطقة",
-//         all: "الكل",
-//         manualRefresh: "تحديث الآن",
-//         nextIn: "التحديث التالي بعد",
-//         updatedAt: "آخر تحديث",
-//         metrics: {
-//             clockings: "المسحات (اليوم)",
-//             exitPark: "خروج من الحظيرة",
-//             enterPark: "دخول الحظيرة",
-//             enterRegion: "دخول المنطقة",
-//             exitRegion: "خروج المنطقة",
-//             exitedNotEnteredRegion: "خرج من الحظيرة • لم يدخل المنطقة",
-//             totalVehicles: "إجمالي المركبات",
-//         },
-//         charts: {
-//             flow: "تدفق الحظيرة / المنطقة",
-//             distribution: "التوزيع",
-//         },
-//         table: {
-//             recent: "المسحات الأخيرة",
-//             vehicle: "المركبة",
-//             when: "التاريخ والوقت",
-//             type: "النوع",
-//             location: "الموقع",
-//             conductor: "السائق",
-//             search: "بحث…",
-//         },
-//         types: {
-//             0: "خروج من الحظيرة",
-//             1: "دخول الحظيرة",
-//             3: "دخول المنطقة",
-//             4: "خروج المنطقة",
-//         },
-//         theme: "السمة",
-//         language: "اللغة",
-//     },
-// };
-
-
-/** THEME **/
-function ThemeToggle() {
-    const [dark, setDark] = useState<boolean>(false);
-    useEffect(() => {
-        const root = document.documentElement;
-        if (dark) root.classList.add("dark");
-        else root.classList.remove("dark");
-    }, [dark]);
-    return (
-        <Button variant="ghost" className="gap-2" onClick={() => setDark((d) => !d)}>
-            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            <span className="hidden sm:inline">{dark ? "Light" : "Dark"}</span>
-        </Button>
-    );
-}
 
 /** HELPERS **/
 const fmtNum = (n: number) => new Intl.NumberFormat().format(n);
@@ -179,21 +70,11 @@ const TYPES_COLORS: Record<number, string> = {
 /** FETCHERS (REPLACE with your server functions) **/
 async function fetchParks(): Promise<Park[]> {
     return (await getParksAdmin()).data as Park[];
-    // const res = await getParksAdmin();
-    // if (res.status!==200) return []
-    // return res.data;
 }
 
 async function fetchNow(params: { vehicle_id?: string; park?: string; region?: string }): Promise<NowStats> {
     const resp = await getClockingsVehicleNow(params.vehicle_id, params.park, params.region);
     return resp.data as NowStats;
-    // const qs = new URLSearchParams();
-    // if (params.vehicle_id) qs.set("vehicle_id", params.vehicle_id);
-    // if (params.park) qs.set("park", params.park);
-    // if (params.region) qs.set("region", params.region);
-    // const res = await getClockingsVehicleNow("",park??"",)
-    // if (!res.ok) throw new Error("Failed to load stats");
-    // return res.json();
 }
 
 /** UI BUILDING BLOCKS **/
@@ -242,7 +123,6 @@ export default function PCCDashboard() {
 
     const [global, setGlobal] = useState<NowStats | null>(null);
     const [perPark, setPerPark] = useState<Record<string, NowStats | null>>({});
-    const [searchQ, setSearchQ] = useState<string>("");
 
     // Fetch parks once
     useEffect(() => {

@@ -33,6 +33,7 @@ function createVehicleSchema(translations: any) {
         vin: z.string().optional(),
         park: z.string().optional(),
         region: z.string().optional(),
+        region2: z.string().optional(),
     });
 }
 
@@ -112,15 +113,16 @@ async function updateVehiclePark(
 async function updateVehicleRegion(
     vehicleId: string,
     newRegionId: string | undefined,
-    userId: string
+    userId: string,
+    type: string
 ) {
-    const currentRegion = await prisma.vehicle_region.findFirst({
-        where: { vehicle_id: vehicleId },
-        orderBy: { added_at: 'desc' },
+    const currentRegion = await prisma.vehicle.findUnique({
+        where: { id: vehicleId },
     });
 
-    const shouldUpdate = (currentRegion && currentRegion.region_id !== newRegionId) ||
-        (!currentRegion && newRegionId);
+    const shouldUpdate = (type === "1" && (currentRegion && currentRegion.region_id !== newRegionId) ||
+        (!currentRegion && newRegionId)) || (type !== "1" && (currentRegion && currentRegion.region_id2 !== newRegionId) ||
+            (!currentRegion && newRegionId));
 
     if (!shouldUpdate) return;
 
@@ -131,13 +133,20 @@ async function updateVehicleRegion(
             vehicle_id: vehicleId,
             region_id: regionExists?.id || null,
             added_from: userId,
+            type
         },
     });
 
-    await prisma.vehicle.update({
-        where: { id: vehicleId },
-        data: { region_id: regionExists?.id || null },
-    });
+    if (type === "1")
+        await prisma.vehicle.update({
+            where: { id: vehicleId },
+            data: { region_id: regionExists?.id || null },
+        });
+    else
+        await prisma.vehicle.update({
+            where: { id: vehicleId },
+            data: { region_id2: regionExists?.id || null },
+        });
 }
 
 // ============================================================================
@@ -173,7 +182,7 @@ export async function UpdateVehicle(id: string, data: any) {
             return { status: 400, data: { errors: result.error.errors } };
         }
 
-        const { matricule, model, year, brand, vin, park, region } = result.data;
+        const { matricule, model, year, brand, vin, park, region, region2 } = result.data;
 
         // Check vehicle exists
         const vehicle = await prisma.vehicle.findUnique({ where: { id } });
@@ -203,7 +212,8 @@ export async function UpdateVehicle(id: string, data: any) {
 
         // Update region
         if (permissions['vehicles_region_update']) {
-            await updateVehicleRegion(id, region, session.data.user.id);
+            await updateVehicleRegion(id, region, session.data.user.id, "1");
+            await updateVehicleRegion(id, region2, session.data.user.id, "2");
         }
 
         return { status: 200, data: { message: s("updatesuccess") } };
@@ -270,7 +280,8 @@ export async function UpdateVehiclesParcMatricule(
 }
 
 export async function UpdateVehiclesRegionMatricules(
-    vehicleMatriculesRegion: { matricule: string; region: string }[]
+    vehicleMatriculesRegion: { matricule: string; region: string }[],
+    type: string
 ) {
     const [e, s] = await Promise.all([
         getTranslations('Error'),
@@ -306,14 +317,21 @@ export async function UpdateVehiclesRegionMatricules(
                 data: {
                     vehicle_id: vehicle.id,
                     region_id: regionRecord.id,
+                    type,
                     added_from: session.data.user.id,
                 },
             });
 
-            await prisma.vehicle.update({
-                where: { id: vehicle.id },
-                data: { region_id: regionRecord.id },
-            });
+            if (type === "1")
+                await prisma.vehicle.update({
+                    where: { id: vehicle.id },
+                    data: { region_id: regionRecord.id },
+                });
+            else
+                await prisma.vehicle.update({
+                    where: { id: vehicle.id },
+                    data: { region_id2: regionRecord.id },
+                });
         }));
 
         return { status: 200, data: { message: s("updatesuccess") } };
@@ -372,7 +390,7 @@ export async function UpdateVehiclesParc(vehicleIds: string[], parcId: string) {
 }
 
 
-export async function UpdateVehiclesRegion(vehicleIds: string[], regionId: string) {
+export async function UpdateVehiclesRegion(vehicleIds: string[], regionId: string, type: string) {
     const e = await getTranslations('Error');
     const s = await getTranslations('System');
     const v = await getTranslations('Vehicle');
@@ -401,13 +419,20 @@ export async function UpdateVehiclesRegion(vehicleIds: string[], regionId: strin
                 vehicle_id: id,
                 region_id: regionId === "null" ? null : regionId,
                 added_from: session.data.user.id,
+                type
             })),
         });
 
-        await prisma.vehicle.updateMany({
-            where: { id: { in: vehicleIds } },
-            data: { region_id: regionId === "null" ? null : regionId },
-        });
+        if (type === "1")
+            await prisma.vehicle.updateMany({
+                where: { id: { in: vehicleIds } },
+                data: { region_id: regionId === "null" ? null : regionId },
+            });
+        else
+            await prisma.vehicle.updateMany({
+                where: { id: { in: vehicleIds } },
+                data: { region_id2: regionId === "null" ? null : regionId },
+            });
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {

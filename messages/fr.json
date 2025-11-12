@@ -573,7 +573,7 @@
         "location": "Emplacement",
         "entry": "Entrée",
         "exit": "Sortie",
-        "entry_exit": "Entrée/Sortie",
+        "entry_exit": "Park",
         "controller": "Contrôleur",
         "vehiclenotfound": "Le véhicule n'a pas été trouvé",
         "total_clockings": "Total des scans",
@@ -581,7 +581,10 @@
         "today_clockings": "Nombre de bus sortant",
         "filter_by_date": "Filtrer par date",
         "filter_by_park": "Filtrer par parc",
+        "filter_by_type": "Filtrer par type",
+        "filter_by_status": "Filtrer par status",
         "all_parks": "Tous les parcs",
+        "all":"Tous",
         "all_dates": "Toutes les dates"
     },
     "Conducteur": {

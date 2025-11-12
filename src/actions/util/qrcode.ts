@@ -4,28 +4,53 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
 /**
- * Fonction qui génère un QR Code pour chaque ID dans la liste et les télécharge dans un fichier ZIP.
- * @param ids La liste des IDs ou des données à encoder dans les QR Codes.
+ * Génère un QR code avec le texte du matricule en dessous et les télécharge dans un fichier ZIP.
  */
 export const generateQRCodeAndDownload = async (matricules: string[]) => {
   try {
     const zip = new JSZip();
 
-    // Pour chaque ID, génère un QR code et l'ajoute au fichier ZIP
     for (const matricule of matricules) {
-      const qrCodeDataUrl = await QRCode.toDataURL(matricule);
-      const base64Data = qrCodeDataUrl.split(',')[1]; // Extraire la partie base64
+      // Génère le QR code dans un canvas
+      const canvas = document.createElement('canvas');
+      await QRCode.toCanvas(canvas, matricule, { width: 300 });
 
-      // Ajouter l'image QR code au fichier ZIP
+      // Crée un second canvas plus grand pour ajouter le texte
+      const finalCanvas = document.createElement('canvas');
+      const ctx = finalCanvas.getContext('2d')!;
+
+      const qrWidth = canvas.width;
+      const qrHeight = canvas.height;
+      const textHeight = 40;
+
+      finalCanvas.width = qrWidth;
+      finalCanvas.height = qrHeight + textHeight;
+
+      // Fond blanc pour toute l'image
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+      // Dessine le QR code
+      ctx.drawImage(canvas, 0, 0);
+
+      // Ajoute le texte du matricule en noir sur fond blanc
+      ctx.fillStyle = '#000000'; // Texte en noir
+      ctx.font = '20px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(matricule, qrWidth / 2, qrHeight + textHeight / 2);
+
+      // Convertit en base64
+      const dataUrl = finalCanvas.toDataURL('image/jpeg');
+      const base64Data = dataUrl.split(',')[1];
+
       zip.file(`${matricule}.jpeg`, base64Data, { base64: true });
     }
 
-    // Créer le fichier ZIP
-    zip.generateAsync({ type: 'blob' }).then((content) => {
-      // Télécharger le fichier ZIP
-      saveAs(content, 'vehicles-qr-codes.zip');
-    });
+    // Génère le ZIP et le télécharge
+    const content = await zip.generateAsync({ type: 'blob' });
+    saveAs(content, 'vehicles-qr-codes.zip');
   } catch (error) {
-    console.log('Erreur lors de la génération des QR codes', error);
+    console.error('Erreur lors de la génération des QR codes', error);
   }
 };

@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl"
 import { useState, useCallback } from "react"
 import useSWR from "swr"
-import { Plus, Trash2, Search } from "lucide-react"
+import { Plus, Trash2, Search, ChevronRight, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -20,6 +20,7 @@ import { getConducteursWithIds } from "@/actions/conducteur/get"
 import { generateFileClient } from "@/actions/util/export-data/export-client"
 import ExportButton from "@/components/my/export-button"
 import Link from "next/link"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const selectors = [
     { title: "id", selector: "id" },
@@ -28,6 +29,9 @@ const selectors = [
     { title: "lastname", selector: "lastname" },
     { title: "phone", selector: "phone" },
 ];
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
+
 
 export default function ConducteursPage() {
     const t = useTranslations()
@@ -40,6 +44,9 @@ export default function ConducteursPage() {
 
     const [sheetNotCreated, setSheetNotCreated] = useState<any>([])
     const [sheetCreated, setSheetCreated] = useState(false)
+    const [pageSize, setPageSize] = useState(10)
+    const [totalCount, setTotalCount] = useState(0)
+    const [totalPages, setTotalPages] = useState(1)
 
     const [data, setData] = useState<any[]>([]);
 
@@ -79,7 +86,7 @@ export default function ConducteursPage() {
         const res = await getConducteursWithIds(selectedIds)
 
         if (res.status !== 200) {
-            toast.error(t("Errors.badrequest"))
+            toast.error(t("Error.badrequest"))
             return
         }
 
@@ -92,7 +99,7 @@ export default function ConducteursPage() {
         const res = await getConducteursAdmin()
 
         if (res.status !== 200) {
-            toast.error(t("Errors.badrequest"))
+            toast.error(t("Error.badrequest"))
             return
         }
 
@@ -102,10 +109,12 @@ export default function ConducteursPage() {
     };
 
     const fetcher = async () => {
-        const result = await getConducteurs(page, 10, searchQuery)
+        const result = await getConducteurs(page, pageSize, searchQuery)
         if (result.status !== 200) {
             throw new Error(result.data.message)
         }
+        setTotalCount(result.totalCount || 0)
+        setTotalPages(result.totalPages || 1)
         return result.data
     }
 
@@ -114,7 +123,7 @@ export default function ConducteursPage() {
         isLoading,
         error,
         mutate,
-    } = useSWR([`conducteurs`, page, searchQuery], fetcher, { revalidateOnFocus: false })
+    } = useSWR([`conducteurs`, page, pageSize, searchQuery], fetcher, { revalidateOnFocus: false })
 
     const handleSearch = useCallback((value: string) => {
         setSearchQuery(value)
@@ -161,6 +170,27 @@ export default function ConducteursPage() {
         }
     }
 
+    const handlePageSizeChange = (value: string) => {
+        const newSize = parseInt(value)
+        setPageSize(newSize)
+        setPage(1) // Reset à la première page quand on change la taille
+    }
+
+    const handlePreviousPage = () => {
+        if (page > 1) {
+            setPage(page - 1)
+        }
+    }
+
+    const handleNextPage = () => {
+        if (page < totalPages) {
+            setPage(page + 1)
+        }
+    }
+
+    const startItem = totalCount > 0 ? (page - 1) * pageSize + 1 : 0
+    const endItem = Math.min(page * pageSize, totalCount)
+
     return (
         <main className="min-h-screen bg-background p-6">
             <div className="max-w-7xl mx-auto">
@@ -187,11 +217,11 @@ export default function ConducteursPage() {
                     <div className="max-h-48 my-2 overflow-auto">
                         {sheetNotCreated.map((data: any, index: any) => (
                             <div key={index} className="mt-4 p-4 bg-red-200 text-red-700 rounded">
-                                <h2 className="font-bold">{t("Errors.errors")}</h2>
+                                <h2 className="font-bold">{t("Error.errors")}</h2>
                                 <ul className="list-disc pl-5">
                                     <li>
                                         {
-                                            (data.message ? data.message + " : " : "") + " " + (data.park.name ?? "") + " " + (data.park.address ?? "") + " " + (data.park.description ?? "")
+                                            (data.message ? data.message + " : " : "") + " " + (data.conducteur.firstname ?? "") + " " + (data.conducteur.lastname ?? "") + " " + (data.conducteur.matricule ?? "")
                                         }
                                     </li>
                                 </ul>
@@ -239,14 +269,75 @@ export default function ConducteursPage() {
                     <Card className="bg-card border-border p-12 text-center">
                         <div className="text-destructive">{t("Error.error")}</div>
                     </Card>
-                ) : (
+                ) : <>
                     <ConducteurTable
                         conducteurs={conducteurs || []}
                         selectedIds={selectedIds}
                         onSelectAll={handleSelectAll}
                         onSelectOne={handleSelectOne}
                     />
-                )}
+                    {/* Pagination */}
+                    <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        {/* Informations sur les éléments affichés */}
+                        <div className="text-sm text-muted-foreground">
+                            {t("System.displayed")} {startItem}-{endItem} {t("System.of_total")} {totalCount} {t("System.items")}
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            {/* Sélecteur de taille de page */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground whitespace-nowrap">
+                                    {t("System.pagesize")}:
+                                </span>
+                                <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+                                    <SelectTrigger className="w-20">
+                                        <SelectValue placeholder={t("System.pagesizeplaceholder")} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {PAGE_SIZE_OPTIONS.map((size) => (
+                                            <SelectItem key={size} value={size.toString()}>
+                                                {size}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Contrôles de pagination */}
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handlePreviousPage}
+                                    disabled={page === 1}
+                                    className="gap-1"
+                                >
+                                    <ChevronLeft size={16} />
+                                    {t("System.back")}
+                                </Button>
+
+                                <div className="flex items-center gap-1 text-sm">
+                                    <span className="text-muted-foreground">{t("System.page")}</span>
+                                    <span className="font-medium">{page}</span>
+                                    <span className="text-muted-foreground">{t("System.of")}</span>
+                                    <span className="font-medium">{totalPages}</span>
+                                </div>
+
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleNextPage}
+                                    disabled={page === totalPages}
+                                    className="gap-1"
+                                >
+                                    {t("System.next")}
+                                    <ChevronRight size={16} />
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </>
+                }
             </div>
 
             {/* Delete Confirmation Dialog */}

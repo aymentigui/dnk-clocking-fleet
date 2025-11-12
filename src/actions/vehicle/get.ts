@@ -72,7 +72,30 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
             }
         });
 
+        // Récupérer toutes les régions nécessaires pour la deuxième région
+        const regionIds2 = vehicles
+            .map(vehicle => vehicle.region_id2)
+            .filter(id => id !== null) as string[];
+
+        let regions2: any[] = [];
+        if (regionIds2.length > 0) {
+            regions2 = await prisma.region.findMany({
+                where: {
+                    id: {
+                        in: regionIds2
+                    }
+                }
+            });
+        }
+
+        // Créer une map pour un accès rapide aux régions par ID
+        const regionMap = new Map();
+        regions2.forEach(region => {
+            regionMap.set(region.id, region);
+        });
+
         const vehiclesFormatted = vehicles.map((vehicle) => {
+            const region2 = vehicle.region_id2 ? regionMap.get(vehicle.region_id2) : null;
             return {
                 id: vehicle.id,
                 matricule: vehicle.matricule,
@@ -84,6 +107,8 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
                 parkId: vehicle.park ? vehicle.park.id : "",
                 region: vehicle.region ? vehicle.region.name : "",
                 regionId: vehicle.region ? vehicle.region.id : "",
+                region2: region2 ? region2.name : "",
+                regionId2: vehicle.region_id2 ? vehicle.region_id2 : "",
             }
         })
 
@@ -93,6 +118,7 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
         return { status: 500, data: null };
     }
 }
+
 export async function getCountVehicles(searchQuery?: string, searchPark?: string, searchRegion?: string): Promise<{ status: number, data: any }> {
 
     const searchConditions = {}
@@ -206,26 +232,15 @@ export async function getVehicle(id: string): Promise<{ status: number, data: an
                 brand: true,
                 model: true,
                 year: true,
-                vehicle_park: {
-                    orderBy: {
-                        added_at: 'desc',
-                    },
-                    include: {
-                        park: true,
-                    },
-                    take: 1,
-                },
-                vehicle_region: {
-                    orderBy: {
-                        added_at: 'desc',
-                    },
-                    include: {
-                        region: true,
-                    },
-                    take: 1,
-                },
+                region_id: true,
+                region_id2: true,
+                region: true,
+                park: true
             }
         });
+
+
+        const region2 = vehicle && vehicle.region_id2 ? await prisma.region.findUnique({ where: { id: vehicle.region_id2 } }) : null
 
         const vehicleFormatted = vehicle ? {
             id: vehicle.id,
@@ -234,10 +249,12 @@ export async function getVehicle(id: string): Promise<{ status: number, data: an
             brand: vehicle.brand,
             model: vehicle.model,
             year: vehicle.year,
-            park: vehicle.vehicle_park && vehicle.vehicle_park[0] && vehicle.vehicle_park[0].park ? vehicle.vehicle_park[0].park.name : "",
-            parkId: vehicle.vehicle_park && vehicle.vehicle_park[0] && vehicle.vehicle_park[0].park ? vehicle.vehicle_park[0].park.id : "",
-            region: vehicle.vehicle_region && vehicle.vehicle_region[0] && vehicle.vehicle_region[0].region ? vehicle.vehicle_region[0].region.name : "",
-            regionId: vehicle.vehicle_region && vehicle.vehicle_region[0] && vehicle.vehicle_region[0].region ? vehicle.vehicle_region[0].region.id : "",
+            park: vehicle.park ? vehicle.park.name : "",
+            parkId: vehicle.park ? vehicle.park.id : "",
+            region: vehicle.region ? vehicle.region.name : "",
+            regionId: vehicle.region ? vehicle.region.id : "",
+            region2: region2 ? region2.name : "",
+            regionId2: region2 ? region2.id : "",
         } : null
 
         return { status: 200, data: vehicleFormatted };

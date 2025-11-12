@@ -575,15 +575,18 @@
         "entry": "Entry",
         "vehiclenotfound": "Vehicle not found",
         "exit": "Exit",
-        "entry_exit": "Entry/Exit",
+        "entry_exit": "Park",
         "controller": "Controller",
         "total_clockings": "Total Scans",
         "totalScannBusHaveExistedParkAndNotEntredRegion": "Total buses that have exited the park but not entered the region",
         "today_clockings": "Number of buses exiting",
         "filter_by_date": "Filter by date",
         "filter_by_park": "Filter by park",
+        "filter_by_type": "Filter by type",
+        "filter_by_status": "Filter by status",
         "all_parks": "All parks",
-        "all_dates": "All dates"
+        "all_dates": "All dates",
+        "all": "All"
     },
     "Conducteur": {
         "title": "Conductors",
@@ -734,7 +737,7 @@
         "route": "Route",
         "add_another_entreprise": "Add another company"
     },
-    "courses":{
+    "courses": {
         "title": "Course Management",
         "subtitle": "Manage and track all courses",
         "stats": {

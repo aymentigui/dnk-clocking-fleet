@@ -50,6 +50,10 @@ model user {
   vehicle_park   vehicle_park[]
   vehicle_region vehicle_region[]
   notification   notification[]
+
+  @@index([deleted_at])
+  @@index([public, deleted_at])
+  @@index([is_admin])
 }
 
 // model Account {
@@ -103,6 +107,10 @@ model session {
   os            String?
   active        Boolean  @default(true)
   created_at    DateTime @default(now())
+
+  @@index([session_token])
+  @@index([expires])
+  @@index([active])
 }
 
 model verificationtoken {
@@ -147,6 +155,8 @@ model userrole {
   user_id String
   role    role   @relation(fields: [role_id], references: [id], onDelete: Cascade)
   role_id String
+
+  @@unique([user_id, role_id])
 }
 
 model files {
@@ -173,6 +183,12 @@ model files {
   admin_view_only     Boolean @default(false)
   admin_download_only Boolean @default(false)
   admin_delete_only   Boolean @default(false)
+
+  @@index([deleted_at])
+  @@index([added_from])
+  @@index([mime_type])
+  @@index([created_at])
+  @@index([admin_view_only, deleted_at])
 }
 
 model park {
@@ -187,6 +203,9 @@ model park {
   vehicle_park vehicle_park[]
   clocking     clocking[]
   vehicle      vehicle[]
+
+  @@index([deleted_at])
+  @@index([name])
 }
 
 model region {
@@ -201,6 +220,9 @@ model region {
   vehicle_park vehicle_region[]
   clocking     clocking[]
   vehicle      vehicle[]
+
+  @@index([deleted_at])
+  @@index([name])
 }
 
 model entreprise {
@@ -227,6 +249,10 @@ model entreprise_route {
   updated_at                DateTime                    @updatedAt
   added_from                String?
   entreprise_route_planning entreprise_route_planning[]
+
+  @@index([region_depart])
+  @@index([region_arrive])
+  @@index([region_depart, region_arrive])
 }
 
 model entreprise_route_planning {
@@ -242,6 +268,8 @@ model entreprise_route_planning {
   updated_at                             DateTime                                 @updatedAt
   added_from                             String?
   entreprise_route_planning_exluded_date entreprise_route_planning_exluded_date[]
+
+  @@index([day_of_week])
 }
 
 model entreprise_route_planning_exluded_date {
@@ -251,6 +279,8 @@ model entreprise_route_planning_exluded_date {
   excluded_date                DateTime
   created_at                   DateTime                  @default(now())
   added_from                   String?
+
+  @@index([excluded_date])
 }
 
 model conducteur {
@@ -264,6 +294,9 @@ model conducteur {
   added_from String?
   clocking   clocking[]
   course     course[]
+
+  @@index([deleted_at])
+  @@index([matricule])
 }
 
 model device {
@@ -286,7 +319,9 @@ model device {
   entreprise    entreprise? @relation(fields: [entreprise_id], references: [id])
   entreprise_id String?
 
-  @@index([park_id])
+  @@index([type])
+  @@index([deleted_at])
+  @@index([code])
 }
 
 model vehicle {
@@ -297,10 +332,11 @@ model vehicle {
   year      Int?
   brand     String?
 
-  region_id String?
-  region    region? @relation(fields: [region_id], references: [id])
-  park_id   String?
-  park      park?   @relation(fields: [park_id], references: [id])
+  region_id  String?
+  region     region? @relation(fields: [region_id], references: [id])
+  region_id2 String?
+  park_id    String?
+  park       park?   @relation(fields: [park_id], references: [id])
 
   in_park Boolean @default(true)
   status  String?
@@ -313,6 +349,11 @@ model vehicle {
   vehicle_region            vehicle_region[]
   rotation                  course[]
   entreprise_route_planning entreprise_route_planning[]
+
+  @@index([matricule])
+  @@index([deleted_at])
+  @@index([park_id, deleted_at])
+  @@index([region_id, deleted_at])
 }
 
 model vehicle_park {
@@ -332,6 +373,7 @@ model vehicle_region {
   vehicle    vehicle  @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
   region_id  String?
   region     region?  @relation(fields: [region_id], references: [id])
+  type       String?
   added_from String
   user       user     @relation(fields: [added_from], references: [id])
   added_at   DateTime @default(now())
@@ -354,6 +396,13 @@ model clocking {
   status               Int?
   region               region?     @relation(fields: [regionId], references: [id])
   regionId             String?
+
+  @@index([created_at])
+  @@index([type])
+  @@index([status])
+  @@index([created_at, park_id])
+  @@index([vehicle_id, created_at])
+  @@index([vehicle_id, conducteur_id, device_id])
 }
 
 model notification {
@@ -364,6 +413,9 @@ model notification {
   created_at DateTime @default(now())
   added_by   String?
   user       user?    @relation(fields: [added_by], references: [id])
+
+  @@index([created_at])
+  @@index([view_by])
 }
 
 model course {
@@ -377,8 +429,18 @@ model course {
   start_date           DateTime
   end_date             DateTime?
   waiting              Boolean    @default(false)
+  clocking_start       String?
+  clocking_end         String?
   start_station        String?
   end_station          String?
   created_at           DateTime   @default(now())
   updated_at           DateTime   @updatedAt
+
+  @@index([start_date])
+  @@index([waiting])
+  @@index([start_station])
+  @@index([end_station])
+  @@index([vehicle_id, start_station, end_station])
+  @@index([start_date, waiting])
+  @@index([vehicle_id, start_date])
 }

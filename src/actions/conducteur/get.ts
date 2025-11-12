@@ -4,17 +4,17 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { withAuthorizationPermission, verifySession } from "../permissions";
 
-export async function getConducteurs(page: number = 1, pageSize: number = 10, searchQuery?: string): Promise<{ status: number, data: any }> {
+export async function getConducteurs(page: number = 1, pageSize: number = 10, searchQuery?: string): Promise<{ status: number, data: any, totalCount?: number, totalPages?: number }> {
     const e = await getTranslations('Error');
     try {
         const session = await verifySession();
         if (!session?.data?.user) {
-            return { status: 401, data: { message: e("unauthorized") } };
+            return { status: 401, data: { message: e("unauthorized") }, totalCount: 0, totalPages: 0 };
         }
         const hasPermission = await withAuthorizationPermission(['conducteur_view'], session.data.user.id);
 
         if (hasPermission.status != 200 || !hasPermission.data.hasPermission) {
-            return { status: 403, data: { message: e('forbidden') } };
+            return { status: 403, data: { message: e('forbidden') }, totalCount: 0, totalPages: 0 };
         }
 
         const skip = (page - 1) * pageSize;
@@ -29,16 +29,23 @@ export async function getConducteurs(page: number = 1, pageSize: number = 10, se
             }
             : {};
 
-        const conducteurs = await prisma.conducteur.findMany({
-            skip: skip, // Nombre d'éléments à sauter
-            take: pageSize === 0 ? undefined : pageSize, // Nombre d'éléments à prendre
-            where: searchConditions,
-        });
+        const [conducteurs, totalCount] = await Promise.all([
+            prisma.conducteur.findMany({
+                skip: skip, // Nombre d'éléments à sauter
+                take: pageSize === 0 ? undefined : pageSize, // Nombre d'éléments à prendre
+                where: searchConditions,
+            }),
+            prisma.conducteur.count({
+                where: searchConditions,
+            })
+        ]);
 
-        return { status: 200, data: conducteurs };
+        const totalPages = pageSize === 0 ? 1 : Math.ceil(totalCount / pageSize);
+
+        return { status: 200, data: conducteurs, totalCount, totalPages };
     } catch (error) {
         console.log("An error occurred in getconducteurs");
-        return { status: 500, data: { message: e("error") } };
+        return { status: 500, data: { message: e("error") }, totalCount: 0, totalPages: 0 };
     }
 }
 

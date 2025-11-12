@@ -32,6 +32,8 @@ import { getRegionsAdmin } from "@/actions/region/get";
 import { getEnteprisesAdmin } from "@/actions/entreprise/get";
 import { getConducteursAdmin } from "@/actions/conducteur/get";
 import { getCourse } from "@/actions/clocking/get-course";
+import ExportButton from "@/components/my/export-button";
+import { generateFileClient } from "@/actions/util/export-data/export-client";
 
 // Mock translations - replace with actual translation hook
 
@@ -52,6 +54,18 @@ import { getCourse } from "@/actions/clocking/get-course";
 }
 */
 
+const selectors = [
+    { title: "Vehicle", selector: "vehicle_matricule" },
+    { title: "Conductor", selector: "conducteur_name" },
+    { title: "Conductor Matricule", selector: "conducteur_matricule" },
+    { title: "Start Station", selector: "start_station" },
+    { title: "End Station", selector: "end_station" },
+    { title: "Start Date", selector: "start_date" },
+    { title: "End Date", selector: "end_date" },
+    { title: "Status", selector: "status" },
+    { title: "Rotation", selector: "rotation" },
+];
+
 const Courses = () => {
     const [courses, setCourses] = useState<any[]>([]);
     const [filteredCourses, setFilteredCourses] = useState<any[]>([]);
@@ -66,7 +80,7 @@ const Courses = () => {
     const [selectedDepartureRegion, setSelectedDepartureRegion] = useState("");
     const [selectedArrivalRegion, setSelectedArrivalRegion] = useState("");
     const [selectedEnterprise, setSelectedEnterprise] = useState("");
-    const [selectedDate, setSelectedDate] = useState<Date>();
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
     const [selectedConductor, setSelectedConductor] = useState("");
     const [showCompleted, setShowCompleted] = useState(true);
     const [withRotation, setWithRotation] = useState(false);
@@ -104,6 +118,39 @@ const Courses = () => {
 
         fetchFilterData();
     }, []);
+
+    const exportAll = async (type: number = 1) => {
+        // Récupérer toutes les données sans pagination
+        const res = await getCourse(
+            1,
+            0, // pageSize = 0 pour récupérer toutes les données
+            selectedVehicle,
+            selectedEnterprise,
+            selectedDate,
+            selectedConductor,
+            selectedDepartureRegion,
+            selectedArrivalRegion,
+            enableAll,
+            showCompleted,
+            withRotation,
+        );
+        if (res.status === 200 && res.data) {
+            // Formater les données pour correspondre aux selectors
+            const formattedData = res.data.map((course: any) => {
+                const vehicle = vehicles.find(v => v.id === course.vehicle_id);
+                return {
+                    ...course,
+                    vehicle_matricule: vehicle?.matricule || course.vehicle_id,
+                    status: course.waiting ? t("courses.status.pending") : t("courses.status.completed"),
+                    start_date: course.start_date ? format(new Date(course.start_date), "PPp") : '-',
+                    end_date: course.end_date ? format(new Date(course.end_date), "PPp") : '-',
+                    rotation: course.rotation || (withRotation ? 0.5 : undefined),
+                };
+            });
+            // Utilisez votre fonction d'exportation existante
+            generateFileClient(selectors, formattedData, type);
+        }
+    };
 
     // Fetch courses
     const fetchCourses = async () => {
@@ -367,6 +414,12 @@ const Courses = () => {
                             <RefreshCw className="mr-2 h-4 w-4" />
                             {t("courses.filters.reset")}
                         </Button>
+                        {/* Boutons Export */}
+                        <ExportButton
+                            all={true}
+                            handleExportCSV={() => exportAll(1)}
+                            handleExportXLSX={() => exportAll(2)}
+                        />
                     </div>
                 </CardContent>
             </Card>

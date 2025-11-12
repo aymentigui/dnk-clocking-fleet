@@ -13,6 +13,7 @@ type Vehicle = {
   parkId?: string;
   region?: string;
   regionId?: string;
+  regionId2?: string;
 };
 
 type DialogContextType = {

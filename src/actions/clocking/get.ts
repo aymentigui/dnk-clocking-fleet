@@ -4,17 +4,17 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { withAuthorizationPermission, verifySession } from "../permissions";
 
-export async function getClockings(page: number, pageSize: number, searchDate?: string, park?: String): Promise<{ status: number, data: any, count: number, countExit: number, total_clockings: number, totalScannBusHaveExistedParkAndNotEntredRegion: number }> {
+export async function getClockings(page: number, pageSize: number, searchDate?: string, park?: String, type?: number, status?: number): Promise<{ status: number, data: any, count: number, countExit: number, total_clockings: number, totalScannBusHaveExistedParkAndNotEntredRegion: number,  uniqueVehicles: number,uniqueConducteurs: number }> {
     const e = await getTranslations('Error');
     try {
         const session = await verifySession();
         if (!session?.data?.user) {
-            return { status: 401, data: { message: e("unauthorized") }, count: 0, countExit: 0, total_clockings: 0, totalScannBusHaveExistedParkAndNotEntredRegion: 0 };
+            return { status: 401, data: { message: e("unauthorized") }, count: 0, countExit: 0, total_clockings: 0, totalScannBusHaveExistedParkAndNotEntredRegion: 0, uniqueVehicles: 0,uniqueConducteurs: 0 };
         }
         const hasPermission = await withAuthorizationPermission(['clocking_view'], session.data.user.id);
 
         if (hasPermission.status != 200 || !hasPermission.data.hasPermission) {
-            return { status: 403, data: { message: e('forbidden') }, count: 0, countExit: 0, total_clockings: 0, totalScannBusHaveExistedParkAndNotEntredRegion: 0 };
+            return { status: 403, data: { message: e('forbidden') }, count: 0, countExit: 0, total_clockings: 0, totalScannBusHaveExistedParkAndNotEntredRegion: 0 , uniqueVehicles: 0,uniqueConducteurs: 0};
         }
 
         // Build where condition for date filter
@@ -35,6 +35,14 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
 
         if (park && park !== "all" && park !== "") {
             whereCondition.park_id = park;
+        }
+
+        if (type === 1 || type === 0 || type === 2 || type === 3) {
+            whereCondition.type = type;
+        }
+
+        if (status === 1 || status === 0) {
+            whereCondition.status = status;
         }
 
         // Get clockings with pagination
@@ -105,22 +113,25 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
                 conducteur: clocking.conducteur,
                 status: clocking.status,
                 park: location,
+                conducteur_name: clocking.conducteur_name
             };
         });
 
         let countExit = 0;
         let total_clockings = 0;
         let totalScannBusHaveExistedParkAndNotEntredRegion = 0;
+        let uniqueConducteurs = 0;
+        let uniqueVehiclesCount=0;
 
         try {
             const whereCondition1 = { ...whereCondition };
-            whereCondition1.type = 0;
             const uniqueVehicles = await prisma.clocking.findMany({
                 where: whereCondition1,
                 distinct: ['vehicle_id'],      // ⚠️ remplace si le champ a un autre nom
-                select: { vehicle_id: true },
+                select: { vehicle_id: true, type:true },
             });
-            countExit = uniqueVehicles.length;
+            countExit = uniqueVehicles.filter((clocking)=>clocking.type===0).length;
+            uniqueVehiclesCount = uniqueVehicles.filter((clocking)=>clocking.type===type).length;
 
             total_clockings = await prisma.clocking.count({
                 where: whereCondition
@@ -146,15 +157,26 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
             });
             const enteredVehicleIds = new Set(enteredVehicles.map(v => v.vehicle_id));
             totalScannBusHaveExistedParkAndNotEntredRegion = exitedVehicleIds.filter(id => !enteredVehicleIds.has(id)).length;
+
+            // Count unique conducteurs (all types)
+            const uniqueConducteursResult = await prisma.clocking.findMany({
+                where: {
+                    ...whereCondition,
+                    conducteur_id: { not: null } // Exclude null conducteur_id
+                },
+                distinct: ['conducteur_id'],
+                select: { conducteur_id: true },
+            });
+            uniqueConducteurs = uniqueConducteursResult.length;
         }
         catch (error) {
             console.error("An error occurred while counting unique vehicles:", error);
         }
 
-        return { status: 200, data: clockingFormatted, count: totalCount, countExit, total_clockings, totalScannBusHaveExistedParkAndNotEntredRegion };
+        return { status: 200, data: clockingFormatted, count: totalCount, countExit, total_clockings, totalScannBusHaveExistedParkAndNotEntredRegion, uniqueVehicles:uniqueVehiclesCount, uniqueConducteurs };
     } catch (error) {
         console.error("An error occurred in getClockings:", error);
-        return { status: 500, data: { message: e("error") }, count: 0, countExit: 0, total_clockings: 0, totalScannBusHaveExistedParkAndNotEntredRegion: 0 };
+        return { status: 500, data: { message: e("error") }, count: 0, countExit: 0, total_clockings: 0, totalScannBusHaveExistedParkAndNotEntredRegion: 0, uniqueVehicles: 0,uniqueConducteurs: 0 };
     }
 }
 
@@ -257,7 +279,7 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
 }
 
 
-export async function getClockingsVehicleNow(vehicle_id?: string, park?: string, region?: string): Promise<{ status: number, data: any }> {
+export async function getClockingsVehicleNow(vehicle_id?: string, park?: string, region?: string, date?: string): Promise<{ status: number, data: any }> {
     try {
         const e = await getTranslations('Error');
 
@@ -273,15 +295,32 @@ export async function getClockingsVehicleNow(vehicle_id?: string, park?: string,
 
         const conditions: any = {}
 
-        if(vehicle_id && vehicle_id!==""){
-            conditions.vehicle_id=vehicle_id
+        if (vehicle_id && vehicle_id !== "") {
+            conditions.vehicle_id = vehicle_id
         }
 
-        if(park && park !== "all" && park !== ""){
+        if (park && park !== "all" && park !== "") {
             conditions.park_id = park;
         }
-        if(region && region !== "all" && region !== ""){
+        if (region && region !== "all" && region !== "") {
             conditions.region_id = region;
+        }
+        if( date && date !== "") {
+            const start = new Date(date);
+            start.setHours(0, 0, 0, 0);
+
+            const end = new Date(date);
+            end.setHours(23, 59, 59, 999);
+
+            conditions.created_at = {
+                gte: start,
+                lte: end,
+            };
+        }else {
+            conditions.created_at = {
+                gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                lt: new Date(new Date().setHours(23, 59, 59, 999)),
+            };
         }
 
         let countClockings = 0;
@@ -290,43 +329,22 @@ export async function getClockingsVehicleNow(vehicle_id?: string, park?: string,
         let countEnterRegionClockings = 0;
         let countExitRegionClockings = 0;
         let countVehicleWithoutEnteringRegion = 0;
-        let countVehicles=0;
-
-        const clocking = await prisma.clocking.findMany({
-            where: {
-                ...conditions,
-                created_at: {
-                    gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                    lte: new Date(new Date().setHours(23, 59, 59, 999)),
-                },
-            },
-            orderBy: {
-                created_at: "desc",
-            },
-            include: {
-                vehicle: true,
-            },
-        });
+        let countVehicles = 0;
 
         const clockings = await prisma.clocking.findMany({
             where: {
                 ...conditions,
-                created_at: {
-                    gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                    lt: new Date(new Date().setHours(23, 59, 59, 999)),
-                },
             },
             orderBy: {
                 created_at: 'asc',
             },
             include: {
                 vehicle: true,
-                park: true,
                 conducteur: true,
             },
         });
 
-        countClockings = clocking.length;
+        countClockings = clockings.length;
 
         // Filtrer pour garder uniquement le premier clocking de chaque véhicule
         const firstClockingsByVehicle = new Map();
@@ -342,7 +360,7 @@ export async function getClockingsVehicleNow(vehicle_id?: string, park?: string,
             (clocking) => clocking.park_id === null
         );
 
-        clocking.forEach((c) => {
+        clockings.forEach((c) => {
             if (c.type === 0) {
                 countExitParcClockings++;
             } else if (c.type === 1) {
@@ -356,26 +374,31 @@ export async function getClockingsVehicleNow(vehicle_id?: string, park?: string,
 
         countExitParcClockings = countExitParcClockings + result.length;
 
-        
+
         const exitedVehicles = await prisma.clocking.findMany({
             where: {
                 created_at: {
-                    gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                    lt: new Date(new Date().setHours(23, 59, 59, 999)),
+                    gte: date? new Date(new Date(date).setHours(0, 0, 0, 0)) : new Date(new Date().setHours(0, 0, 0, 0)),
+                    lt: date? new Date(new Date(date).setHours(23, 59, 59, 999)) : new Date(new Date().setHours(23, 59, 59, 999)),
                 },
+                ...conditions.park_id ? { park_id: conditions.park_id } : {},
+                ...conditions.region_id ? { region_id: conditions.region_id } : {},
                 type: 0,
             },
             distinct: ['vehicle_id'],
             select: { vehicle_id: true },
         });
+
         const exitedVehicleIds = exitedVehicles.map(v => v.vehicle_id);
-        const enteredVehicles = await prisma.clocking.findMany({
+        const enteredVehicles =  await prisma.clocking.findMany({
             where: {
                 created_at: {
-                    gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                    lt: new Date(new Date().setHours(23, 59, 59, 999)),
+                    gte: date? new Date(new Date(date).setHours(0, 0, 0, 0)) : new Date(new Date().setHours(0, 0, 0, 0)),
+                    lt: date? new Date(new Date(date).setHours(23, 59, 59, 999)) : new Date(new Date().setHours(23, 59, 59, 999)),
                 },
                 type: 4,
+                ...conditions.park_id ? { park_id: conditions.park_id } : {},
+                ...conditions.region_id ? { region_id: conditions.region_id } : {},
                 vehicle_id: { in: exitedVehicleIds },
             },
             distinct: ['vehicle_id'],
@@ -384,15 +407,17 @@ export async function getClockingsVehicleNow(vehicle_id?: string, park?: string,
         const enteredVehicleIds = new Set(enteredVehicles.map(v => v.vehicle_id));
         countVehicleWithoutEnteringRegion = exitedVehicleIds.filter(id => !enteredVehicleIds.has(id)).length;
 
-        countVehicles= await prisma.vehicle.count({
+        countVehicles = await prisma.vehicle.count({
             where: {
-                ...conditions
+                ...conditions.park_id ? { park_id: conditions.park_id } : {},
+                ...conditions.region_id ? { region_id: conditions.region_id } : {},
+                ...conditions.region_id ? { region_id2: conditions.region_id } : {},
             }
         });
 
         return {
             status: 200, data: {
-                clocking,
+                clocking:null,
                 countClockings,
                 countExitParcClockings,
                 countEnterParcClockings,

@@ -572,15 +572,18 @@
         "location": "الموقع",
         "entry": "دخول",
         "exit": "خروج",
-        "entry_exit": "دخول/خروج",
+        "entry_exit": "Park",
         "controller": "جهاز تحكم",
         "total_clockings": "إجمالي Scans",
         "today_clockings": "عدد تسجيل خروج الحافلات",
         "totalScannBusHaveExistedParkAndNotEntredRegion": "إجمالي المركبات التي تم مسحها والتي لها حظيرة ولكن لم تدخل المنطقة",
         "filter_by_date": "تصفية حسب التاريخ",
         "filter_by_park": "تصفية حسب الحظيرة",
+        "filter_by_type": "تصفية حسب نوع التسجيل",
+        "filter_by_status": "تصفية حسب الحالة",
         "all_dates": "جميع التواريخ",
         "all_parks": "جميع الحظائر",
+        "all":"الكل",
         "vehiclenotfound": "المركبة غير موجودة"
     },
     "Conducteur": {
@@ -732,7 +735,7 @@
         "route": "الطريق",
         "add_another_entreprise": "إضافة شركة أخرى"
     },
-    "courses":{
+    "courses": {
         "title": "إدارة الرحلات",
         "subtitle": "إدارة وتتبع جميع الرحلات",
         "stats": {

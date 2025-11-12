@@ -488,7 +488,7 @@ export default function DevicesPage() {
                         <div className="max-h-48 my-2 overflow-auto">
                             {sheetNotCreated.map((data: any, index: any) => (
                                 <div key={index} className="mt-4 p-4 bg-red-200 text-red-700 rounded">
-                                    <h2 className="font-bold">{t("Errors:errors")}</h2>
+                                    <h2 className="font-bold">{t("Error.errors")}</h2>
                                     <ul className="list-disc pl-5">
                                         <li>
                                             {

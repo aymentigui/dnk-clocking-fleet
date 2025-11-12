@@ -14,9 +14,10 @@ interface ConfirmDialogProps {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     selectedIds: string[];
     parcs: { id: string; name: string }[];
+    type: string;
 }
 
-const UpdateRegion = ({ open, setOpen, selectedIds, parcs }: ConfirmDialogProps) => {
+const UpdateRegion = ({ open, setOpen, selectedIds, parcs, type }: ConfirmDialogProps) => {
     const translateSystem = useTranslations("System")
     const translate = useTranslations("Vehicle")
     const [parc, setParc] = useState<any>(null)
@@ -29,8 +30,6 @@ const UpdateRegion = ({ open, setOpen, selectedIds, parcs }: ConfirmDialogProps)
         option.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
 
-
-
     const hadnleConfirmUpdate = async () => {
         if (selectedIds.length === 0) {
             toast.error(translate("selectvehicles"))
@@ -41,7 +40,7 @@ const UpdateRegion = ({ open, setOpen, selectedIds, parcs }: ConfirmDialogProps)
 
     const handleUpdate = async () => {
         if (selectedIds.length === 0) return
-        const res = await UpdateVehiclesRegion(selectedIds, parc)
+        const res = await UpdateVehiclesRegion(selectedIds, parc, type)
         if (res.status === 200 && res.data.message) {
             toast.success(translateSystem("updatesuccess"))
             setOpen(false)
@@ -54,11 +53,11 @@ const UpdateRegion = ({ open, setOpen, selectedIds, parcs }: ConfirmDialogProps)
     return (
         <AlertDialog open={open} onOpenChange={hadnleConfirmUpdate}>
             <AlertDialogTrigger asChild>
-                <Button variant="primary">{translate("updateregion")}</Button>
+                <Button variant="primary">{translate("updateregion")+ " "+ type}</Button>
             </AlertDialogTrigger>
             <AlertDialogContent >
                 <AlertDialogHeader>
-                    <AlertDialogTitle className={cn(locale == "ar" ? "text-right" : "text-left")}>{translate("updateregion")}</AlertDialogTitle>
+                    <AlertDialogTitle className={cn(locale == "ar" ? "text-right" : "text-left")}>{translate("updateregion") + " "+ type}</AlertDialogTitle>
                     <div className='flex flex-col'>
                         <Select value={parc} onValueChange={(value) => setParc(value)}>
                             <SelectGroup>
