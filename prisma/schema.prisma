@@ -50,10 +50,6 @@ model user {
   vehicle_park   vehicle_park[]
   vehicle_region vehicle_region[]
   notification   notification[]
-
-  @@index([deleted_at])
-  @@index([public, deleted_at])
-  @@index([is_admin])
 }
 
 // model Account {
@@ -107,10 +103,6 @@ model session {
   os            String?
   active        Boolean  @default(true)
   created_at    DateTime @default(now())
-
-  @@index([session_token])
-  @@index([expires])
-  @@index([active])
 }
 
 model verificationtoken {
@@ -294,9 +286,8 @@ model conducteur {
   added_from String?
   clocking   clocking[]
   course     course[]
-
-  @@index([deleted_at])
-  @@index([matricule])
+  status  String?
+  work_status Boolean @default(true)
 }
 
 model device {

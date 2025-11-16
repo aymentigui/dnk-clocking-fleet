@@ -18,8 +18,6 @@ import {
     MapPin,
     Bus,
     User,
-    Building2,
-    TrendingUp,
     CheckCircle2,
     Clock,
     RotateCcw
@@ -37,29 +35,12 @@ import { generateFileClient } from "@/actions/util/export-data/export-client";
 
 // Mock translations - replace with actual translation hook
 
-
-/*interface Course {
-    id: string;
-    vehicle_id: string;
-    conducteur_id: string;
-    conducteur_name: string;
-    conducteur_matricule: string;
-    start_date: Date;
-    end_date?: Date;
-    waiting: boolean;
-    start_station?: string;
-    end_station?: string;
-    rotation?: number;
-    course_retour?: Course;
-}
-*/
-
 const selectors = [
     { title: "Vehicle", selector: "vehicle_matricule" },
     { title: "Conductor", selector: "conducteur_name" },
     { title: "Conductor Matricule", selector: "conducteur_matricule" },
-    { title: "Start Station", selector: "start_station" },
-    { title: "End Station", selector: "end_station" },
+    { title: "Start Station", selector: "start_region_name" },
+    { title: "End Station", selector: "end_region_name" },
     { title: "Start Date", selector: "start_date" },
     { title: "End Date", selector: "end_date" },
     { title: "Status", selector: "status" },
@@ -82,10 +63,15 @@ const Courses = () => {
     const [selectedEnterprise, setSelectedEnterprise] = useState("");
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
     const [selectedConductor, setSelectedConductor] = useState("");
-    const [showCompleted, setShowCompleted] = useState(true);
+    const [showCompleted, setShowCompleted] = useState(false);
+    const [showWaiting, setShowWaiting] = useState(false);
+    const [showAll, setShowAll] = useState(true);
     const [withRotation, setWithRotation] = useState(false);
     const [enableAll, setEnableAll] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [completedCount, setCompletedCount] = useState(0);
+    const [pendingCount, setPendingCount] = useState(0);
+    const [waitingCount, setWaitingCount] = useState(0);
 
     // Data for filters
     const [vehicles, setVehicles] = useState<any[]>([]);
@@ -112,7 +98,7 @@ const Courses = () => {
                 setEnterprises(enterprisesData.data || []);
                 setConductors(conductorsData.data || []);
             } catch (error) {
-                console.error('Error fetching filter data:', error);
+                console.log('Error fetching filter data:', error);
             }
         };
 
@@ -131,8 +117,9 @@ const Courses = () => {
             selectedDepartureRegion,
             selectedArrivalRegion,
             enableAll,
-            showCompleted,
+            showAll ? undefined : showCompleted,
             withRotation,
+            showAll ? undefined : showWaiting
         );
         if (res.status === 200 && res.data) {
             // Formater les données pour correspondre aux selectors
@@ -167,18 +154,23 @@ const Courses = () => {
                 selectedDepartureRegion,
                 selectedArrivalRegion,
                 enableAll,
-                showCompleted,
+                showAll ? undefined : showCompleted,
                 withRotation,
+                showAll ? undefined : showWaiting
             )
 
-            if (response.status === 200)
+            if (response.status === 200){
                 setCourses(response.data);
+                setWaitingCount(response.totalWaiting || 0);
+                setCompletedCount(response.totalCompleted || 0);
+                setPendingCount(response.totalInProgress || 0);
+            }
             else
                 setCourses([])
             setTotalCount(response.count || 0);
             setTotalRotations(response.totalRotations || 0);
         } catch (error) {
-            console.error('Error fetching courses:', error);
+            console.log('Error fetching courses:', error);
         } finally {
             setLoading(false);
         }
@@ -202,16 +194,14 @@ const Courses = () => {
         setSelectedEnterprise("");
         setSelectedDate(undefined);
         setSelectedConductor("");
-        setShowCompleted(true);
+        setShowCompleted(false);
+        setShowWaiting(false);
+        setShowAll(true);
         setWithRotation(false);
         setEnableAll(false);
         setSearchQuery("");
         setPage(1);
     };
-
-    // Statistics
-    const completedCount = courses.filter(c => !c.waiting).length;
-    const pendingCount = courses.filter(c => c.waiting).length;
 
     return (
         <div className="min-h-screen bg-background p-6 space-y-6">
@@ -242,6 +232,14 @@ const Courses = () => {
                 <StatsCard
                     title={t("courses.stats.pending")}
                     value={pendingCount}
+                    icon={<Clock className="h-5 w-5" />}
+                    trend=""
+                    iconBg="bg-warning/10"
+                    iconColor="text-warning"
+                />
+                <StatsCard
+                    title={t("courses.stats.pending")}
+                    value={waitingCount}
                     icon={<Clock className="h-5 w-5" />}
                     trend=""
                     iconBg="bg-warning/10"
@@ -293,7 +291,7 @@ const Courses = () => {
                             placeholder={t("courses.filters.departureRegion")}
                             value={selectedDepartureRegion}
                             onValueChange={setSelectedDepartureRegion}
-                            options={regions.map(r => ({ value: r.name, label: r.name }))}
+                            options={regions.map(r => ({ value: r.id, label: r.name }))}
                             searchPlaceholder="Search region..."
                             icon={<MapPin className="h-4 w-4" />}
                         />
@@ -303,7 +301,7 @@ const Courses = () => {
                             placeholder={t("courses.filters.arrivalRegion")}
                             value={selectedArrivalRegion}
                             onValueChange={setSelectedArrivalRegion}
-                            options={regions.map(r => ({ value: r.name, label: r.name }))}
+                            options={regions.map(r => ({ value: r.id, label: r.name }))}
                             searchPlaceholder="Search region..."
                             icon={<MapPin className="h-4 w-4" />}
                         />
@@ -363,15 +361,49 @@ const Courses = () => {
                     <div className="flex flex-wrap gap-6">
                         <div className="flex items-center space-x-2">
                             <Checkbox
+                                id="all"
+                                checked={showAll}
+                                onCheckedChange={(checked) => {
+                                    setShowAll(checked as boolean)
+                                }}
+                            />
+                            <label
+                                htmlFor="all"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                                {t("courses.filters.all")}
+                            </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
                                 id="completed"
                                 checked={showCompleted}
-                                onCheckedChange={(checked) => setShowCompleted(checked as boolean)}
+                                onCheckedChange={(checked) => {
+                                    setShowCompleted(checked as boolean)
+                                    setShowAll(false)
+                                }}
                             />
                             <label
                                 htmlFor="completed"
                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
                                 {t("courses.filters.completed")}
+                            </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="waiting"
+                                checked={showWaiting}
+                                onCheckedChange={(checked) => {
+                                    setShowWaiting(checked as boolean)
+                                    setShowAll(false)
+                                }}
+                            />
+                            <label
+                                htmlFor="waiting"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                                {t("courses.filters.waiting")}
                             </label>
                         </div>
 
@@ -461,13 +493,18 @@ const Courses = () => {
                                                         {vehicles.find(v => v.id === course.vehicle_id)?.matricule || course.vehicle_id}
                                                     </TableCell>
                                                     <TableCell>{course.conducteur_name}</TableCell>
-                                                    <TableCell>{course.start_station || '-'}</TableCell>
-                                                    <TableCell>{course.end_station || '-'}</TableCell>
+                                                    <TableCell>{course.start_region_name || '-'}</TableCell>
+                                                    <TableCell>{course.end_region_name || '-'}</TableCell>
                                                     <TableCell>{format(new Date(course.start_date), "PPp")}</TableCell>
                                                     <TableCell>{course.end_date ? format(new Date(course.end_date), "PPp") : '-'}</TableCell>
                                                     <TableCell>
                                                         <Badge variant={course.waiting ? "secondary" : "default"}>
-                                                            {course.waiting ? t("courses.status.pending") : t("courses.status.completed")}
+                                                            {course.waiting
+                                                                ? t("Conducteur.waiting")
+                                                                : course.end_date
+                                                                    ? t("courses.status.completed")
+                                                                    : t("Conducteur.in_progress")
+                                                            }
                                                         </Badge>
                                                     </TableCell>
                                                     {withRotation && (

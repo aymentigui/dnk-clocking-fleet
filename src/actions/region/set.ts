@@ -3,8 +3,6 @@ import { prisma } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { withAuthorizationPermission, verifySession } from "../permissions";
 import { z } from "zod";
-import { getUserName } from "../users/get";
-import { sendEmail } from "../email";
 
 export async function createRegion(data: any) {
     const u = await getTranslations("Region");

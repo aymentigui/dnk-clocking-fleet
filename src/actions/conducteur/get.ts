@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { withAuthorizationPermission, verifySession } from "../permissions";
 
-export async function getConducteurs(page: number = 1, pageSize: number = 10, searchQuery?: string): Promise<{ status: number, data: any, totalCount?: number, totalPages?: number }> {
+export async function getConducteurs(page: number = 1, pageSize: number = 10, searchQuery?: string, status?:string, work_status?:boolean): Promise<{ status: number, data: any, totalCount?: number, totalPages?: number }> {
     const e = await getTranslations('Error');
     try {
         const session = await verifySession();
@@ -19,7 +19,7 @@ export async function getConducteurs(page: number = 1, pageSize: number = 10, se
 
         const skip = (page - 1) * pageSize;
 
-        const searchConditions = searchQuery && searchQuery !== ""
+        const searchConditions:any = searchQuery && searchQuery !== ""
             ? {
                 OR: [
                     { firstname: { contains: searchQuery } },
@@ -28,12 +28,20 @@ export async function getConducteurs(page: number = 1, pageSize: number = 10, se
                 ],
             }
             : {};
+        if (status && status !== "") {
+            searchConditions.AND = [
+                { status: status }
+            ];
+        }
 
         const [conducteurs, totalCount] = await Promise.all([
             prisma.conducteur.findMany({
                 skip: skip, // Nombre d'éléments à sauter
                 take: pageSize === 0 ? undefined : pageSize, // Nombre d'éléments à prendre
-                where: searchConditions,
+                where: {
+                    ...searchConditions,
+                    work_status: work_status===undefined ? true : work_status,
+                },
             }),
             prisma.conducteur.count({
                 where: searchConditions,
@@ -101,7 +109,7 @@ export async function getConducteursWithIds(conducteurIds: string[]): Promise<{ 
 }
 
 
-export async function getConducteursAdmin(): Promise<{ status: number, data: any }> {
+export async function getConducteursAdmin(all?:false): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
     try {
         const session = await verifySession()
@@ -109,7 +117,9 @@ export async function getConducteursAdmin(): Promise<{ status: number, data: any
             return { status: 401, data: { message: e('unauthorized') } }
         }
 
-        const conducteurs = await prisma.conducteur.findMany();
+        const conducteurs = await prisma.conducteur.findMany({
+            where: all ? {} : { work_status: true },
+        });
         return { status: 200, data: conducteurs };
     } catch (error) {
         console.log("An error occurred in getconducteursPublic");

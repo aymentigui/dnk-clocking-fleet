@@ -63,6 +63,7 @@ export const SearchableSelect = ({
                             <CommandItem
                                 key={option.value}
                                 value={option.value}
+                                keywords={[option.label]} 
                                 onSelect={(currentValue:any) => {
                                     onValueChange(currentValue === value ? "" : currentValue);
                                     setOpen(false);

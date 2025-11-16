@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, Clock, Car, User } from "lucide-react";
+import { Calendar, Clock, Car, User, AlertTriangle } from "lucide-react";
 import { ClockingsFilters } from "./ClockingsFilters";
 import { ClockingsTable } from "./ClockingsTable";
+import { VehiclesWithoutEnteringRegionTable } from "./VehiclesWithoutEnteringRegionTable"; // Nouveau composant
 import { getClockings } from "@/actions/clocking/get";
 import { getParksAdmin } from "@/actions/park/get";
 
@@ -21,13 +22,25 @@ interface Clocking {
     park: string;
 }
 
+interface VehicleWithoutEnteringRegion {
+    id: string;
+    vehicle_id: string;
+    vehicle_matricule: string;
+    exit_time: string;
+    exit_park: string;
+    conducteur_name?: string;
+    conducteur_matricule?: string;
+}
+
 export default function ClockingsPage() {
     const t = useTranslations("Clocking");
     const s = useTranslations("System");
     const e = useTranslations("Error");
 
     const [clockings, setClockings] = useState<Clocking[]>([]);
+    const [vehiclesWithoutEnteringRegion, setVehiclesWithoutEnteringRegion] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingVehiclesWithoutRegion, setLoadingVehiclesWithoutRegion] = useState(false);
     const [searchDate, setSearchDate] = useState<string>(() => {
         const today = new Date();
         return today.toISOString().split('T')[0];
@@ -58,6 +71,7 @@ export default function ClockingsPage() {
 
     useEffect(() => {
         loadClockings();
+        loadVehiclesWithoutEnteringRegion();
     }, [currentPage, pageSize, searchDate, parkFilter, typeFilter, statusFilter]);
 
     const loadClockings = async () => {
@@ -68,8 +82,8 @@ export default function ClockingsPage() {
                 pageSize,
                 searchDate ? searchDate : undefined,
                 parkFilter || undefined,
-                typeFilter? Number(typeFilter): undefined,
-                statusFilter? Number(statusFilter): undefined
+                typeFilter ? Number(typeFilter) : undefined,
+                statusFilter ? Number(statusFilter) : undefined
             );
 
             if (response.status === 200) {
@@ -79,13 +93,38 @@ export default function ClockingsPage() {
                 setTotalCountExit(response.countExit);
                 setUniqueConductors(response.uniqueConducteurs);
                 setUniqueVehicles(response.uniqueVehicles);
+                setVehiclesWithoutEnteringRegion(response.scannBusHaveExistedParkAndNotEntredRegion || []);
             } else {
-                console.error("Error loading clockings:", response.data);
+                console.log("Error loading clockings:", response.data);
             }
         } catch (error) {
-            console.error("Error loading clockings:", error);
+            console.log("Error loading clockings:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const loadVehiclesWithoutEnteringRegion = async () => {
+        setLoadingVehiclesWithoutRegion(true);
+        try {
+            const response = await getClockings(
+                1, // Première page pour les véhicules sans région
+                50, // Limite raisonnable pour l'affichage
+                searchDate ? searchDate : undefined,
+                parkFilter || undefined,
+                typeFilter ? Number(typeFilter) : undefined,
+                statusFilter ? Number(statusFilter) : undefined
+            );
+
+            if (response.status === 200 && response.scannBusHaveExistedParkAndNotEntredRegion) {
+                // Transformer les données pour l'affichage
+                const formattedVehicles = response.scannBusHaveExistedParkAndNotEntredRegion
+                setVehiclesWithoutEnteringRegion(formattedVehicles);
+            }
+        } catch (error) {
+            console.log("Error loading vehicles without entering region:", error);
+        } finally {
+            setLoadingVehiclesWithoutRegion(false);
         }
     };
 
@@ -117,90 +156,6 @@ export default function ClockingsPage() {
         setCurrentPage(1);
     };
 
-    // Stats Cards Component
-    const StatsCards = () => (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Total Clockings */}
-            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg">
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-blue-100 text-sm font-medium">{t("total_clockings")}</p>
-                            <p className="text-3xl font-bold mt-2">{totalCount.toLocaleString()}</p>
-                            <p className="text-blue-100 text-xs mt-1">{s("total")}</p>
-                        </div>
-                        <div className="bg-blue-400/20 p-3 rounded-full">
-                            <Calendar className="h-8 w-8" />
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Today's Clockings */}
-            <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg">
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-green-100 text-sm font-medium">{t("today_clockings")}</p>
-                            <p className="text-3xl font-bold mt-2">{totalCountExit}</p>
-                            <p className="text-green-100 text-xs mt-1"></p>
-                        </div>
-                        <div className="bg-green-400/20 p-3 rounded-full">
-                            <Clock className="h-8 w-8" />
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Unique Vehicles */}
-            <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg">
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-orange-100 text-sm font-medium">{t("vehicle")}</p>
-                            <p className="text-3xl font-bold mt-2">{uniqueVehicles}</p>
-                            <p className="text-orange-100 text-xs mt-1">Unique</p>
-                        </div>
-                        <div className="bg-orange-400/20 p-3 rounded-full">
-                            <Car className="h-8 w-8" />
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Unique Conductors */}
-            <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg">
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-purple-100 text-sm font-medium">{t("conducteur")}</p>
-                            <p className="text-3xl font-bold mt-2">{uniqueConductors}</p>
-                            <p className="text-purple-100 text-xs mt-1">Unique</p>
-                        </div>
-                        <div className="bg-purple-400/20 p-3 rounded-full">
-                            <User className="h-8 w-8" />
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-            {/* Today's Clockings */}
-            <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg">
-                <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-green-100 text-sm font-medium">{t("totalScannBusHaveExistedParkAndNotEntredRegion")}</p>
-                            <p className="text-3xl font-bold mt-2">{totalScannBusHaveExistedParkAndNotEntredRegion}</p>
-                            <p className="text-green-100 text-xs mt-1"></p>
-                        </div>
-                        <div className="bg-green-400/20 p-3 rounded-full">
-                            <Clock className="h-8 w-8" />
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    );
-
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -219,7 +174,86 @@ export default function ClockingsPage() {
                 </div>
 
                 {/* Stats Cards */}
-                <StatsCards />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    {/* Total Clockings */}
+                    <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg">
+                        <CardContent className="p-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-blue-100 text-sm font-medium">{t("total_clockings")}</p>
+                                    <p className="text-3xl font-bold mt-2">{totalCount.toLocaleString()}</p>
+                                    <p className="text-blue-100 text-xs mt-1">{s("total")}</p>
+                                </div>
+                                <div className="bg-blue-400/20 p-3 rounded-full">
+                                    <Calendar className="h-8 w-8" />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Today's Clockings */}
+                    <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg">
+                        <CardContent className="p-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-green-100 text-sm font-medium">{t("today_clockings")}</p>
+                                    <p className="text-3xl font-bold mt-2">{totalCountExit}</p>
+                                    <p className="text-green-100 text-xs mt-1"></p>
+                                </div>
+                                <div className="bg-green-400/20 p-3 rounded-full">
+                                    <Clock className="h-8 w-8" />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Unique Vehicles */}
+                    <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg">
+                        <CardContent className="p-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-orange-100 text-sm font-medium">{t("vehicle")}</p>
+                                    <p className="text-3xl font-bold mt-2">{uniqueVehicles}</p>
+                                    <p className="text-orange-100 text-xs mt-1">Unique</p>
+                                </div>
+                                <div className="bg-orange-400/20 p-3 rounded-full">
+                                    <Car className="h-8 w-8" />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Unique Conductors */}
+                    <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg">
+                        <CardContent className="p-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-purple-100 text-sm font-medium">{t("conducteur")}</p>
+                                    <p className="text-3xl font-bold mt-2">{uniqueConductors}</p>
+                                    <p className="text-purple-100 text-xs mt-1">Unique</p>
+                                </div>
+                                <div className="bg-purple-400/20 p-3 rounded-full">
+                                    <User className="h-8 w-8" />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Vehicles Without Entering Region */}
+                    <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg">
+                        <CardContent className="p-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-red-100 text-sm font-medium">{t("totalScannBusHaveExistedParkAndNotEntredRegion")}</p>
+                                    <p className="text-3xl font-bold mt-2">{totalScannBusHaveExistedParkAndNotEntredRegion}</p>
+                                </div>
+                                <div className="bg-red-400/20 p-3 rounded-full">
+                                    <AlertTriangle className="h-8 w-8" />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
 
                 {/* Filters */}
                 <ClockingsFilters
@@ -292,6 +326,27 @@ export default function ClockingsPage() {
                                     {s("next")}
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Table des véhicules sans entrée en région */}
+                {vehiclesWithoutEnteringRegion.length > 0 && (
+                    <div className="mb-8">
+                        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+                            <div className="flex items-center mb-4">
+                                <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 mr-2" />
+                                <h2 className="text-lg font-semibold text-yellow-800 dark:text-yellow-300">
+                                    Véhicules sortis du parking mais non entrés en région
+                                </h2>
+                                <span className="ml-2 bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-100 text-sm font-medium px-2.5 py-0.5 rounded-full">
+                                    {vehiclesWithoutEnteringRegion.length}
+                                </span>
+                            </div>
+                            <VehiclesWithoutEnteringRegionTable
+                                vehicles={vehiclesWithoutEnteringRegion}
+                                loading={loadingVehiclesWithoutRegion}
+                            />
                         </div>
                     </div>
                 )}

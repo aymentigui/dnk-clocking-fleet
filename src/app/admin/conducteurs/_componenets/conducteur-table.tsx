@@ -72,11 +72,17 @@ export default function ConducteurTable({ conducteurs, selectedIds, onSelectAll,
                                 <td className="px-6 py-4 text-sm text-muted-foreground">{conducteur.firstname || "-"}</td>
                                 <td className="px-6 py-4 text-sm text-muted-foreground">{conducteur.lastname || "-"}</td>
                                 <td className="px-6 py-4 text-sm text-muted-foreground">{conducteur.phone || "-"}</td>
-                                <td className="px-6 py-4 text-sm">
+                                <td className="px-6 py-4 text-sm flex gap-2">
                                     <a href={`/admin/conducteurs/${conducteur.id}/edit`}>
                                         <Button size="sm" variant="outline" className="gap-2 bg-transparent">
                                             <Edit2 size={16} />
                                             {t("System.edit")}
+                                        </Button>
+                                    </a>
+                                    <a href={`/admin/conducteurs/${conducteur.id}`}>
+                                        <Button size="sm" variant="outline" className="gap-2 bg-transparent">
+                                            <Edit2 size={16} />
+                                            {t("Conducteur.view")}
                                         </Button>
                                     </a>
                                 </td>

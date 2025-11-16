@@ -2,7 +2,7 @@
 
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
-import { withAuthorizationPermission,verifySession } from "../permissions";
+import { withAuthorizationPermission, verifySession } from "../permissions";
 
 export async function getRegions(): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
@@ -11,9 +11,9 @@ export async function getRegions(): Promise<{ status: number, data: any }> {
         if (!session?.data?.user) {
             return { status: 401, data: { message: e("unauthorized") } };
         }
-        const hasPermission = await withAuthorizationPermission(['region_view'],session.data.user.id);
+        const hasPermission = await withAuthorizationPermission(['region_view'], session.data.user.id);
 
-        if(hasPermission.status != 200 || !hasPermission.data.hasPermission) {
+        if (hasPermission.status != 200 || !hasPermission.data.hasPermission) {
             return { status: 403, data: { message: e('forbidden') } };
         }
 
@@ -35,9 +35,9 @@ export async function getRegion(id: string): Promise<{ status: number, data: any
         if (!session?.data?.user) {
             return { status: 401, data: { message: e("unauthorized") } };
         }
-        const hasPermissionAdd = await withAuthorizationPermission(['region_view'],session.data.user.id);
-        
-        if(hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
+        const hasPermissionAdd = await withAuthorizationPermission(['region_view'], session.data.user.id);
+
+        if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
             return { status: 403, data: { message: e('forbidden') } };
         }
         const device = await prisma.region.findUnique({ where: { id } });
@@ -94,16 +94,15 @@ export async function getRegionsAdmin(): Promise<{ status: number, data: any }> 
     }
 }
 
-export async function getRegionsName(id: string): Promise<{ status: number, data: any }> {
-    const e = await getTranslations('Error');
+export async function getRegionsName(id: string) {
     try {
         const session = await verifySession()
         if (!session || session.status != 200) {
-            return { status: 401, data: { message: e('unauthorized') } }
+            return ""
         }
 
-        if(!id) {
-            return { status: 400, data: { message: e('badrequest') } }
+        if (!id) {
+            return ""
         }
 
         const name = await prisma.region.findUnique({
@@ -114,10 +113,10 @@ export async function getRegionsName(id: string): Promise<{ status: number, data
                 name: true
             }
         });
-        
-        return { status: 200, data: name };
+
+        return name
     } catch (error) {
         console.log("An error occurred in getRegionsPublic");
-        return { status: 500, data: { message: e("error") } };
+        return ""
     }
 }

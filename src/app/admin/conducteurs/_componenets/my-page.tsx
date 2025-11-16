@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl"
 import { useState, useCallback } from "react"
 import useSWR from "swr"
-import { Plus, Trash2, Search, ChevronRight, ChevronLeft } from "lucide-react"
+import { Plus, Trash2, Search, ChevronRight, ChevronLeft, CheckCircle, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -21,6 +21,8 @@ import { generateFileClient } from "@/actions/util/export-data/export-client"
 import ExportButton from "@/components/my/export-button"
 import Link from "next/link"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { updateWorkStatusConducteur } from "@/actions/conducteur/update"
+import UpdateWorkStatusDialog from "./UpdateWorkStatus"
 
 const selectors = [
     { title: "id", selector: "id" },
@@ -37,9 +39,14 @@ export default function ConducteursPage() {
     const t = useTranslations()
     const [page, setPage] = useState(1)
     const [searchQuery, setSearchQuery] = useState("")
+    const [statusFilter, setStatusFilter] = useState<undefined | string>(undefined); // État pour le filtre de statut
+    const [workStatusFilter, setWorkStatusFilter] = useState<undefined | boolean>(true); // État pour le filtre de statut de travail
     const [selectedIds, setSelectedIds] = useState<string[]>([])
     const [showDeleteDialog, setShowDeleteDialog] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
+    const [showUpdateStatusDialog, setShowUpdateStatusDialog] = useState(false)
+    const [isUpdating, setIsUpdating] = useState(false)
+    const [workStatusToUpdate, setWorkStatusToUpdate] = useState<boolean>(true)
     const { data: sheetData, setColumns, setData: setSheetData } = useImportSheetsStore();
 
     const [sheetNotCreated, setSheetNotCreated] = useState<any>([])
@@ -95,6 +102,34 @@ export default function ConducteursPage() {
 
     };
 
+    const handleUpdateWorkStatus = (workStatus: boolean) => {
+        if (selectedIds.length === 0) return
+        setWorkStatusToUpdate(workStatus)
+        setShowUpdateStatusDialog(true)
+    }
+
+    const confirmUpdateWorkStatus = async () => {
+        setIsUpdating(true)
+        try {
+            const result = await updateWorkStatusConducteur(selectedIds, workStatusToUpdate)
+
+            if (result.status === 200) {
+                setSelectedIds([])
+                mutate()
+                toast.success(t("Conducteur.work_status_updated"))
+            } else {
+                console.error("Update work status failed:", result.data)
+                toast.error(result.data.message || t("Error.error"))
+            }
+        } catch (err) {
+            console.error("Error updating work status:", err)
+            toast.error(t("Error.error"))
+        } finally {
+            setIsUpdating(false)
+            setShowUpdateStatusDialog(false)
+        }
+    }
+
     const exportAll = async (type: number = 1) => {
         const res = await getConducteursAdmin()
 
@@ -109,7 +144,7 @@ export default function ConducteursPage() {
     };
 
     const fetcher = async () => {
-        const result = await getConducteurs(page, pageSize, searchQuery)
+        const result = await getConducteurs(page, pageSize, searchQuery, statusFilter, workStatusFilter)
         if (result.status !== 200) {
             throw new Error(result.data.message)
         }
@@ -123,7 +158,7 @@ export default function ConducteursPage() {
         isLoading,
         error,
         mutate,
-    } = useSWR([`conducteurs`, page, pageSize, searchQuery], fetcher, { revalidateOnFocus: false })
+    } = useSWR([`conducteurs`, page, pageSize, searchQuery, statusFilter, workStatusFilter], fetcher, { revalidateOnFocus: false })
 
     const handleSearch = useCallback((value: string) => {
         setSearchQuery(value)
@@ -251,11 +286,55 @@ export default function ConducteursPage() {
                                 className="pl-10 bg-input border-border text-foreground placeholder:text-muted-foreground"
                             />
                         </div>
+                        {/* Status Select */}
+                        <div className="flex-1">
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="w-full bg-input border-border text-foreground placeholder:text-muted-foreground p-2 rounded"
+                            >
+                                <option value="">{t("Conducteur.all")}</option>
+                                <option value="exit_from_park">{t("Conducteur.exit_from_park")}</option>
+                                <option value="entry_to_park">{t("Conducteur.entry_to_park")}</option>
+                                <option value="exit_from_region">{t("Conducteur.exit_from_region")}</option>
+                                <option value="entry_to_region">{t("Conducteur.entry_to_region")}</option>
+                            </select>
+                        </div>
+
+                        {/* Work Status Select */}
+                        <div className="flex-1">
+                            <select
+                                value={workStatusFilter === undefined ? "true" : workStatusFilter.toString()}
+                                onChange={(e) => setWorkStatusFilter(e.target.value === "" ? undefined : e.target.value === "true")}
+                                className="w-full bg-input border-border text-foreground placeholder:text-muted-foreground p-2 rounded"
+                            >
+                                <option value="true">{t("Conducteur.active")}</option>
+                                <option value="false">{t("Conducteur.inactive")}</option>
+                            </select>
+                        </div>
+
                         {selectedIds.length > 0 && (
-                            <Button onClick={handleDeleteSelected} variant="destructive" className="gap-2">
-                                <Trash2 size={20} />
-                                {t("Conducteur.delete")} ({selectedIds.length})
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button
+                                    onClick={() => handleUpdateWorkStatus(true)}
+                                    className="gap-2 bg-green-600 hover:bg-green-700"
+                                >
+                                    <CheckCircle size={20} />
+                                    {t("Conducteur.activate")} ({selectedIds.length})
+                                </Button>
+                                <Button
+                                    onClick={() => handleUpdateWorkStatus(false)}
+                                    variant="secondary"
+                                    className="gap-2"
+                                >
+                                    <XCircle size={20} />
+                                    {t("Conducteur.deactivate")} ({selectedIds.length})
+                                </Button>
+                                <Button onClick={handleDeleteSelected} variant="destructive" className="gap-2">
+                                    <Trash2 size={20} />
+                                    {t("Conducteur.delete")} ({selectedIds.length})
+                                </Button>
+                            </div>
                         )}
                     </div>
                 </Card>
@@ -347,6 +426,14 @@ export default function ConducteursPage() {
                 onConfirm={confirmDelete}
                 isDeleting={isDeleting}
                 count={selectedIds.length}
+            />
+            <UpdateWorkStatusDialog
+                open={showUpdateStatusDialog}
+                onOpenChange={setShowUpdateStatusDialog}
+                onConfirm={confirmUpdateWorkStatus}
+                isUpdating={isUpdating}
+                count={selectedIds.length}
+                workStatus={workStatusToUpdate}
             />
         </main>
     )

@@ -271,13 +271,13 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s: an
             }
         }
 
-        if (entreprise && entreprise != null && entreprise != "null" && region != "" && entreprise.trim() != "") {
-            const entrepriseExists = await prisma.entreprise.findFirst({ where: { name: entreprise } });
+        // if (entreprise && entreprise != null && entreprise != "null" && entreprise != "" && entreprise.trim() != "") {
+        //     const entrepriseExists = await prisma.entreprise.findFirst({ where: { name: entreprise } });
 
-            if (!entrepriseExists) {
-                return { status: 400, data: { device: data, message: u("regionnotexist") } };
-            }
-        }
+        //     if (!entrepriseExists) {
+        //         return { status: 400, data: { device: data, message: u("regionnotexist") } };
+        //     }
+        // }
 
 
         const hashedPassword = await bcrypt.hash(password, 10);

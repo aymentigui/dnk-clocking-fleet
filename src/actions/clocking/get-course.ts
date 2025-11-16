@@ -4,18 +4,18 @@ import { getTranslations } from "next-intl/server";
 import { verifySession, withAuthorizationPermission } from "../permissions";
 
 
-export async function getCourse(page:number=1, pageSize:number= 20, vehicle_id: string, entreprise_id?: string, date?: Date, conducteur_id?: string, region_depart?: string, region_arrive?: string, enableAll?: boolean, completed: boolean = true, withRotation: boolean =false) {
+export async function getCourse(page: number = 1, pageSize: number = 20, vehicle_id: string, entreprise_id?: string, date?: Date, conducteur_id?: string, region_depart?: string, region_arrive?: string, enableAll?: boolean, completed: boolean | undefined = undefined, withRotation: boolean = false, waiting: boolean | undefined = undefined) {
     const e = await getTranslations('Error');
     try {
         const session = await verifySession()
         if (!session || session.status != 200) {
-            return { status: 401, data: [],  message: e('unauthorized') }
+            return { status: 401, data: [], message: e('unauthorized'), totalCompleted: 0, totalWaiting: 0, totalInProgress: 0 }
         }
 
         const hasPermission = await withAuthorizationPermission(['course_view'], session.data.user.id);
 
         if (hasPermission.status != 200 || !hasPermission.data.hasPermission) {
-            return { status: 403, data: [], message: e('forbidden') };
+            return { status: 403, data: [], message: e('forbidden'), totalCompleted: 0, totalWaiting: 0, totalInProgress: 0 };
         }
 
 
@@ -39,7 +39,14 @@ export async function getCourse(page:number=1, pageSize:number= 20, vehicle_id: 
 
         const condtition = {
             AND: [
-                { waiting: !completed },
+                completed === undefined
+                    ? {}
+                    : completed === false
+                        ? { end_date: null }
+                        : { NOT: { end_date: null } }, // end_date non null
+                waiting === undefined
+                    ? {}
+                    : { waiting: waiting },
                 date ? {
                     start_date: {
                         gte: new Date(date.setHours(0, 0, 0, 0)),
@@ -55,6 +62,39 @@ export async function getCourse(page:number=1, pageSize:number= 20, vehicle_id: 
                     (end_stations.length > 0 ? { end_station: { in: end_stations } } : {}),
             ]
         }
+
+        const baseWhere = { ...condtition };
+
+        // Total completed (end_date != null)
+        const totalCompleted = await prisma.course.count({
+            where: {
+                AND: [
+                    ...baseWhere.AND,
+                    { NOT: { end_date: null } }
+                ]
+            }
+        });
+
+        // Total waiting (waiting = true)
+        const totalWaiting = await prisma.course.count({
+            where: {
+                AND: [
+                    ...baseWhere.AND,
+                    { waiting: true }
+                ]
+            }
+        });
+
+        // Total in progress (waiting = false AND end_date = null)
+        const totalInProgress = await prisma.course.count({
+            where: {
+                AND: [
+                    ...baseWhere.AND,
+                    { waiting: false },
+                    { end_date: null }
+                ]
+            }
+        });
 
         if (withRotation) {
             // Récupérer toutes les courses sans pagination pour pouvoir les grouper
@@ -125,15 +165,33 @@ export async function getCourse(page:number=1, pageSize:number= 20, vehicle_id: 
             }
 
             // Appliquer la pagination sur les courses groupées
-            const paginatedCourses = pageSize === 0 
-                ? groupedCourses 
+            const paginatedCourses = pageSize === 0
+                ? groupedCourses
                 : groupedCourses.slice(skip, skip + pageSize);
 
-            return { 
-                status: 200, 
-                data: paginatedCourses, 
+            const paginatedCoursesFiltred = await Promise.all(paginatedCourses.map(async (course) => {
+                const start_region_name = course.start_station ? (await prisma.region.findUnique({ where: { id: course.start_station } }))?.name : null
+                const end_region_name = course.end_station ? (await prisma.region.findUnique({ where: { id: course.end_station } }))?.name : null
+                return {
+                    ...course,
+                    start_region_name: start_region_name,
+                    end_region_name: end_region_name,
+                    course_retour: course.course_retour ? {
+                        ...course.course_retour,
+                        start_region_name: end_region_name,
+                        end_region_name: start_region_name
+                    } : null,
+                }
+            }));
+
+            return {
+                status: 200,
+                data: paginatedCoursesFiltred,
                 count: groupedCourses.length,
-                totalRotations: totalRotations
+                totalRotations: totalRotations,
+                totalCompleted: totalCompleted,
+                totalWaiting: totalWaiting,
+                totalInProgress: totalInProgress
             };
         } else {
             // Logique normale sans rotation
@@ -151,12 +209,20 @@ export async function getCourse(page:number=1, pageSize:number= 20, vehicle_id: 
                 }
             });
 
-            return { status: 200, data: courses, count };
+            const courseFiltred = await Promise.all(courses.map(async (course) => {
+                return {
+                    ...course,
+                    start_region_name: course.start_station ? (await prisma.region.findUnique({ where: { id: course.start_station } }))?.name : null,
+                    end_region_name: course.end_station ? (await prisma.region.findUnique({ where: { id: course.end_station } }))?.name : null,
+                }
+            }));
+
+            return { status: 200, data: courseFiltred, count, totalCompleted: totalCompleted, totalWaiting: totalWaiting, totalInProgress: totalInProgress};
         }
     }
     catch (error) {
         console.log("An error occurred in getCourse");
-        return { status: 500, data: [], message: e("error") };
+        return { status: 500, data: [], message: e("error"), totalCompleted: 0, totalWaiting: 0, totalInProgress: 0 };
     }
 }
 

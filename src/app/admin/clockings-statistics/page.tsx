@@ -1,31 +1,13 @@
 "use client"
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
-import { Moon, Sun, RefreshCcw, Globe, Timer, Activity, Bus, BarChart3, Filter, Search, Loader2 } from "lucide-react";
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip as ReTooltip,
-    Legend,
-    ResponsiveContainer,
-    PieChart,
-    Pie,
-    Cell,
-} from "recharts";
+import { RefreshCcw, Timer, Activity, Bus, Filter, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-
-
 import { getClockingsVehicleNow } from "@/actions/clocking/get";
 import { getParksAdmin } from "@/actions/park/get";
 import { useLocale, useTranslations } from "next-intl";
@@ -48,6 +30,7 @@ type Clocking = {
 type NowStats = {
     countClockings: number;
     countExitParcClockings: number;
+    countExitParcClockings2: number;
     countEnterParcClockings: number;
     countEnterRegionClockings: number;
     countExitRegionClockings: number;
@@ -135,6 +118,13 @@ export default function PCCDashboard() {
             }
         })();
     }, []);
+
+    useEffect(() => {
+        if (nextInMs <= 0) {
+            window.location.reload();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [nextInMs]);
 
     // Countdown timer
     useEffect(() => {
@@ -301,6 +291,13 @@ export default function PCCDashboard() {
                             value={global ? fmtNum(global.countExitParcClockings) : "—"}
                             icon={<span className="inline-block h-3 w-3 rounded-full" style={{ background: TYPES_COLORS[0] }} />}
                         />
+
+                        <StatCard
+                            title={t("metrics.exitPark") + " 2"}
+                            value={global ? fmtNum(global.countExitParcClockings2) : "—"}
+                            icon={<span className="inline-block h-3 w-3 rounded-full" style={{ background: TYPES_COLORS[0] }} />}
+                        />
+
                         <StatCard
                             title={t("metrics.enterPark")}
                             value={global ? fmtNum(global.countEnterParcClockings) : "—"}
@@ -352,6 +349,10 @@ export default function PCCDashboard() {
                                             <div className="flex items-center justify-between">
                                                 <span>{t("metrics.exitPark")}</span>
                                                 <span>{fmtNum(stats.countExitParcClockings)}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span>{t("metrics.exitPark")}</span>
+                                                <span>{fmtNum(stats.countExitParcClockings2)}</span>
                                             </div>
                                             <div className="flex items-center justify-between">
                                                 <span>{t("metrics.enterPark")}</span>
