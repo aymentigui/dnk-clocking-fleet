@@ -243,8 +243,8 @@ export async function getClockingStatistics(
     });
 
     let filteredCounts = clockingCounts;
-    if (minClockings !== undefined && minClockings > 0) {
-      filteredCounts = clockingCounts.filter(c => c._count.id >= minClockings);
+    if (minClockings !== undefined && minClockings >= 0) {
+      filteredCounts = clockingCounts.filter(c => c._count.id === minClockings);
     }
 
     // Pagination
@@ -383,8 +383,8 @@ export async function getCourseStatistics(
     });
 
     let filteredCounts = completedCourseCounts;
-    if (minCourses !== undefined && minCourses > 0) {
-      filteredCounts = completedCourseCounts.filter(c => c._count.id >= minCourses);
+    if (minCourses !== undefined && minCourses >= 0) {
+      filteredCounts = completedCourseCounts.filter(c => c._count.id === minCourses);
     }
 
     // Pagination

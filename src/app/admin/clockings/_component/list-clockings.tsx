@@ -18,6 +18,10 @@ interface Clocking {
     deviceType: number;
     type: number;
     conducteur: any;
+    conducteur_name: string;
+    conducteur_matricule: string;
+    vehicle_matricule: string;
+    vehicle_id: string;
     status: string;
     park: string;
 }

@@ -113,7 +113,9 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
                 conducteur: clocking.conducteur,
                 status: clocking.status,
                 park: location,
-                conducteur_name: clocking.conducteur_name
+                conducteur_name: clocking.conducteur_name,
+                conducteur_id: clocking.conducteur_id,
+                vehicle_id: clocking.vehicle_id,
             };
         });
 
@@ -148,7 +150,7 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
             const exitedVehicleIds = exitedVehicles.map(v => v.vehicle_id);
             const enteredVehicles = await prisma.clocking.findMany({
                 where: {
-                    ...whereCondition,
+                    created_at: whereCondition.created_at,
                     type: 4,
                     vehicle_id: { in: exitedVehicleIds },
                 },
@@ -188,7 +190,8 @@ export async function getClockings(page: number, pageSize: number, searchDate?: 
                 exit_time: new Date(clocking.created_at).toLocaleString('fr-FR'),
                 exit_park: clocking.park?.name || 'Inconnu',
                 conducteur_name: clocking.conducteur ? `${clocking.conducteur.firstname} ${clocking.conducteur.lastname}`.trim() : undefined,
-                conducteur_matricule: clocking.conducteur?.matricule
+                conducteur_matricule: clocking.conducteur?.matricule,
+                conducteur_id: clocking.conducteur_id
             }));
 
             totalScannBusHaveExistedParkAndNotEntredRegion = scannBusHaveExistedParkAndNotEntredRegion.length;
@@ -425,8 +428,8 @@ export async function getClockingsVehicleNow(vehicle_id?: string, park?: string,
                     lt: date ? new Date(new Date(date).setHours(23, 59, 59, 999)) : new Date(new Date().setHours(23, 59, 59, 999)),
                 },
                 type: 4,
-                ...conditions.park_id ? { park_id: conditions.park_id } : {},
-                ...conditions.region_id ? { region_id: conditions.region_id } : {},
+                // ...conditions.park_id ? { park_id: conditions.park_id } : {},
+                // ...conditions.region_id ? { region_id: conditions.region_id } : {},
                 vehicle_id: { in: exitedVehicleIds },
             },
             distinct: ['vehicle_id'],

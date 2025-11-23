@@ -14,6 +14,8 @@ interface Clocking {
     conducteur_name?: string;
     status: string;
     park: string;
+    vehicle_id: string;
+    conducteur_id?: string;
 }
 
 interface ClockingsTableProps {
@@ -136,7 +138,7 @@ export function ClockingsTable({ clockings, loading }: ClockingsTableProps) {
                                 {clocking.created_at}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                {clocking.vehicle}
+                               <a href={"/admin/vehicles/"+clocking.vehicle_id}> {clocking.vehicle}</a>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                 {clocking.device?.code || "-"}
@@ -161,7 +163,7 @@ export function ClockingsTable({ clockings, loading }: ClockingsTableProps) {
                                 </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                {(clocking.conducteur_name ?? "") + (clocking.conducteur_matricule ?? "") || "-"}
+                               <a href={"/admin/conducteurs/"+clocking.conducteur_id}> {(clocking.conducteur_name ?? "") + (clocking.conducteur_matricule ?? "") || "-"}</a>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(clocking.status)}`}>
