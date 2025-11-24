@@ -58,7 +58,6 @@ export async function updateUser(id: string, data: any): Promise<{ status: numbe
 
         const result = userSchema.safeParse(data);
         if (!result.success) {
-            //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
 
@@ -143,7 +142,6 @@ export async function updateUser(id: string, data: any): Promise<{ status: numbe
 
         return { status: 200, data: { message: s("updatesuccess") } }
     } catch (error) {
-        console.log("An error occurred in updateUser")
         return { status: 500, data: { message: e("error") } }
     }
 }

@@ -311,7 +311,6 @@ export async function getClockingsVehicle(vehicle_id: string, page: number, page
 
         return { status: 200, data: clockingFormatted, count: vehicleClockingsCount };
     } catch (error) {
-        console.log("An error occurred in getClockingsVehicle" + error);
         return { status: 500, data: { message: e("error") }, count: 0 };
     }
 }
@@ -463,7 +462,6 @@ export async function getClockingsVehicleNow(vehicle_id?: string, park?: string,
         };
 
     } catch (error) {
-        console.log("An error occurred in getClockingsVehicleNow" + error);
         const e = await getTranslations('Error');
         return { status: 500, data: { message: e("error") } };
     }

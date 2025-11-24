@@ -550,6 +550,7 @@
         "vininvalid": "VIN is invalid",
         "selectpark": "Select parc",
         "selectregion": "Select region",
+        "selectlastregion": "Select last region",
         "selectvehicles": "Select vehicles",
         "deletevehicles": "Delete vehicles",
         "confermationdelete": "Are you absolutely sure?",

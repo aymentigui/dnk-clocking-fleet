@@ -13,7 +13,7 @@ export function withAuth<User = any>(
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return NextResponse.json({ error: "Token manquant" }, { status: 401 });
         }
-
+        
         const token = authHeader.split(" ")[1];
         const decoded = decrypt(token) as User | null;
 

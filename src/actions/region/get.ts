@@ -21,7 +21,6 @@ export async function getRegions(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: regions };
     } catch (error) {
-        console.log("An error occurred in getRegions");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -43,7 +42,6 @@ export async function getRegion(id: string): Promise<{ status: number, data: any
         const device = await prisma.region.findUnique({ where: { id } });
         return { status: 200, data: device };
     } catch (error) {
-        console.log("An error occurred in getRegion");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -72,7 +70,6 @@ export async function getRegionsWithIds(regionIds: string[]): Promise<{ status: 
 
         return { status: 200, data: regions };
     } catch (error) {
-        console.log("Error fetching getRegionsWithIds:", error);
         return { status: 500, data: null };
     }
 }
@@ -89,7 +86,6 @@ export async function getRegionsAdmin(): Promise<{ status: number, data: any }> 
         const regions = await prisma.region.findMany();
         return { status: 200, data: regions };
     } catch (error) {
-        console.log("An error occurred in getRegionsPublic");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -116,7 +112,6 @@ export async function getRegionsName(id: string) {
 
         return name
     } catch (error) {
-        console.log("An error occurred in getRegionsPublic");
         return ""
     }
 }

@@ -27,7 +27,6 @@ export async function createConducteur(data: any) {
         const result = schema.safeParse(data);
 
         if (!result.success) {
-            //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { matricule, firstname, lastname, phone } = result.data;
@@ -50,7 +49,6 @@ export async function createConducteur(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.log("An error occurred in createconducteur" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -84,8 +82,6 @@ export async function createConducteurs(data: any) {
 
         return { status: 200, data: { message: s("createsuccess"), conducteurs: conducteursResuls } };
     } catch (error) {
-        //@ts-ignore
-        console.log("An error occurred in createconducteurs" + error.message);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -127,8 +123,6 @@ const addconducteur = async (data: any, userSchema: any, session: any, s: any) =
 
         return { status: 200, data: data };
     } catch (error) {
-        // @ts-ignore
-        console.log("An error occurred in addconducteur" + error.message);
         return { status: 500, data: { message: s("createfail"), conducteur: data } }
     };
 }

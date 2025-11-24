@@ -91,7 +91,6 @@ export default function ListRegions() {
       }
 
     } catch (error) {
-      console.log("Error fetching regions:", error);
     } finally {
       setIsLoading(false);
     }

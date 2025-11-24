@@ -62,6 +62,8 @@ export default function ListVehicles() {
   const [searchRegion, setSearchRegion] = useState("");
   const [parks, setParks] = useState([])
   const [regions, setRegions] = useState([])
+  const [lastRegion, setLastRegion] = useState<string>("")
+  const [inPark, setInPark] = useState<string>("")
 
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
@@ -199,7 +201,7 @@ export default function ListVehicles() {
 
   useEffect(() => {
     fetchDevices();
-  }, [page, debouncedSearchQuery, mounted, pageSize, searchPark, searchRegion]);
+  }, [page, debouncedSearchQuery, mounted, pageSize, searchPark, searchRegion, lastRegion,inPark]);
 
   const fetchDevices = async () => {
     setData([]);
@@ -207,19 +209,17 @@ export default function ListVehicles() {
     try {
       if (!origin) return
       setIsLoading(true);
-      const response = await getVehicles(page, pageSize, debouncedSearchQuery, searchPark, searchRegion);
-      console.log(response)
+      const response = await getVehicles(page, pageSize, debouncedSearchQuery, searchPark, searchRegion, lastRegion === "0" ? undefined : lastRegion, inPark === "true" ? true : inPark === "false" ? false : undefined);
       if (response.status === 200) {
         setData(response.data);
       }
 
-      const countResponse = await getCountVehicles(debouncedSearchQuery, searchPark, searchRegion);
+      const countResponse = await getCountVehicles(debouncedSearchQuery, searchPark, searchRegion, lastRegion === "0" ? undefined : lastRegion, inPark === "true" ? true : inPark === "false" ? false : undefined);
       if (countResponse.status === 200) {
         setCount(countResponse.data);
       }
       setIsLoading(false);
     } catch (error) {
-      console.log("Error fetching devices:", error);
     } finally {
       setIsLoading(false);
     }
@@ -502,10 +502,47 @@ export default function ListVehicles() {
                 }
               />
             </div>
+
+            <div className="w-48">
+              <SelectSearchFetch
+                value={inPark}
+                onChange={(val) => { setInPark(val) }}
+                label={translate("in_park")}
+                placeholder={translate("in_park")}
+                options={
+                  [
+                    {
+                      value: "true",
+                      label: "Yes"
+                    },
+                    {
+                      value: "false",
+                      label: "Flase"
+                    }
+                  ]
+                }
+              />
+            </div>
+
+            <div className="w-48">
+              <SelectSearchFetch
+                value={lastRegion}
+                onChange={(val) => { setLastRegion(val) }}
+                label={translate("selectlastregion")}
+                placeholder={translate("selectlastregion")}
+                options={
+                  regions.map((region: any) => ({
+                    value: region.id,
+                    label: region.name
+                  }))
+                }
+              />
+            </div>
+
           </div>
 
           {/* Composant de recherche */}
-          <div className="flex-1 max-w-md">
+          <div className="min-w-60 max-w-md">
             <SearchTable
               page={page}
               debouncedSearchQuery={debouncedSearchQuery}
@@ -559,6 +596,12 @@ export default function ListVehicles() {
                     {translate("region")} 2
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    {translate("in_park")}
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    {translate("status")}
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     {translateSystem("actions")}
                   </th>
                 </tr>
@@ -601,6 +644,12 @@ export default function ListVehicles() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                         {vehicle.region2}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                        {vehicle.inpark === true ? "Yes" : "No"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                        {vehicle.status}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="flex gap-2">

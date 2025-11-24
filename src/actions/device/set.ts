@@ -18,6 +18,7 @@ export async function createDevice(data: any) {
         password: z.string().min(6, u("password6")),
         park: z.string().optional(),
         region: z.string().optional(),
+        allregion: z.array(z.string()).optional(),
         entreprise: z.string().optional(),
         type: z.number().optional(),
     });
@@ -37,8 +38,7 @@ export async function createDevice(data: any) {
         if (!result.success) {
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { code, username, password, park, type, region, entreprise } = result.data;
-        console.log(type, region)
+        const { code, username, password, park, type, region, entreprise, allregion } = result.data;
         const codeExists = await prisma.device.findFirst({ where: { code } });
         if (codeExists) {
             return { status: 400, data: { message: u("codeexists") } };
@@ -145,6 +145,17 @@ export async function createDevice(data: any) {
             })
         }
 
+        if (allregion && allregion != null && allregion.length > 0 && device) {
+            await prisma.device.update({
+                where: {
+                    id: device.id
+                },
+                data: {
+                    all_region: allregion.join(",")
+                }
+            })
+        }
+
         if (entreprise && entreprise != null && entreprise != "null" && region != "" && entreprise.trim() != "" && device) {
             await prisma.device.update({
                 where: {
@@ -162,7 +173,6 @@ export async function createDevice(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.log("An error occurred in createDevice" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -202,7 +212,6 @@ export async function createDevices(data: any) {
         return { status: 200, data: { message: s("createsuccess"), devices: devicesResuls } };
     } catch (error) {
         //@ts-ignore
-        console.log("An error occurred in createDevices" + error.message);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -289,7 +298,7 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s: an
                 password: hashedPassword,
                 is_admin: false,
                 public: false,
-                email_verified:new Date(),
+                email_verified: new Date(),
             },
         });
 
@@ -354,8 +363,6 @@ const addDevice = async (data: any, userSchema: any, session: any, u: any, s: an
 
         return { status: 200, data: data };
     } catch (error) {
-        // @ts-ignore
-        console.log("An error occurred in addDevice" + error.message);
         return { status: 500, data: { message: s("createfail"), device: data } }
     };
 }

@@ -174,7 +174,10 @@ export async function createClocking(data: any) {
             case 3:
                 await prisma.vehicle.update({
                     where: { id: existingVehicle.id },
-                    data: { status: "exit_from_region" },
+                    data: {
+                        last_region: existingDevice.region_id,
+                        status: "exit_from_region"
+                    },
                 });
                 await prisma.conducteur.update({
                     where: { id: existingConducteur.id },
@@ -207,7 +210,10 @@ export async function createClocking(data: any) {
             case 4:
                 await prisma.vehicle.update({
                     where: { id: existingVehicle.id },
-                    data: { status: "entry_to_region" },
+                    data: {
+                        last_region: existingDevice.region_id,
+                        status: "entry_to_region"
+                    },
                 });
                 await prisma.conducteur.update({
                     where: { id: existingConducteur.id },
@@ -232,7 +238,7 @@ export async function createClocking(data: any) {
                         data: {
                             clocking_end: clocking.id,
                             end_date: new Date(),
-                            waiting:false,
+                            waiting: false,
                             end_station: existingDevice.region_id,
                         },
                     });
@@ -265,13 +271,48 @@ export async function createClocking(data: any) {
             )
         }
 
+        if (!existingVehicle.region_id && (data.type === 3 || data.type === 4)) {
+            await prisma.vehicle.update({
+                data: {
+                    region_id: existingDevice.region_id
+                },
+                where: {
+                    id: existingVehicle.id
+                }
+            })
+            await prisma.vehicle_region.create({
+                data: {
+                    added_from: existingDevice.user_id,
+                    vehicle_id: existingVehicle.id,
+                    region_id: existingDevice.region_id,
+                    type: "1"
+                }
+            })
+        } else if (!existingVehicle.region_id2 && (data.type === 3 || data.type === 4)) {
+            await prisma.vehicle.update({
+                data: {
+                    region_id2: existingDevice.region_id
+                },
+                where: {
+                    id: existingVehicle.id
+                }
+            })
+            await prisma.vehicle_region.create({
+                data: {
+                    added_from: existingDevice.user_id,
+                    vehicle_id: existingVehicle.id,
+                    region_id: existingDevice.region_id,
+                    type: "2"
+                }
+            })
+        }
+
         const conducteur_name = `${existingConducteur?.firstname ?? ''} ${existingConducteur?.lastname ?? ''}`.trim();
         const vehicle = [existingVehicle?.matricule, existingVehicle?.model, existingVehicle?.brand]
             .filter(Boolean)
             .join(' --- ') || 'N/A';
         return { status: 200, data: { message: "تم الاستقبال بنجاج", conducteur_name: conducteur_name, vehicle: vehicle } };
     } catch (error) {
-        // console.log("An error occurred in createColocking" + error);
         return { status: 500, data: { message: "حدث مشكل" } };
     }
 }
@@ -306,7 +347,6 @@ export async function createNotificationBadClocking(existingVehicle: any) {
         //                     "La véhicule " + existingVehicle.matricule + "(de parc :" + existingVehicle?.park?.name + " et parc :" + existingVehicle?.region?.name + ")" + " vient de passer un pointage incorrect" + (existingDevice.park ? " dans la parc " + existingDevice.park.name + "(" + existingDevice.park.address + ")" : existingDevice.region ? " dans la region " + existingDevice.region.name + "(" + existingDevice.region.address + ")" : " avec un appareil qui n'a pas de parc et pas de région")
         //                 )
         //             } catch (erreur) {
-        //                 // console.log("error sendig mail analyse to" + email.email)
         //             }
         //         }
         //     })

@@ -111,7 +111,6 @@ export default function FileUploadForm({
     try {
       handleUpload(values.files)
     } catch (error) {
-      console.log('Error uploading files:', error)
     } finally {
       setUploading(false)
     }
@@ -141,7 +140,6 @@ export default function FileUploadForm({
       const config = {
         onUploadProgress: (progressEvent: any) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          //console.log(percentCompleted);
         }
       }
 
@@ -150,7 +148,6 @@ export default function FileUploadForm({
           toast.success("File uploaded successfully")
           form.reset()
         } else {
-          //console.log(res.data)
           res.data.forEach((file: any) => {
             file.status !== 200 && toast.error(file.data.message)
           })

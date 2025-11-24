@@ -11,7 +11,6 @@ export async function getUserByid(id: string): Promise<{ status: number, data: a
         }
         return { status: 200, data: user };
     } catch (error) {
-        console.log("An error occurred in getUserByid");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -27,7 +26,6 @@ export async function getUserByEmailOrUsername(emailOrUsername: string): Promise
         }
         return { status: 200, data: user };
     } catch (error) {
-        console.log("An error occurred in getUserByid");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -57,7 +55,6 @@ export async function findExistingSession(userId: string, deviceName: string, de
         });
         return existingSession;
     } catch (error) {
-        console.log("An error occurred in findExistingSession");
         return null;
     }
 }
@@ -79,7 +76,6 @@ export async function createNewSession(userId: string, sessionToken: string, dev
         });
         return newSession;
     } catch (error) {
-        console.log("An error occurred in createNewSession");
         return null;
     }   
 }

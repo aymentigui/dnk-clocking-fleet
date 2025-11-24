@@ -36,7 +36,7 @@ export default function VehicleHeader({ vehicleDetails, statistics }: VehicleHea
         <div className="space-y-4">
             {/* Back Button */}
             <div>
-                <Link href="/dashboard/vehicles">
+                <Link href="/admin/vehicles">
                     <Button variant="outline" size="sm" className="gap-2">
                         <ArrowLeft className="h-4 w-4" />
                         {t('back')}

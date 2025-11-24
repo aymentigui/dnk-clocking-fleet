@@ -16,10 +16,11 @@ export async function UpdateDevice(id: string, data: any) {
             code: z.string().min(1, u("coderequired")),
             username: z.string().min(1, u("usernamerequired")).refine(username => !username.includes(' '), {
                 message: u("usernamecontainspace")
-            }),            password: z.string().min(6, u("password6")),
+            }), password: z.string().min(6, u("password6")),
             park: z.string().optional(),
             region: z.string().optional(),
             entreprise: z.string().optional(),
+            allregion: z.array(z.string()).optional(),
             type: z.number().optional(),
         });
 
@@ -36,10 +37,9 @@ export async function UpdateDevice(id: string, data: any) {
         const result = schema.safeParse(data);
 
         if (!result.success) {
-            //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
-        const { code, username, password, park, type, region, entreprise } = result.data;
+        const { code, username, password, park, type, region, entreprise, allregion } = result.data;
 
         const deviceExists = await prisma.device.findFirst({ where: { id } });
 
@@ -74,12 +74,12 @@ export async function UpdateDevice(id: string, data: any) {
         if (emailExists) {
             return { status: 400, data: { message: u("usernameexists") } };
         }
-        if (park && park!=null && park!="null" && park != "" && park.trim() != "") {
+        if (park && park != null && park != "null" && park != "" && park.trim() != "") {
             const parkExists = await prisma.park.findFirst({ where: { id: park } });
 
             if (!parkExists) {
                 return { status: 400, data: { message: u("parknotexist") } };
-            }else{
+            } else {
                 await prisma.device.update({
                     where: {
                         id
@@ -93,7 +93,7 @@ export async function UpdateDevice(id: string, data: any) {
                     }
                 })
             }
-        }else{
+        } else {
             await prisma.device.update({
                 where: {
                     id
@@ -106,12 +106,12 @@ export async function UpdateDevice(id: string, data: any) {
             })
         }
 
-        if (region && region!=null && region!="null" && region != "" && region.trim() != "")  {
+        if (region && region != null && region != "null" && region != "" && region.trim() != "") {
             const regionExists = await prisma.region.findFirst({ where: { id: region } });
 
             if (!regionExists) {
                 return { status: 400, data: { message: u("regionnotexist") } };
-            }else{
+            } else {
                 await prisma.device.update({
                     where: {
                         id
@@ -125,7 +125,7 @@ export async function UpdateDevice(id: string, data: any) {
                     }
                 })
             }
-        }else{
+        } else {
             await prisma.device.update({
                 where: {
                     id
@@ -138,12 +138,23 @@ export async function UpdateDevice(id: string, data: any) {
             })
         }
 
-        if (entreprise && entreprise!=null && entreprise!="null" && region != "" && entreprise.trim() != "")  {
+        if (allregion && allregion != null) {
+            await prisma.device.update({
+                where: {
+                    id: id
+                },
+                data: {
+                    all_region: allregion.join(",")
+                }
+            })
+        }
+
+        if (entreprise && entreprise != null && entreprise != "null" && region != "" && entreprise.trim() != "") {
             const entrepriseExists = await prisma.entreprise.findFirst({ where: { id: entreprise } });
 
             if (!entrepriseExists) {
                 return { status: 400, data: { message: u("regionnotexist") } };
-            }else{
+            } else {
                 await prisma.device.update({
                     where: {
                         id
@@ -157,7 +168,7 @@ export async function UpdateDevice(id: string, data: any) {
                     }
                 })
             }
-        }else{
+        } else {
             await prisma.device.update({
                 where: {
                     id
@@ -206,8 +217,6 @@ export async function UpdateDevice(id: string, data: any) {
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        // @ts-ignore
-        //console.log("An error occurred in UpdateDeive"+error.message);
         return { status: 500, data: { message: e("error") } };
     }
 }

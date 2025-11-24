@@ -47,7 +47,6 @@ export async function deletePark(ids: string[]): Promise<{ status: number, data:
                             ids.length > 1 ? "Des parcs ont été supprimés" : "Un parc a été supprimé",   
                             (ids.length > 1 ? "Des parcs ont été supprimés" : "Un parc a été supprimé") + " par " + userName + "\n Nombre de parcs supprimé : " + ids.length + "\n Parcs supprimé : " + parcs.map(park => "\n Parc : " + park.name + " " + park.address + " " + park.description),                        )
                     } catch (erreur) {
-                        console.log("error sendig mail analyse to" + email.email)
                     }
                 }
             })
@@ -55,7 +54,6 @@ export async function deletePark(ids: string[]): Promise<{ status: number, data:
 
         return { status: 200, data: { message: s("deletesuccess") } };
     } catch (error) {
-        console.log("An error occurred in deletePark");
         return { status: 500, data: { message: e("error") } };
     }
 }

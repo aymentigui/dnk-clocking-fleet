@@ -549,6 +549,7 @@
         "vininvalid": "Le VIN est invalide",
         "selectpark": "Sélectionner une parc",
         "selectregion": "Sélectionner une région",
+        "selectlastregion": "Sélectionner derniere région",
         "selectvehicles": "Sélectionner des véhicules",
         "deletevehicles": "Supprimer des véhicules",
         "confermationdelete": "Etes-vous sûr de vouloir supprimer?",

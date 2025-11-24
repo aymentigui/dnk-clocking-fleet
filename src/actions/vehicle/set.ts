@@ -266,7 +266,6 @@ async function addSingleVehicle(
         return { status: 200, data: data };
 
     } catch (error) {
-        console.log("An error occurred in addVehicle:", error);
         return { status: 500, data: { message: translations.system("createfail"), vehicle: data } };
     }
 }
@@ -338,7 +337,6 @@ export async function createVehicle(data: any) {
         return { status: 200, data: { message: s("createsuccess") } };
 
     } catch (error) {
-        console.log("An error occurred in createVehicle:", error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -382,7 +380,6 @@ export async function createVehicles(data: any) {
         };
 
     } catch (error) {
-        console.log("An error occurred in createVehicles:", error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }

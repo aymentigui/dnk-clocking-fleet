@@ -22,7 +22,6 @@ export async function getSession(): Promise<{ status: number, data: any }> {
         }
         return { status: 200, data: session };
     } catch (error) {
-        console.log("An error occurred in getSession");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -73,7 +72,6 @@ export async function verifySession(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: session }
     } catch (error) {
-        console.log("An error occurred in verifySession");
         return { status: 500, data: { message: e("error") } }
     }
 }
@@ -131,7 +129,6 @@ export async function getUserPermissions(id: string): Promise<{ status: number, 
         return { status: 200, data: permissions };
 
     } catch (error) {
-        console.log("An error occurred in getUserPermissions");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -148,7 +145,6 @@ export async function getUserRolesNames(id: string): Promise<{ status: number, d
 
         return { status: 200, data: roles };
     } catch (error) {
-        console.log("An error occurred in getUserRoles");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -164,7 +160,6 @@ export async function getUserRolesId(id: string): Promise<{ status: number, data
 
         return { status: 200, data: roles };
     } catch (error) {
-        console.log("An error occurred in getUserRoles");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -204,7 +199,6 @@ export async function withAuthorizationPermission(
         }
         return { status: 200, data: { hasPermission: true } };
     } catch (error) {
-        console.log("An error occurred in withAuthorization");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -233,7 +227,6 @@ export async function withAuthorizationRole(
         }
         return { status: 200, data: true };
     } catch (error) {
-        console.log("An error occurred in withAuthorization");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -253,7 +246,6 @@ export async function ISADMIN(id?: string): Promise<{ status: number, data: any 
         const is_admin = await prisma.user.findUnique({ where: { id: userId } });
         return { status: 200, data: { is_admin: is_admin?.is_admin ? true : false } };
     } catch (error) {
-        console.log("An error occurred in ISADMIN");
         return { status: 500, data: { message: e("error") } };
     }
 }

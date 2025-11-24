@@ -25,7 +25,6 @@ export async function getSessions(user:user): Promise<{ status: number, data: an
 
         return { status: 200, data: sessionsFormatted }
     } catch (error) {
-        console.log("An error occurred in getInfo");
         return { status: 500, data: { message: e("getInfo") } }
     }
 }

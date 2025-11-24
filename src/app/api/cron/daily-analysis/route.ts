@@ -124,35 +124,6 @@ export async function GET(request: NextRequest) {
             })),
         }
 
-        // Afficher les résultats dans la console
-        // console.log("=== ANALYSE QUOTIDIENNE DES VÉHICULES ===")
-        // console.log(`Date d'analyse: ${analysisResults.date}`)
-        // console.log("\n1. Véhicules sans pointage:")
-        // console.log(`Total: ${analysisResults.vehiclesWithoutClocking.length}`)
-        // console.log(analysisResults.vehiclesWithoutClocking)
-
-        // console.log("\n2. Véhicules avec pointages multiples de type 0 ou 1:")
-        // console.log(`Total: ${analysisResults.vehiclesWithMultipleClockings.length}`)
-        // console.log(analysisResults.vehiclesWithMultipleClockings)
-
-        // console.log("\n3. Véhicules avec pointage type 0 sans type 1:")
-        // console.log(`Total: ${analysisResults.vehiclesWithType0WithoutType1.length}`)
-        // console.log(analysisResults.vehiclesWithType0WithoutType1)
-
-        // console.log("\n4. Véhicules avec pointage type 0 et 1 sans type 3:")
-        // console.log(`Total: ${analysisResults.vehiclesWithType0And1WithoutType3.length}`)
-        // console.log(analysisResults.vehiclesWithType0And1WithoutType3)
-
-        // console.log("\n5. Véhicules avec pointage type 1 sans type 0:")
-        // console.log(`Total: ${analysisResults.vehiclesWithType1WithoutType0.length}`)
-        // console.log(analysisResults.vehiclesWithType1WithoutType0)
-
-        // console.log("\n6. Véhicules avec pointage type 3 sans type 0 ou 1:")
-        // console.log(`Total: ${analysisResults.vehiclesWithType3WithoutType0Or1.length}`)
-        // console.log(analysisResults.vehiclesWithType3WithoutType0Or1)
-
-        // Vous pourriez également sauvegarder ces résultats dans une base de données
-
         const title = `Analyse quotidienne des véhicules du ${new Date().toLocaleDateString()}`
         const content = `Analyse quotidienne des véhicules du ${new Date().toLocaleDateString()}
 \n1. Véhicules avec pointages multiples de type 0 ou 1: \tTotal: ${analysisResults.vehiclesWithMultipleClockings.length} \n${analysisResults.vehiclesWithMultipleClockings.map((v) => `\t${v.matricule}  - ${v.brand} \t${v.clockings.map((c) => `\t\tType ${c.type} - ${c.created_at}`).join("\n\t")} `).join("\n\t")}
@@ -192,7 +163,6 @@ export async function GET(request: NextRequest) {
                                 </html>`
                         )
                     } catch (erreur) {
-                        console.log("error sendig mail analyse to" + email.email)
                     }
                 }
             })
@@ -212,7 +182,6 @@ export async function GET(request: NextRequest) {
             },
         })
     } catch (error) {
-        console.log("Erreur lors de l'analyse quotidienne:", error)
         return Response.json(
             {
                 success: false,

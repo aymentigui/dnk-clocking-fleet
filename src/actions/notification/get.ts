@@ -40,7 +40,6 @@ export async function getNotifications(page: number): Promise<{ status: number, 
         
         return { status: 200, data: formattedNotifications, count: notificationCount };
     } catch (error) {
-        console.log("An error occurred in getNotifications");
         return { status: 500, data: { message: e("error") }, count: 0 };
     }
 }
@@ -71,7 +70,6 @@ export async function getNotification(id: string): Promise<{ status: number, dat
             view: notification.view_by?notification.view_by.includes(session.data.user.id):false,
         } };
     } catch (error) {
-        console.log("An error occurred in getNotification");
         return { status: 500, data: { message: e("error") } };
     }
 }

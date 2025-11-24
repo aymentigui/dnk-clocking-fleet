@@ -18,7 +18,6 @@ const getEmailTemplate = async (templateName: string): Promise<string> => {
         const templatePath = path.join(process.cwd(), 'templates', `${templateName}.html`);
         return await fs.readFile(templatePath, 'utf-8');
     } catch (error) {
-        console.log(`Erreur lors de la lecture du template ${templateName}:`, error);
         throw new Error(`Impossible de charger le template d'email: ${templateName}`);
     }
 };
@@ -34,7 +33,6 @@ const replaceTemplateVariables = (template: string, variables: Record<string, st
 
 export async function sendEmail(to: string, subject: string, html: string) {
     if (!process.env.EMAIL_HOST || !process.env.EMAIL_PORT || !process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.log('Email configuration is missing')
         return
     }
     await transporter.sendMail({
@@ -63,7 +61,6 @@ export async function sendCode(data: any): Promise<{ status: number; message: st
 
         return { status: 200, message: 'Email envoyé avec succès' };
     } catch (error) {
-        console.log('Erreur lors de l\'envoi de l\'email de code:', error);
         return { status: 500, message: `Erreur: ${(error as Error).message}` };
     }
 }
@@ -84,7 +81,6 @@ export async function send2FACode(data: any): Promise<{ status: number; message:
 
         return { status: 200, message: 'Email envoyé avec succès' };
     } catch (error) {
-        console.log('Erreur lors de l\'envoi de l\'email de code:', error);
         return { status: 500, message: `Erreur: ${(error as Error).message}` };
     }
 }

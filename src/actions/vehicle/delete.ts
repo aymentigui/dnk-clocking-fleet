@@ -27,7 +27,6 @@ export async function deleteVehicles(ids: string[]): Promise<{ status: number, d
         });
         return { status: 200, data: { message: s("deletesuccess") } };
     } catch (error) {
-        console.log("An error occurred in deleteVehicles" + error);
         return { status: 500, data: { message: e("error") } };
     }
 }

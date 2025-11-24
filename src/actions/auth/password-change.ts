@@ -94,7 +94,6 @@ export async function resetPasswordWithoutConnection(data: { email: string, pass
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.log("An error occurred in resetPasswordWithoutConnection");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -154,7 +153,6 @@ export async function getConfirmationCodePasswordChange(emailOrUsername: string)
 
         return { status: 200, data: { message: s("emailsent") } };
     } catch (error) {
-        console.log("An error occurred in getConfirmationCode");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -188,7 +186,6 @@ export async function createOrUpdateResetPasswordConfermation(id: string): Promi
             return { status: 200, data: verificationToken };
         }
     } catch (error) {
-        console.log("An error occurred in createOrUpdateResetPasswordConfermation");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -219,7 +216,6 @@ export async function incrementResetAttempt(id: string): Promise<{ status: numbe
         }
         return { status: 404, data: { message: "Not found" } };
     } catch (error) {
-        console.log("An error occurred in incrementResetAttempt");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -241,7 +237,6 @@ export async function createResetPasswordConfermation(id: string): Promise<{ sta
         })
         return { status: 200, data: verificationToken };
     } catch (error) {
-        console.log("An error occurred in createResetPasswordConfermation");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -259,7 +254,6 @@ export async function getResetPasswordConfermation(id: string): Promise<{ status
         }
         return { status: 200, data: verificationToken };
     } catch (error) {
-        console.log("An error occurred in getResetPasswordConfermation");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -274,7 +268,6 @@ export async function deleteResetPasswordConfermation(id: string): Promise<{ sta
         })
         return { status: 200, data: verificationToken };
     } catch (error) {
-        console.log("An error occurred in deleteResetPasswordConfermation");
         return { status: 500, data: { message: e("error") } };
     }
 }

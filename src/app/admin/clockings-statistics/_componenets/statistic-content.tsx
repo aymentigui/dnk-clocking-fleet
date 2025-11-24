@@ -43,26 +43,20 @@ export default function StatisticsContent({
 
     const handleDateChange = useCallback(
         async (newDate: string) => {
-            console.log('📅 Date changed to:', newDate);
             setSelectedDate(newDate);
             setIsLoading(true);
             setError(null);
 
             try {
                 const date = new Date(newDate);
-                console.log('🔄 Refreshing statistics...');
-
                 // Call the server action first
                 await onRefresh(date);
 
                 // Then fetch the new statistics
-                console.log('📊 Fetching new statistics...');
                 const newStats = await getRegionStatistics(date);
-                console.log('✅ Statistics updated:', newStats.length, 'regions');
 
                 setStatistics(newStats);
             } catch (error) {
-                console.error('❌ Error refreshing statistics:', error);
                 setError(error instanceof Error ? error.message : 'Error refreshing statistics');
             } finally {
                 setIsLoading(false);

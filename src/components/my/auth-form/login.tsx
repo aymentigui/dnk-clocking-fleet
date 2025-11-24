@@ -66,7 +66,6 @@ const LoginForm = () => {
             }
         } catch (error) {
             toast.error(s("unexpected_error"));
-            console.log(error);
         } finally {
             setLoading(false);
         }

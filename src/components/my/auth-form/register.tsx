@@ -68,7 +68,6 @@ const RegisterForm = () => {
             }
         } catch (error) {
             toast.error(s("unexpected_error") || "Une erreur inattendue est survenue")
-            console.log(error)
         } finally {
             setLoading(false)
         }

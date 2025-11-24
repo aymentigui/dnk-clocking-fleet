@@ -98,7 +98,6 @@ const Courses = () => {
                 setEnterprises(enterprisesData.data || []);
                 setConductors(conductorsData.data || []);
             } catch (error) {
-                console.log('Error fetching filter data:', error);
             }
         };
 
@@ -170,7 +169,6 @@ const Courses = () => {
             setTotalCount(response.count || 0);
             setTotalRotations(response.totalRotations || 0);
         } catch (error) {
-            console.log('Error fetching courses:', error);
         } finally {
             setLoading(false);
         }

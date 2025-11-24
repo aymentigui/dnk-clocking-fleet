@@ -31,6 +31,7 @@ interface Device {
     parkId: string;
     region: string;
     regionId: string;
+    regionsSupervisor: string[];
 }
 
 const selectors = [
@@ -153,7 +154,6 @@ export default function DevicesPage() {
                 setRegions(regionsResponse.data);
             }
         } catch (error) {
-            console.log("Error loading filters data:", error);
         }
     };
 
@@ -168,14 +168,12 @@ export default function DevicesPage() {
             if (devicesResponse.status === 200) {
                 setDevices(devicesResponse.data);
             } else {
-                console.log("Error loading devices:", devicesResponse.data);
             }
 
             if (countResponse.status === 200) {
                 setTotalCount(countResponse.data);
             }
         } catch (error) {
-            console.log("Error loading devices:", error);
         } finally {
             setLoading(false);
         }
@@ -205,7 +203,6 @@ export default function DevicesPage() {
                 toast.error(e("error"));
             }
         } catch (error) {
-            console.log("Error deleting devices:", error);
             toast.error(e("error"));
         }
     };
@@ -222,7 +219,6 @@ export default function DevicesPage() {
                 toast.error(response.data.message || e("error"));
             }
         } catch (error) {
-            console.log("Error creating device:", error);
             toast.error(e("error"));
         } finally {
             setFormLoading(false);
@@ -244,7 +240,6 @@ export default function DevicesPage() {
                 toast.error(response.data.message || e("error"));
             }
         } catch (error) {
-            console.log("Error updating device:", error);
             toast.error(e("error"));
         } finally {
             setFormLoading(false);

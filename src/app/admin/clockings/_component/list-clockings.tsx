@@ -99,10 +99,8 @@ export default function ClockingsPage() {
                 setUniqueVehicles(response.uniqueVehicles);
                 setVehiclesWithoutEnteringRegion(response.scannBusHaveExistedParkAndNotEntredRegion || []);
             } else {
-                console.log("Error loading clockings:", response.data);
             }
         } catch (error) {
-            console.log("Error loading clockings:", error);
         } finally {
             setLoading(false);
         }
@@ -126,7 +124,6 @@ export default function ClockingsPage() {
                 setVehiclesWithoutEnteringRegion(formattedVehicles);
             }
         } catch (error) {
-            console.log("Error loading vehicles without entering region:", error);
         } finally {
             setLoadingVehiclesWithoutRegion(false);
         }

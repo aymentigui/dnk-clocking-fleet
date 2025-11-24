@@ -38,7 +38,6 @@ export async function getRoles(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: formattedRoles };
     } catch (error) {
-        console.log("An error occurred in getRoles");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -60,7 +59,6 @@ export async function getRole(id: string): Promise<{ status: number, data: any }
         const role = await prisma.role.findUnique({ where: { id } });
         return { status: 200, data: role };
     } catch (error) {
-        console.log("An error occurred in getRole");
         return { status: 500, data: { message: e("error") } };
     }
 }

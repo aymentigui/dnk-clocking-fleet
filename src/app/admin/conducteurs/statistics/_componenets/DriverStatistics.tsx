@@ -53,7 +53,6 @@ export function DriverStatistics() {
         try {
             const response = await getConducteursStatistics(period)
             const result = response.data;
-            console.log('Fetched statistics data:', result);
             setData(result);
         } catch (error) {
             console.error('Error fetching statistics:', error);

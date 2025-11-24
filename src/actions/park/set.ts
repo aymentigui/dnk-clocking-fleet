@@ -29,7 +29,6 @@ export async function createPark(data: any) {
         const result = schema.safeParse(data);
 
         if (!result.success) {
-            //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { name, description, address } = result.data;
@@ -50,7 +49,6 @@ export async function createPark(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.log("An error occurred in createPark" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -84,8 +82,6 @@ export async function createParks(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") , parks: parksResuls } };
     } catch (error) {
-        //@ts-ignore
-        console.log("An error occurred in createParks" + error.message);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -125,7 +121,6 @@ const addPark = async (data: any, userSchema: any, session: any, u:any, s:any) =
         return { status: 200, data: data };
     } catch (error) {
         // @ts-ignore
-        console.log("An error occurred in addPark" + error.message);
         return { status: 500, data: { message: s("createfail") , park : data} }
     };
 }

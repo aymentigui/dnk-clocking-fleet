@@ -68,7 +68,6 @@ export async function uploadFileDB(
 
         return { status: 200, data: { message: s("createsuccess"), file: fileCreated } };
     } catch (error) {
-        console.log("An error occurred in uploadFileDB" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }

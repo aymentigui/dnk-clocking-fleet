@@ -49,7 +49,6 @@ export const { handlers, auth, signIn, signOut } =
               token.session = session
 
           } catch (error) {
-            console.log("An error occurred in jwt");
           }
         }
         return token

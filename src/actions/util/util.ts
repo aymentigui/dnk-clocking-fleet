@@ -85,7 +85,6 @@ export function decrypt(encryptedText: string): string {
   const [ivHex, encrypted] = encryptedText.split(":")
   const iv = Buffer.from(ivHex, "hex")
   const key = getEncryptionKey()
-
   const decipher = createDecipheriv("aes-256-cbc", key, iv)
   let decrypted = decipher.update(encrypted, "hex", "utf8")
   decrypted += decipher.final("utf8")

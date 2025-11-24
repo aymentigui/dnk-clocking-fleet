@@ -90,7 +90,6 @@ export default function AddRoleForm({ permissions, roleId }: AddRoleFormProps) {
 
     } catch (error) {
       setError(e("error"));
-      console.log(error);
     }
   };
 

@@ -29,23 +29,15 @@ export async function getRegionStatistics(
         const dayStart = startOfDay(date);
         const dayEnd = endOfDay(date);
 
-        console.log('📊 Fetching statistics for date:', {
-            date: date.toISOString(),
-            dayStart: dayStart.toISOString(),
-            dayEnd: dayEnd.toISOString(),
-        });
-
         // Get all regions (not deleted)
         const regions = await prisma.region.findMany({
             where: { deleted_at: null },
         });
 
-        console.log(`📍 Found ${regions.length} regions`);
 
         const statistics: RegionStatistics[] = [];
 
         for (const region of regions) {
-            console.log(`\n🔍 Processing region: ${region.name} (${region.id})`);
 
             // Get ALL courses where start_station equals region.id
             const courses = await prisma.course.findMany({
@@ -61,17 +53,16 @@ export async function getRegionStatistics(
                 },
             });
 
-            console.log(`  ✓ Found ${courses.length} courses in region`);
 
             if (courses.length > 0) {
-                console.log('  Courses details:', courses.map(c => ({
-                    id: c.id,
-                    waiting: c.waiting,
-                    end_station: c.end_station,
-                    start_station: c.start_station,
-                    start_date: c.start_date,
-                    vehicle_id: c.vehicle_id,
-                })));
+                // console.log('  Courses details:', courses.map(c => ({
+                //     id: c.id,
+                //     waiting: c.waiting,
+                //     end_station: c.end_station,
+                //     start_station: c.start_station,
+                //     start_date: c.start_date,
+                //     vehicle_id: c.vehicle_id,
+                // })));
             }
 
             // Count courses by status
@@ -84,20 +75,12 @@ export async function getRegionStatistics(
                 (c) => c.end_station === null && c.waiting === false
             ).length;
 
-            console.log(`  Status breakdown:`, {
-                total: totalCourses,
-                pending: pendingCourses,
-                completed: completedCourses,
-                inProgress: inProgressCourses,
-            });
-
             // Get unique vehicles in this region (by start_station)
             const vehicleIds = new Set(courses.map(c => c.vehicle_id));
             const totalVehicles = vehicleIds.size;
             const averageCoursesPerVehicle =
                 totalVehicles > 0 ? totalCourses / totalVehicles : 0;
 
-            console.log(`  Vehicles: ${totalVehicles}, Average: ${averageCoursesPerVehicle.toFixed(2)}`);
 
             statistics.push({
                 regionId: region.id,
@@ -111,7 +94,6 @@ export async function getRegionStatistics(
             });
         }
 
-        console.log('\n✅ Statistics retrieved successfully');
         return statistics.sort((a, b) =>
             a.regionName.localeCompare(b.regionName)
         );
@@ -129,23 +111,15 @@ export async function getVehicleStatisticsByRegion(
         const dayStart = startOfDay(date);
         const dayEnd = endOfDay(date);
 
-        console.log(`\n🚗 Fetching vehicle statistics for region: ${regionId}`, {
-            date: date.toISOString(),
-            dayStart: dayStart.toISOString(),
-            dayEnd: dayEnd.toISOString(),
-        });
-
         // First verify region exists
         const region = await prisma.region.findUnique({
             where: { id: regionId, deleted_at: null },
         });
 
         if (!region) {
-            console.log(`❌ Region not found: ${regionId}`);
             return [];
         }
 
-        console.log(`✓ Region found: ${region.name}`);
 
         // Get all courses for this region (by start_station)
         const courses = await prisma.course.findMany({
@@ -160,8 +134,6 @@ export async function getVehicleStatisticsByRegion(
                 vehicle: true,
             },
         });
-
-        console.log(`✓ Found ${courses.length} courses in region`);
 
         // Group courses by vehicle
         const vehicleMap = new Map<string, VehicleStatistics>();
@@ -188,17 +160,14 @@ export async function getVehicleStatisticsByRegion(
         const result = Array.from(vehicleMap.values())
             .sort((a, b) => b.totalCourses - a.totalCourses);
 
-        console.log(`✓ Vehicles with courses: ${result.length}`);
         return result;
     } catch (error) {
-        console.error('❌ Error fetching vehicle statistics:', error);
         throw new Error('Failed to fetch vehicle statistics');
     }
 }
 
 export async function getAllRegions() {
     try {
-        console.log('\n📍 Fetching all regions...');
         const regions = await prisma.region.findMany({
             where: { deleted_at: null },
             select: {
@@ -208,7 +177,6 @@ export async function getAllRegions() {
             orderBy: { name: 'asc' },
         });
 
-        console.log(`✓ Found ${regions.length} regions`);
         return regions;
     } catch (error) {
         console.error('❌ Error fetching regions:', error);
@@ -270,7 +238,6 @@ export async function getDebugInfo(date: Date = new Date()) {
             },
         };
 
-        console.log('🔍 Debug Info:', debugInfo);
         return debugInfo;
     } catch (error) {
         console.error('❌ Error getting debug info:', error);

@@ -13,12 +13,10 @@ export async function getVerificationTokenByEmail(email: string): Promise<{ stat
             }
         })
         if (!verificationToken) {
-            //console.log('Verification token not found');
             return { status: 404, data: { message: e("error") } };
         }
         return { status: 200, data: verificationToken };
     } catch (error) {
-        console.log("An error occurred in getVerificationToken");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -37,12 +35,10 @@ export async function getVerificationTokenByToken(token: string): Promise<{ stat
             }
         )
         if (!verificationToken) {
-            //console.log('Verification token not found');
             return { status: 404, data: { message: e("error") } };
         }
         return { status: 200, data: verificationToken };
     } catch (error) {
-        console.log("An error occurred in getVerificationTokenByToken");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -59,7 +55,6 @@ export async function deleteVerificationTokenByEmail(email: string): Promise<{ s
         )
         return { status: 200, data: {} };
     } catch (error) {
-        console.log("An error occurred in getVerificationTokenByToken");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -87,8 +82,6 @@ export async function generateVerificationToken(email: string, minutes?: number)
         })
         return { status: 200, data: verificationToken };
     } catch (error) {
-        console.log("An error occurred in generateVerificationToken");
-
         return { status: 500, data: { message: e("error") } };
     }
 }

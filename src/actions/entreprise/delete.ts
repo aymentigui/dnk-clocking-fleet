@@ -28,7 +28,6 @@ export async function deleteEntreprise(ids: string[]): Promise<{ status: number,
         const successMessage = ids.length > 1 ? c("delete_success_plural") : c("delete_success");
         return { status: 200, data: { message: successMessage } };
     } catch (error) {
-        console.log("An error occurred in deleteentreprise");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -55,7 +54,6 @@ export async function deleteEntrepriseRoutes(ids: string[]): Promise<{ status: n
         const successMessage = ids.length > 1 ? c("delete_success_plural") : c("delete_success");
         return { status: 200, data: { message: successMessage } };
     } catch (error) {
-        console.log("An error occurred in deleteentrepriseRoute");
         return { status: 500, data: { message: e("error") } };
     }
 }

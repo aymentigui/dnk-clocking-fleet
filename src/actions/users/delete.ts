@@ -45,7 +45,6 @@ export async function deleteUsers(ids: string[]): Promise<{ status: number, data
         return { status: 200, data: { message: s('deletesuccess') } }
     } catch (error) {
         // @ts-ignore
-        console.log(error.message);
         return { status: 500, data: { message: e('error') } }
     }
 }

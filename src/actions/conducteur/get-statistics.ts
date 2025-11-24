@@ -51,7 +51,6 @@ export async function getConducteursStatistics(periodParms?: string): Promise<{ 
             }
         };
     } catch (error) {
-        console.log("An error occurred in getconducteursStatistics", error);
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -340,7 +339,6 @@ export async function getDailyDriverStats(days: number = 30) {
             data: dailyStats.reverse() // Du plus ancien au plus récent
         };
     } catch (error) {
-        console.log("An error occurred in getDailyDriverStats", error);
         return { status: 500, data: { message: e("error") } };
     }
 }

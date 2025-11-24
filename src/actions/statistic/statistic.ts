@@ -16,7 +16,6 @@ export async function getVehiclesCount(): Promise<{ status: number, data: any }>
 
         return { status: 200, data: count };
     } catch (error) {
-        console.log("Error fetching vehicles count:", error);
         return { status: 500, data: 0 };
     }
 }
@@ -33,7 +32,6 @@ export async function getParksCount(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: count };
     } catch (error) {
-        console.log("Error fetching parks count:", error);
         return { status: 500, data: 0 };
     }
 }
@@ -50,7 +48,6 @@ export async function getDevicesCount(): Promise<{ status: number, data: any }> 
 
         return { status: 200, data: count };
     } catch (error) {
-        console.log("Error fetching devices count:", error);
         return { status: 500, data: 0 };
     }
 }
@@ -80,7 +77,6 @@ export async function getUsersCount(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: count };
     } catch (error) {
-        console.log("Error fetching users count:", error);
         return { status: 500, data: 0 };
     }
 }
@@ -104,7 +100,6 @@ export async function getVehiclesNoParkCount(): Promise<{ status: number, data: 
 
         return { status: 200, data: count };
     } catch (error) {
-        console.log("Error fetching getVehiclesNoParkCount:", error);
         return { status: 500, data: 0 };
     }
 }
@@ -149,7 +144,6 @@ export async function getParkVehiclesCount(): Promise<{ status: number, data: an
 
         return { status: 200, data: vehicleCountByParkFormatted };
     } catch (error) {
-        console.log("Error fetching getVehiclesNoParkCount:", error);
         return { status: 500, data: 0 };
     }
 }

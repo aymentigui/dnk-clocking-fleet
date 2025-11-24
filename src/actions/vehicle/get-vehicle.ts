@@ -75,11 +75,8 @@ export async function getVehicleDetails(vehicleId: string): Promise<VehicleDetai
         });
 
         if (!vehicle) {
-            // console.log(`❌ Vehicle not found: ${vehicleId}`);
             return null;
         }
-
-        // console.log(`✅ Vehicle found: ${vehicle.matricule}`);
 
         return {
             id: vehicle.id,

@@ -334,7 +334,7 @@ export function ParksTable({
                                                         <div className="flex justify-center space-x-2">
                                                             {/* Bouton Modifier */}
                                                             {(session?.user?.permissions.includes("park_update") || session?.user?.is_admin) && (
-                                                                <Link href={`/admin/parks/edit/${park.id}`}>
+                                                                <Link href={`/admin/parks/${park.id}/edit`}>
                                                                     <Button
                                                                         variant="outline"
                                                                         size="sm"

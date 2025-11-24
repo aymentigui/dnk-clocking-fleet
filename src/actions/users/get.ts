@@ -78,7 +78,6 @@ export async function getUsers(page: number = 1, pageSize: number = 10, searchQu
 
         return { status: 200, data: formattedUsers };
     } catch (error) {
-        console.log("Error fetching users:", error);
         return { status: 500, data: null };
     }
 }
@@ -121,7 +120,6 @@ export async function getUsersPublic(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: formattedUsers };
     } catch (error) {
-        console.log("Error fetching users:", error);
         return { status: 500, data: null };
     }
 }
@@ -173,7 +171,6 @@ export async function getAllUsers(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: formattedUsers };
     } catch (error) {
-        console.log("Error fetching users:", error);
         return { status: 500, data: { message: e("badrequest") } };
     }
 }
@@ -229,7 +226,6 @@ export async function getUsersWithIds(userIds: string[]): Promise<{ status: numb
 
         return { status: 200, data: formattedUsers };
     } catch (error) {
-        console.log("Error fetching users:", error);
         return { status: 500, data: null };
     }
 }
@@ -254,7 +250,6 @@ export async function getUser(userId?: string): Promise<{ status: number, data: 
 
         return { status: 200, data: user };
     } catch (error) {
-        console.log("An error occurred in getUserByid");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -291,7 +286,6 @@ export async function getCountUsers(searchQuery?: string): Promise<{ status: num
         );
         return { status: 200, data: count };
     } catch (error) {
-        console.log("Error fetching count users:", error);
         return { status: 500, data: null };
     }
 }
@@ -305,7 +299,6 @@ export async function getUserByid(id: string): Promise<{ status: number, data: a
         }
         return { status: 200, data: user };
     } catch (error) {
-        console.log("An error occurred in getUserByid");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -323,7 +316,6 @@ export async function getUserByEmailOrUsername(emailOrUsername: string): Promise
         }
         return { status: 200, data: user };
     } catch (error) {
-        console.log("An error occurred in getUserByid");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -342,7 +334,6 @@ export async function getUserName(id:string){
         }
         return { status: 200, data: user.firstname+" "+ user.lastname };
     } catch (error) {
-        console.log("An error occurred in getUserByid");
         return { status: 500, data: "" };
     }
 }
@@ -359,7 +350,6 @@ export async function getUsersAdmin(){
         );
         return { status: 200, data: users};
     } catch (error) {
-        console.log("An error occurred in getUserByid");
         return { status: 500, data: "" };
     }
 }

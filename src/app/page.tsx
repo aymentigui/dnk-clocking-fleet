@@ -25,7 +25,6 @@ export default function Home() {
     //   },
     // }).then((res) => {
     //   if (res && res.status === 200) {
-    //     console.log("res", res.data);
     //   }
     // })
 

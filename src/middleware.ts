@@ -58,7 +58,6 @@ export default auth(async (req) => {
     if (isLogging) {
       const domainUrl = process.env.DOMAIN_URL;
       if (!domainUrl) {
-        console.log("DOMAIN_URL is not defined in the environment variables");
         throw new Error("DOMAIN_URL is not defined in the environment variables");
       }
       const redirectRes = NextResponse.redirect(`${domainUrl}/admin`);

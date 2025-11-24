@@ -21,7 +21,6 @@ export async function deleteRegion(ids: string[]): Promise<{ status: number, dat
 
         return { status: 200, data: { message: s("deletesuccess") } };
     } catch (error) {
-        console.log("An error occurred in deleteRegion");
         return { status: 500, data: { message: e("error") } };
     }
 }

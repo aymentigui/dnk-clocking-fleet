@@ -548,6 +548,7 @@
         "vininvalid": "رقم تعريف المركبة غير صالح",
         "selectpark": "اختر حظيرة",
         "selectregion": "اختر منطقة",
+        "selectlastregion": "اختر أخر منطقة",
         "selectvehicles": "اختر مركبات",
         "deletevehicles": "حذف المركبات",
         "confermationdelete": "هل أنت متأكد تماماً؟",

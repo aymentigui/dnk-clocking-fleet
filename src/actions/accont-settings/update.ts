@@ -40,7 +40,6 @@ export async function updateEmail(email: string): Promise<{ status: number, data
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.log("An error occurred in updateEmail");
         return { status: 500, data: { message: s("updatefail") } };
     }
 }
@@ -77,7 +76,6 @@ export async function updateUsername(username: string): Promise<{ status: number
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.log(s("updatefail"));
         return { status: 500, data: { message: 'An error occurred in updateUsername' } };
     }
 }
@@ -100,7 +98,6 @@ export async function updateTwoFactorConfermation(twoFactorConfermation: boolean
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.log("An error occurred in updateTwoFactorConfermation");
         return { status: 500, data: { message: s("updatefail") } };
     }
 }
@@ -146,7 +143,6 @@ export async function updatePassword(currentPassword: string, newPassword: strin
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.log("An error occurred in updatePassword");
         return { status: 500, data: { message: s("updatefail") } };
     }
 }
@@ -273,7 +269,6 @@ export async function updateImage(image: File): Promise<{ status: number, data: 
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.log(s("updatefail"));
         return { status: 500, data: { message: 'An error occurred in updateUsername' } };
     }
 }

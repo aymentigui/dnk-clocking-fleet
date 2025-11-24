@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 import { withAuthorizationPermission, verifySession } from "../permissions";
 
 
-export async function getVehicles(page: number = 1, pageSize: number = 10, searchQuery?: string, searchPark?: string, searchRegion?: string): Promise<{ status: number, data: any }> {
+export async function getVehicles(page: number = 1, pageSize: number = 10, searchQuery?: string, searchPark?: string, searchRegion?: string, lastRegion?: string, in_park?: boolean): Promise<{ status: number, data: any }> {
     const e = await getTranslations('Error');
     try {
         const session = await verifySession()
@@ -61,8 +61,20 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
                 }
             )
         }
+        if (in_park === true || in_park === false) {
+            // @ts-ignore
+            if (!searchConditions.AND)
+                // @ts-ignore
+                searchConditions.AND = []
+            // @ts-ignore
+            searchConditions.AND.push(
+                {
+                    in_park: in_park
+                }
+            )
+        }
 
-        const vehicles = await prisma.vehicle.findMany({
+        const vehicles1 = await prisma.vehicle.findMany({
             skip: skip, // Nombre d'éléments à sauter
             take: pageSize === 0 ? undefined : pageSize, // Nombre d'éléments à prendre
             where: searchConditions,
@@ -71,6 +83,8 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
                 park: true,
             }
         });
+
+        const vehicles = lastRegion ? vehicles1.filter((vehicle) => vehicle.last_region === lastRegion) : vehicles1
 
         // Récupérer toutes les régions nécessaires pour la deuxième région
         const regionIds2 = vehicles
@@ -103,6 +117,8 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
                 brand: vehicle.brand,
                 model: vehicle.model,
                 year: vehicle.year,
+                status: vehicle.status,
+                inpark: vehicle.in_park,
                 park: vehicle.park ? vehicle.park.name : "",
                 parkId: vehicle.park ? vehicle.park.id : "",
                 region: vehicle.region ? vehicle.region.name : "",
@@ -114,12 +130,11 @@ export async function getVehicles(page: number = 1, pageSize: number = 10, searc
 
         return { status: 200, data: vehiclesFormatted };
     } catch (error) {
-        console.log("Error fetching vehicles:", error);
         return { status: 500, data: null };
     }
 }
 
-export async function getCountVehicles(searchQuery?: string, searchPark?: string, searchRegion?: string): Promise<{ status: number, data: any }> {
+export async function getCountVehicles(searchQuery?: string, searchPark?: string, searchRegion?: string, lastRegion?: string, in_park?: boolean): Promise<{ status: number, data: any }> {
 
     const searchConditions = {}
     if ((searchQuery && searchQuery !== ""))
@@ -153,6 +168,18 @@ export async function getCountVehicles(searchQuery?: string, searchPark?: string
         // @ts-ignore
         searchConditions.AND.push({ region_id: searchRegion })
     }
+    if (in_park === true || in_park === false) {
+        // @ts-ignore
+        if (!searchConditions.AND)
+            // @ts-ignore
+            searchConditions.AND = []
+        // @ts-ignore
+        searchConditions.AND.push(
+            {
+                in_park: in_park
+            }
+        )
+    }
 
     const e = await getTranslations('Error');
     try {
@@ -164,9 +191,10 @@ export async function getCountVehicles(searchQuery?: string, searchPark?: string
             }
         });
 
-        return { status: 200, data: vehicles.length };
+        const count = lastRegion ? vehicles.filter((vehicle) => vehicle.last_region === lastRegion).length : vehicles.length
+
+        return { status: 200, data: count };
     } catch (error) {
-        console.log("Error fetching count vehicles:", error);
         return { status: 500, data: null };
     }
 }
@@ -187,7 +215,6 @@ export async function getVehiclesAll(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: vehicles };
     } catch (error) {
-        console.log("An error occurred in getVehiclesAll");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -206,7 +233,6 @@ export async function getVehiclesAllMatrciule(): Promise<{ status: number, data:
 
         return { status: 200, data: vehicleFormatted };
     } catch (error) {
-        console.log("An error occurred in getVehiclesAllMatricles");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -259,7 +285,6 @@ export async function getVehicle(id: string): Promise<{ status: number, data: an
 
         return { status: 200, data: vehicleFormatted };
     } catch (error) {
-        console.log("An error occurred in getvehicle:", error);
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -285,7 +310,6 @@ export async function getVehiclesWithIds(vehicleIds: string[]): Promise<{ status
 
         return { status: 200, data: devices };
     } catch (error) {
-        console.log("Error fetching getVehiclesWithIds:", error);
         return { status: 500, data: null };
     }
 }
@@ -309,7 +333,6 @@ export async function getVehiclesMatriculeWithIds(vehicleIds: string[]): Promise
 
         return { status: 200, data: vehiclesFormatted };
     } catch (error) {
-        console.log("Error fetching getVehiclesMatriclesWithIds:", error);
         return { status: 500, data: null };
     }
 }
@@ -372,7 +395,6 @@ export async function getVehicleParks(id: string, page: number, pageSize: number
 
         return { status: 200, data: vehicleParksFormatted, count: vehicleParksCount };
     } catch (error) {
-        console.log("An error occurred in getVehicleParks:", error);
         return { status: 500, data: { message: e("error") }, count: 0 };
     }
 }
@@ -434,7 +456,6 @@ export async function getVehicleRegions(id: string, page: number, pageSize: numb
 
         return { status: 200, data: vehicleRegionsFormatted, count: vehicleRegionCount };
     } catch (error) {
-        console.log("An error occurred in getVehicleRegion:", error);
         return { status: 500, data: { message: e("error") }, count: 0 };
     }
 }

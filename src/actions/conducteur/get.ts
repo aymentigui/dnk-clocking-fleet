@@ -52,7 +52,6 @@ export async function getConducteurs(page: number = 1, pageSize: number = 10, se
 
         return { status: 200, data: conducteurs, totalCount, totalPages };
     } catch (error) {
-        console.log("An error occurred in getconducteurs");
         return { status: 500, data: { message: e("error") }, totalCount: 0, totalPages: 0 };
     }
 }
@@ -74,7 +73,6 @@ export async function getConducteur(id: string): Promise<{ status: number, data:
         const device = await prisma.conducteur.findUnique({ where: { id } });
         return { status: 200, data: device };
     } catch (error) {
-        console.log("An error occurred in getconducteur");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -103,7 +101,6 @@ export async function getConducteursWithIds(conducteurIds: string[]): Promise<{ 
 
         return { status: 200, data: conducteurs };
     } catch (error) {
-        console.log("Error fetching getconducteursWithIds:", error);
         return { status: 500, data: null };
     }
 }
@@ -122,7 +119,6 @@ export async function getConducteursAdmin(all?:false): Promise<{ status: number,
         });
         return { status: 200, data: conducteurs };
     } catch (error) {
-        console.log("An error occurred in getconducteursPublic");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -150,7 +146,6 @@ export async function getConducteursMatricules(id: string): Promise<{ status: nu
 
         return { status: 200, data: matricule };
     } catch (error) {
-        console.log("An error occurred in getconducteursMatricules");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -179,7 +174,6 @@ export async function getConducteursNames(id: string): Promise<{ status: number,
 
         return { status: 200, data: conducteur?.firstname + " " + conducteur?.lastname };
     } catch (error) {
-        console.log("An error occurred in getconducteursNames");
         return { status: 500, data: { message: e("error") } };
     }
 }

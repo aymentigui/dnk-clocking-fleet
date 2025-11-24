@@ -67,7 +67,6 @@ export async function UpdateEntreprise(id: string, data: any) {
 
         return { status: 200, data: { message: p("update_success") } };
     } catch (error) {
-        console.log("An error occurred in UpdateEntreprise:", error);
         return { status: 500, data: { message: e("error") } };
     }
 }

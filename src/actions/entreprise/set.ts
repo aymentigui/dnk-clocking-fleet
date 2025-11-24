@@ -28,7 +28,6 @@ export async function createEntreprise(data: any) {
         const result = schema.safeParse(data);
 
         if (!result.success) {
-            //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { name, description, address, phone } = result.data;
@@ -50,7 +49,6 @@ export async function createEntreprise(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.log("An error occurred in createentreprise" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -85,8 +83,6 @@ export async function createentreprises(data: any) {
 
         return { status: 200, data: { message: s("createsuccess"), entreprises: entreprisesResuls } };
     } catch (error) {
-        //@ts-ignore
-        console.log("An error occurred in createentreprises" + error.message);
         return { status: 500, data: { message: s("createfail") } };
     }
 }
@@ -128,8 +124,6 @@ const addentreprise = async (data: any, userSchema: any, session: any, u: any, s
 
         return { status: 200, data: data };
     } catch (error) {
-        // @ts-ignore
-        console.log("An error occurred in addentreprise" + error.message);
         return { status: 500, data: { message: s("createfail"), entreprise: data } }
     };
 }
@@ -159,7 +153,6 @@ export async function createEntrepriseRoute(data: any) {
         const result = schema.safeParse(data);
 
         if (!result.success) {
-            //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { entreprise_id, distance, region_arrive, region_depart } = result.data;
@@ -190,7 +183,6 @@ export async function createEntrepriseRoute(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.log("An error occurred in createentrepriseRoute" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }

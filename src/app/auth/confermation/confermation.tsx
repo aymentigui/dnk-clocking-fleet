@@ -73,7 +73,6 @@ const ConfermationFrom = () => {
             }
         } catch (error) {
             toast.error(s("unexpected_error") || "Une erreur inattendue est survenue")
-            console.log(error)
         } finally {
             setLoading(false)
         }
@@ -104,7 +103,6 @@ const ConfermationFrom = () => {
             }
         } catch (error) {
             toast.error(s("unexpected_error") || "Une erreur inattendue est survenue")
-            console.log(error)
         } finally {
             setResendLoading(false)
         }

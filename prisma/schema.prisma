@@ -276,18 +276,18 @@ model entreprise_route_planning_exluded_date {
 }
 
 model conducteur {
-  id         String     @id @default(cuid())
-  matricule  String     @unique
-  firstname  String?
-  lastname   String?
-  phone      String?
-  created_at DateTime   @default(now())
-  deleted_at DateTime?
-  added_from String?
-  clocking   clocking[]
-  course     course[]
-  status  String?
-  work_status Boolean @default(true)
+  id          String     @id @default(cuid())
+  matricule   String     @unique
+  firstname   String?
+  lastname    String?
+  phone       String?
+  created_at  DateTime   @default(now())
+  deleted_at  DateTime?
+  added_from  String?
+  clocking    clocking[]
+  course      course[]
+  status      String?
+  work_status Boolean    @default(true)
 }
 
 model device {
@@ -307,6 +307,7 @@ model device {
   clocking      clocking[]
   region        region?     @relation(fields: [region_id], references: [id])
   region_id     String?
+  all_region    String?
   entreprise    entreprise? @relation(fields: [entreprise_id], references: [id])
   entreprise_id String?
 
@@ -329,8 +330,9 @@ model vehicle {
   park_id    String?
   park       park?   @relation(fields: [park_id], references: [id])
 
-  in_park Boolean @default(true)
-  status  String?
+  in_park     Boolean @default(true)
+  status      String?
+  last_region String?
 
   created_at                DateTime                    @default(now())
   deleted_at                DateTime?

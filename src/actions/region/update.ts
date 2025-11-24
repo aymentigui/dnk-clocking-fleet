@@ -39,7 +39,6 @@ export async function UpdateRegion(id:string, data: any) {
         const result = schema.safeParse(data);
 
         if (!result.success) {
-            //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { name, description, address } = result.data;
@@ -60,7 +59,6 @@ export async function UpdateRegion(id:string, data: any) {
 
         return { status: 200, data: { message: s("updatesuccess") } };
     } catch (error) {
-        console.log("An error occurred in UpdateRegion");
         return { status: 500, data: { message: e("error") } };
     }
 }

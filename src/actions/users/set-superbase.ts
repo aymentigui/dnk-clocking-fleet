@@ -40,7 +40,6 @@ export async function createUser(data: any) {
         const result = userSchema.safeParse(data);
 
         if (!result.success) {
-            //console.log(result.error.errors);
             return { status: 400, data: { errors: result.error.errors } };
         }
         const { firstname, lastname, username, email, password, is_admin, roles, image } = result.data;
@@ -106,7 +105,6 @@ export async function createUser(data: any) {
 
         return { status: 200, data: { message: s("createsuccess") } };
     } catch (error) {
-        console.log("An error occurred in createUser" + error);
         return { status: 500, data: { message: s("createfail") } };
     }
 }

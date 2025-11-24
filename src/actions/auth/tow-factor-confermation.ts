@@ -17,7 +17,6 @@ export async function createTowFactorConfermation(id: string): Promise<{ status:
         })
         return { status: 200, data: verificationToken };
     } catch (error) {
-        console.log("An error occurred in createTowFactorConfermation");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -36,7 +35,6 @@ export async function getTowFactorConfermationByUserId(id: string): Promise<{ st
         }
         return { status: 200, data: verificationToken };
     } catch (error) {
-        console.log("An error occurred in getTowFactorConfermationByUserId");
         return { status: 500, data: { message: 'An error occurred in getTowFactorConfermationByUserId' } };
     }
 }
@@ -51,7 +49,6 @@ export async function deleteTowFactorConfermationByUserId(id: string): Promise<{
         })
         return { status: 200, data: verificationToken };
     } catch (error) {
-        console.log("An error occurred in deleteTowFactorConfermation");
         return { status: 500, data: { message: e("error") } };
     }
 }

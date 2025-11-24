@@ -221,7 +221,6 @@ export async function getCourse(page: number = 1, pageSize: number = 20, vehicle
         }
     }
     catch (error) {
-        console.log("An error occurred in getCourse");
         return { status: 500, data: [], message: e("error"), totalCompleted: 0, totalWaiting: 0, totalInProgress: 0 };
     }
 }

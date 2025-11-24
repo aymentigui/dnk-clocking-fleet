@@ -8,4 +8,5 @@ export interface Device {
     parkId: string;
     region: string;
     regionId: string;
+    regionsSupervisor: string[]
   }

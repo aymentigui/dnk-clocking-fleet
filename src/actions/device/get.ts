@@ -33,7 +33,7 @@ export async function getDevices(page: number = 1, pageSize: number = 10, search
             searchConditions.AND = [
                 { park: { id: searchPark } }
             ]
-        if((searchRegion && searchRegion !== "" && searchRegion !== "0")) {
+        if ((searchRegion && searchRegion !== "" && searchRegion !== "0")) {
             // @ts-ignore
             if (!searchConditions.AND)
                 // @ts-ignore
@@ -54,6 +54,7 @@ export async function getDevices(page: number = 1, pageSize: number = 10, search
                 username: true,
                 code: true,
                 password: true,
+                all_region: true,
                 park: {
                     select: {
                         id: true,
@@ -69,22 +70,39 @@ export async function getDevices(page: number = 1, pageSize: number = 10, search
             }
         });
 
-        const devicesFormatted = devices.map((device) => ({
-            id: device.id,
-            username: device.username,
-            code: device.code,
-            type: device.type,
-            password: device.password,
-            park: device.park ? device.park.name : "",
-            parkId: device.park ? device.park.id : "",
-            region: device.region ? device.region.name : "",
-            regionId: device.region ? device.region.id : "",
-        }))
+        const allRegionIds: string[] = []
+        devices.forEach((device) => {
+            const ids = device.all_region?.split(",")
+            ids?.forEach((id) => allRegionIds.push(id))
+        })
+        const deveicesRegion = await prisma.region.findMany({
+            where: {
+                id: {
+                    in: allRegionIds
+                }
+            }
+        })
+
+        const devicesFormatted = devices.map((device) => {
+            const regionName = device.all_region ? device.all_region.split(",").map((item) => deveicesRegion.find(i => i.id === item)?.name+" - ") : ""
+
+            return {
+                id: device.id,
+                username: device.username,
+                code: device.code,
+                type: device.type,
+                password: device.password,
+                park: device.park ? device.park.name : "",
+                parkId: device.park ? device.park.id : "",
+                region: device.region ? device.region.name : regionName,
+                regionId: device.region ? device.region.id : "",
+                regionsSupervisor: device.all_region ? device.all_region.split(",") : []
+            };
+        })
 
 
         return { status: 200, data: devicesFormatted };
     } catch (error) {
-        console.log("Error fetching devices:", error);
         return { status: 500, data: null };
     }
 }
@@ -123,7 +141,6 @@ export async function getCountDevices(searchQuery?: string, searchPark?: string,
         );
         return { status: 200, data: count };
     } catch (error) {
-        console.log("Error fetching count devices:", error);
         return { status: 500, data: null };
     }
 }
@@ -144,7 +161,6 @@ export async function getDevicesAll(): Promise<{ status: number, data: any }> {
 
         return { status: 200, data: devices };
     } catch (error) {
-        console.log("An error occurred in getAllDevices");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -166,7 +182,6 @@ export async function getDevice(id: string): Promise<{ status: number, data: any
         const device = await prisma.device.findUnique({ where: { id } });
         return { status: 200, data: device };
     } catch (error) {
-        console.log("An error occurred in getDevice");
         return { status: 500, data: { message: e("error") } };
     }
 }
@@ -195,7 +210,6 @@ export async function getDevicesWithIds(deviceIds: string[]): Promise<{ status: 
 
         return { status: 200, data: devices };
     } catch (error) {
-        console.log("Error fetching getDevicesWithIds:", error);
         return { status: 500, data: null };
     }
 }
