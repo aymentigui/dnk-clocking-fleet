@@ -12,6 +12,8 @@ interface ImportSheetsStructureProps {
 }
 
 const ImportSheetsStructure: FC<ImportSheetsStructureProps> = ({ columns, data }) => {
+  console.log(columns)
+  console.log(data)
   return (
     <div className="space-y-6 m-2">
       <div className="border rounded-lg p-2">

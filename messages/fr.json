@@ -128,6 +128,7 @@
         "entreprises": "Entreprises",
         "entreprise_routes": "Routes d'entreprise",
         "courses": "Courses",
+        "global_etat": "Etat global",
         "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
@@ -153,7 +154,7 @@
         "errorsendcode": "Erreur lors de l'envoi du code",
         "errorconfirmation": "Erreur lors de la confirmation",
         "error2afa": "Erreur lors de la configuration de la vérification en deux étapes",
-        "account_blocked": "Compte bloqué. Réessayez dans {{minutes}} minutes.",
+        "account_blocked": "Compte bloqué. Réessayez dans {minutes} minutes.",
         "too_many_attempts": "Trop de tentatives. Compte bloqué pour 15 minutes."
     },
     "Settings": {
@@ -526,6 +527,7 @@
         "title": "Véhicule",
         "importvehiclespark": "Importer des véhicules avec sa parc",
         "importvehiclesregion": "Importer des véhicules avec sa région",
+        "importvehiclesimei": "Importer des véhicules avec son IMEI",
         "addvehicle": "Ajouter un véhicule",
         "updatevehicle": "Mettre à jour le véhicule",
         "deletevehicle": "Supprimer le véhicule",
@@ -619,7 +621,46 @@
         "filter_by_status": "Filtrer par status",
         "all_parks": "Tous les parcs",
         "all": "Tous",
-        "all_dates": "Toutes les dates"
+        "all_dates": "Toutes les dates",
+        "regionStatistics": "Statistiques des régions",
+        "regionStatisticsDescription": "Afficher les statistiques de pointage pour chaque région",
+        "vehicleThresholdStatistics": "Surveillance du seuil des véhicules",
+        "vehicleThresholdDescription": "Surveiller les véhicules dépassant le seuil temporel",
+        "totalClockings": "Total des pointages",
+        "totalVehicles": "Total des véhicules",
+        "exits": "Sorties",
+        "entries": "Entrées",
+        "vehicles": "Véhicules",
+        "noDataAvailable": "Aucune donnée disponible pour la date sélectionnée",
+        "regionClockings": "Détails des pointages de la région",
+        "regionClockingsFor": "Pointages pour",
+        "time": "Heure",
+        "type": "Type",
+        "park": "Parc",
+        "region": "Région",
+        "noClockings": "Aucun pointage trouvé pour cette région",
+        "threshold": "Seuil",
+        "hours": "heures",
+        "alertTitle": "Attention requise",
+        "alertDescription": "{count} véhicules ont dépassé le seuil de {threshold} heures",
+        "unknown": "Inconnu",
+        "lastClocking": "Dernier pointage",
+        "vin": "VIN",
+        "inPark": "Dans le parc",
+        "outOfPark": "Hors du parc",
+        "noVehiclesExceeding": "Aucun véhicule ne dépasse le seuil",
+        "allVehiclesWithinThreshold": "Tous les véhicules sont dans le seuil de {threshold} heures",
+        "yesterdayAt": "Hier à",
+        "todayAt": "Aujourd’hui à",
+        "at": "à",
+        "filterByType": "Filtrer par type",
+        "selectType": "Sélectionner un type",
+        "allTypes": "Tous les types",
+        "resultsCount": "{count} résultat(s)",
+        "hoursExceeded": "Heures dépassées",
+        "noVehiclesForType": "Aucun véhicule trouvé pour ce type",
+        "tryDifferentFilter": "Essayez avec un filtre différent",
+        "actions": "Actions"
     },
     "Conducteur": {
         "title": "Conducteurs",
@@ -768,6 +809,7 @@
         "all": "Tous",
         "manualRefresh": "Actualiser maintenant",
         "nextIn": "Prochaine actualisation dans",
+        "noParks": "Aucun parc disponible",
         "updatedAt": "Mis à jour à",
         "metrics": {
             "clockings": "Scans (Aujourd'hui)",
@@ -1064,6 +1106,58 @@
             "region": "Région",
             "clockings": "Pointages",
             "courses": "Courses"
+        }
+    },
+    "GlobalEtat": {
+        "title": "Gestion des Véhicules",
+        "tabs": {
+            "confirmVehicles": "Véhicules Confirmés",
+            "confirmVehiclesNotPark": "Véhicules dans mauvais parc",
+            "qrRequest": "Demandes QR Code",
+            "creationRequest": "Demandes de Création",
+            "editRequest": "Demandes de Modification"
+        },
+        "filters": {
+            "dateRange": "Période",
+            "startDate": "Date début",
+            "endDate": "Date fin",
+            "park": "Parc",
+            "allParks": "Tous les parcs",
+            "filter": "Filtrer",
+            "reset": "Réinitialiser",
+            "markAsRead": "Marquer comme lu",
+            "all": "Tous",
+            "read": "Lu",
+            "unread": "Non lu",
+            "filtered": "Filtré",
+            "search": "Rechercher..."
+        },
+        "table": {
+            "matricule": "Matricule",
+            "brand": "Marque",
+            "model": "Modèle",
+            "year": "Année",
+            "parkName": "Parc",
+            "date": "Date",
+            "actions": "Actions",
+            "noResults": "Aucun véhicule trouvé",
+            "loading": "Chargement...",
+            "view": "Voir",
+            "edit": "Modifier",
+            "approve": "Approuver",
+            "confirm": "Confirmer"
+        },
+        "pagination": {
+            "previous": "Précédent",
+            "next": "Suivant",
+            "page": "Page",
+            "of": "sur",
+            "rowsPerPage": "Lignes par page",
+            "total": "Total {count} véhicules"
+        },
+        "status": {
+            "success": "Opération réussie",
+            "error": "Une erreur est survenue"
         }
     }
 }

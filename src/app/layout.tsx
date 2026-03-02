@@ -1,4 +1,5 @@
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 import { Cairo } from "next/font/google";
 import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";

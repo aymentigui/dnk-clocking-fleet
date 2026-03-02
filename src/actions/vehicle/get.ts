@@ -459,3 +459,93 @@ export async function getVehicleRegions(id: string, page: number, pageSize: numb
         return { status: 500, data: { message: e("error") }, count: 0 };
     }
 }
+
+
+
+export async function getPositionVehicle (id: string) {
+    const e = await getTranslations('Error')
+    try {
+      const session = await verifySession()
+      if (!session?.data?.user) {
+        return { status: 401, data: { message: e('unauthorized') } }
+      }
+      
+      const vehicle = await prisma.vehicle.findUnique({
+        where: { id },
+        select: { imei: true }
+      })
+  
+      if(!vehicle || !vehicle.imei) {
+        return { status: 404, data: { message: e('vehicle_not_found') } }
+      }
+  
+      const imei = vehicle.imei
+      const user = await prisma.user.findUnique({
+          where: { id: session.data.user.id },
+          select: { user_api_hash: true }
+        })
+        let user_api_hash = user?.user_api_hash
+        
+        if (!user || !user.user_api_hash) {
+            user_api_hash = await loginDJAZFLEET()
+        }
+
+      const vehicleResponse = await fetch(
+        `https://djazfleet-dz.com/api/get_devices?imei=${imei}&user_api_hash=${user_api_hash}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
+  
+      if (!vehicleResponse.ok) {
+        if (vehicleResponse.status === 401) {
+          await prisma.user.update({
+            where: { id: session.data.user.id },
+            data: { user_api_hash: null }
+          })
+        }
+        return { status: 500, data: { message: e('error') } }
+      }
+      const vehicleData = await vehicleResponse.json()
+  
+      return { status: 200, data: vehicleData[0].items[0] }
+    } catch (error) {
+      return { status: 500, data: { message: e('error') } }
+    }
+  }
+  
+  async function loginDJAZFLEET () {
+    const e = await getTranslations('Error')
+    try {
+      const session = await verifySession()
+      if (!session?.data?.user) {
+        return { status: 401, data: { message: e('unauthorized') } }
+      }
+  
+      const response = await fetch(`https://djazfleet-dz.com/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: 'ayman@transtev.com',
+          password: 'Azert@123',
+          lang: 'en'
+        })
+      })
+      if (!response.ok) {
+        return { status: 500, data: { message: e('error') } }
+      }
+  
+      const responseData = await response.json()
+  
+      const user_api_hash = responseData.user_api_hash
+      await prisma.user.update({
+        where: { id: session.data.user.id },
+        data: { user_api_hash }
+      })
+  
+      return user_api_hash
+    } catch (error) {
+      return { status: 500, data: { message: e('error') } }
+    }
+  }

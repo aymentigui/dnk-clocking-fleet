@@ -26,7 +26,7 @@ export const GET = withAuth(async (request, { user }) => {
             where: { user_id: session.data.user.id },
         });
 
-        if (!device || !device.all_region) {
+        if (!device || !device.all_region || device.type !== 5) {
             return NextResponse.json(
                 { message: "No regions found for this supervisor" },
                 { status: 404 }
@@ -100,23 +100,23 @@ export const GET = withAuth(async (request, { user }) => {
 
         const enrichedVehicles = await Promise.all(
             vehicles.map(async (v) => {
-              let regionName = null;
-          
-              if (v.last_region) {
-                const region = await prisma.region.findUnique({
-                  where: { id: v.last_region },
-                  select: { name: true }, // On ne récupère que le nom
-                });
-                regionName = region?.name ?? null;
-              }
-          
-              return {
-                ...v,
-                last_region_name: regionName,
-              };
+                let regionName = null;
+
+                if (v.last_region) {
+                    const region = await prisma.region.findUnique({
+                        where: { id: v.last_region },
+                        select: { name: true }, // On ne récupère que le nom
+                    });
+                    regionName = region?.name ?? null;
+                }
+
+                return {
+                    ...v,
+                    last_region_name: regionName,
+                };
             })
-          );
-          
+        );
+
 
         const totalCount = await prisma.vehicle.count({
             where: whereClause,

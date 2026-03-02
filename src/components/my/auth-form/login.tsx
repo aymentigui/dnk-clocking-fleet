@@ -66,7 +66,7 @@ const LoginForm = () => {
             }
         } catch (error) {
             toast.error(s("unexpected_error"));
-        } finally {
+            } finally {
             setLoading(false);
         }
     };
@@ -266,7 +266,7 @@ const LoginForm = () => {
                 </form>
 
                 {/* LIEN D'INSCRIPTION */}
-                <div className="mt-6 text-center">
+                {/* <div className="mt-6 text-center">
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
                             <div className="w-full border-t border-black/10"></div>
@@ -280,12 +280,12 @@ const LoginForm = () => {
                     <Link href="/auth/register" passHref className="mt-4 block">
                         <Button 
                             variant='default' 
-                            className='w-full py-3 border-black/20 text-white hover:bg-black/10 hover:text-black transition-all duration-200 rounded-xl'
+                            className='w-full py-3 border-black/20 text-background hover:bg-black/10 hover:text-black transition-all duration-200 rounded-xl'
                         >
                             {t("youhavenotaccount")}
                         </Button>
                     </Link>
-                </div>
+                </div> */}
             </Form>
         </div>
     )

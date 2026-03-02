@@ -76,7 +76,7 @@ export const { handlers, auth, signIn, signOut } =
           session.user.roles = roles.map((role) => role.role.name);
           // @ts-ignore
           session.user.permissions = roles
-            .map((role) => role.role.permissions)
+            .map((role:any) => role.role.permissions)
         }
         return session
       },

@@ -158,13 +158,13 @@ export default function ClockingsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+        <div className="min-h-screen bg-sidebar dark:bg-gray-900 theme-ocean:bg-gray-900 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white ">
                                 {t("title")}
                             </h1>
                             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -276,7 +276,7 @@ export default function ClockingsPage() {
                 />
 
                 {/* Clockings Table */}
-                <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                <div className="bg-background dark:bg-gray-800 theme-ocean:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
                     <ClockingsTable
                         clockings={clockings}
                         loading={loading}

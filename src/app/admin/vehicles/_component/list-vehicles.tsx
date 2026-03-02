@@ -16,20 +16,22 @@ import ExportButton from "@/components/my/export-button";
 import SelectSearchFetch from "@/components/myui/select-search-fetch";
 import { getParksAdmin } from "@/actions/park/get";
 import { createVehicles } from "@/actions/vehicle/set";
-import { getCountVehicles, getVehicles, getVehiclesAll, getVehiclesAllMatrciule, getVehiclesMatriculeWithIds, getVehiclesWithIds } from "@/actions/vehicle/get";
+import { getCountVehicles, getPositionVehicle, getVehicles, getVehiclesAll, getVehiclesAllMatrciule, getVehiclesMatriculeWithIds, getVehiclesWithIds } from "@/actions/vehicle/get";
 import { deleteVehicles } from "@/actions/vehicle/delete";
 import { getColumns } from "@/actions/util/sheet-columns/vehicle";
 import { getColumns as getColumnsParc } from "@/actions/util/sheet-columns/vehicles-park";
 import { getColumns as getColumnsRegion } from "@/actions/util/sheet-columns/vehicles-region";
+import { getColumns as getColumnsIMEI } from "@/actions/util/sheet-columns/vehicles-imei";
 import UpdateParcs from "./dialog/update-parc";
 import { generateQRCodeAndDownload } from "@/actions/util/qrcode";
-import { Eye, QrCode, Settings2, Trash } from "lucide-react";
+import { Eye, MapPinIcon, QrCode, Settings2, Trash } from "lucide-react";
 import { getRegionsAdmin } from "@/actions/region/get";
 import UpdateRegion from "./dialog/update-region";
-import { UpdateVehiclesParc, UpdateVehiclesParcMatricule, UpdateVehiclesRegionMatricules } from "@/actions/vehicle/update";
+import { UpdateVehiclesIMEIMatricule, UpdateVehiclesParc, UpdateVehiclesParcMatricule, UpdateVehiclesRegionMatricules } from "@/actions/vehicle/update";
 import SearchTable from "@/components/myui/table/search-table";
 import TablePagination from "@/components/myui/table/table-pagination";
 import { useAddUpdateVehicleDialog } from "@/context/add-update-dialog-context-vehicle";
+import { LocationMapDialog } from "@/components/dialogs/LocationMapDialog";
 
 const selectors = [
   { title: "matricule", selector: "matricule" },
@@ -41,6 +43,9 @@ const selectors = [
 ];
 
 export default function ListVehicles() {
+  const [openMap, setOpenMap] = useState(false);
+  const [positionVehicle, setPositionVehicle] = useState<{ lat: number; lng: number }>({ lat: 0, lng: 0 });
+
   const translate = useTranslations("Vehicle")
   const translateSystem = useTranslations("System");
   const translateErrors = useTranslations("Error")
@@ -78,6 +83,7 @@ export default function ListVehicles() {
   const columnsSheet = getColumns()
   const columnsSheetVehiclesPark = getColumnsParc()
   const columnsSheetVehiclesRegion = getColumnsRegion()
+  const columnsSheetVehiclesIMEI = getColumnsIMEI()
 
   const handleOpenDialogWithTitle = (vehicle: any) => {
     openDialog(false, vehicle)
@@ -114,6 +120,12 @@ export default function ListVehicles() {
   const importvehiclesregion = () => {
     setColumns(columnsSheetVehiclesRegion);
     setTypeData("Region")
+    router.push("/admin/sheetimport")
+  }
+
+  const importvehiclesIMEI = () => {
+    setColumns(columnsSheetVehiclesIMEI);
+    setTypeData("IMEI")
     router.push("/admin/sheetimport")
   }
 
@@ -196,14 +208,29 @@ export default function ListVehicles() {
           setSheetData([]);
         });
       }
+      else if (typeData === "IMEI") {
+        UpdateVehiclesIMEIMatricule(sheetData).then((res) => {
+          if (res.status === 200) {
+            toast.success(res.data.message);
+            window.location.reload()
+          } else {
+            toast.error(res.data.message);
+            setColumns(columnsSheet);
+          }
+        }).catch((error) => {
+          toast.error(translateSystem("errorcreate"));
+        }).finally(() => {
+          setSheetData([]);
+        });
+      }
     }
   }, [sheetData]);
 
   useEffect(() => {
-    fetchDevices();
+    fetchVehicles();
   }, [page, debouncedSearchQuery, mounted, pageSize, searchPark, searchRegion, lastRegion,inPark]);
 
-  const fetchDevices = async () => {
+  const fetchVehicles = async () => {
     setData([]);
     setIsLoading(false)
     try {
@@ -290,6 +317,17 @@ export default function ListVehicles() {
     }
   };
 
+  const handleOpenMap = async (id: string) => {
+    const response = await getPositionVehicle(id)
+    if(response.status!==200){
+      toast.error("Error getting position")
+      return
+    }
+    const position = response.data
+    setPositionVehicle({lat:position.lat,lng:position.lng})    
+    setOpenMap(true)
+  }
+
   const isAllSelected = data.length > 0 && selectedIds.length === data.length
   const isIndeterminate = selectedIds.length > 0 && selectedIds.length < data.length
 
@@ -303,10 +341,17 @@ export default function ListVehicles() {
 
   return (
     <div className="py-10">
+      <LocationMapDialog
+        open={openMap}
+        onOpenChange={setOpenMap}
+        position={positionVehicle}
+        title="Localisation"
+        zoom={17}
+      />
+
       <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
         {translate("title")}
       </h1>
-
       {/* Alertes */}
       {userSheetCreated && (
         <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-6 flex items-center">
@@ -363,6 +408,16 @@ export default function ListVehicles() {
               className="border-gray-300 hover:bg-gray-50"
             >
               {translate('importvehiclesregion')}
+            </Button>
+          ) : null}
+
+          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_update") ?? false) || session?.user?.is_admin ? (
+            <Button
+              onClick={importvehiclesIMEI}
+              variant="outline"
+              className="border-gray-300 hover:bg-gray-50"
+            >
+              {translate('importvehiclesimei')}
             </Button>
           ) : null}
 
@@ -661,6 +716,17 @@ export default function ListVehicles() {
                               className="h-8 w-8 p-0"
                             >
                               <Trash size={14} />
+                            </Button>
+                          ) : null}
+
+                          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_update") ?? false) || session?.user?.is_admin ? (
+                            <Button
+                              onClick={() => handleOpenMap(vehicle.id)}
+                              variant="default"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <MapPinIcon size={14} />
                             </Button>
                           ) : null}
 

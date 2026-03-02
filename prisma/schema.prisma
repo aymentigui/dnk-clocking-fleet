@@ -42,6 +42,7 @@ model user {
   two_factor_attempts              Int                        @default(0)
   last_two_factor_attempt          DateTime?
   two_factor_blocked_until         DateTime?
+  user_api_hash                    String?
 
   created_at     DateTime         @default(now())
   updated_at     DateTime         @updatedAt
@@ -136,7 +137,7 @@ model resetpasswordconfermation {
 model role {
   id          String     @id @default(cuid())
   name        String     @unique
-  permissions String
+  permissions String     @db.Text
   users       userrole[]
   public      Boolean    @default(true)
 }
@@ -301,15 +302,16 @@ model device {
   user     user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   type     Int?
 
-  created_at    DateTime    @default(now())
+  created_at    DateTime      @default(now())
   deleted_at    DateTime?
   added_from    String?
   clocking      clocking[]
-  region        region?     @relation(fields: [region_id], references: [id])
+  region        region?       @relation(fields: [region_id], references: [id])
   region_id     String?
-  all_region    String?
-  entreprise    entreprise? @relation(fields: [entreprise_id], references: [id])
+  all_region    String?       @db.Text
+  entreprise    entreprise?   @relation(fields: [entreprise_id], references: [id])
   entreprise_id String?
+  globalEtats   global_etat[]
 
   @@index([type])
   @@index([deleted_at])
@@ -323,6 +325,7 @@ model vehicle {
   model     String?
   year      Int?
   brand     String?
+  imei      String?
 
   region_id  String?
   region     region? @relation(fields: [region_id], references: [id])
@@ -342,6 +345,7 @@ model vehicle {
   vehicle_region            vehicle_region[]
   rotation                  course[]
   entreprise_route_planning entreprise_route_planning[]
+  globalEtats               global_etat[]
 
   @@index([matricule])
   @@index([deleted_at])
@@ -350,14 +354,14 @@ model vehicle {
 }
 
 model vehicle_park {
-  id         String   @id @default(cuid())
-  vehicle_id String
-  vehicle    vehicle  @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
-  park_id    String?
-  park       park?    @relation(fields: [park_id], references: [id])
-  added_from String
-  user       user     @relation(fields: [added_from], references: [id])
-  added_at   DateTime @default(now())
+  id          String        @id @default(cuid())
+  vehicle_id  String
+  vehicle     vehicle       @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
+  park_id     String?
+  park        park?         @relation(fields: [park_id], references: [id])
+  added_from  String
+  user        user          @relation(fields: [added_from], references: [id])
+  added_at    DateTime      @default(now())
 }
 
 model vehicle_region {
@@ -436,4 +440,35 @@ model course {
   @@index([vehicle_id, start_station, end_station])
   @@index([start_date, waiting])
   @@index([vehicle_id, start_date])
+}
+
+model global_etat {
+  id         String   @id @default(cuid())
+  vehicle_id String?
+  vehicle    vehicle? @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
+
+  device_id String?
+  device    device? @relation(fields: [device_id], references: [id], onDelete: Cascade)
+
+  park_id   String?
+  park_name String?
+
+  vehicle_park_id   String?
+  vehicle_park_name String?
+
+  matricule String?
+  model     String?
+  brand     String?
+  year      Int?
+
+  old_matricule String?
+  old_model     String?
+  old_brand     String?
+  old_year      Int?
+
+  status  String? // "Confirmed", "Edit request", "QR code request",  "Creation request"
+  view_at DateTime?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }

@@ -101,7 +101,7 @@ export async function accessPage(requiredPermission: string[], id?: string) {
         userId = session.data.user.id as string;
     }
 
-    const hasPermission = await withAuthorizationPermission(requiredPermission, false, userId);
+    const hasPermission = await withAuthorizationPermission(requiredPermission, userId);
 
     if (hasPermission.status !== 200 || !hasPermission.data || !hasPermission.data.hasPermission) {
         return redirect('/admin');
@@ -166,8 +166,8 @@ export async function getUserRolesId(id: string): Promise<{ status: number, data
 
 export async function withAuthorizationPermission(
     requiredPermission: string[],
-    requireAdmin?: boolean,
-    id?: string
+    id?: string,
+    requireAdmin?: boolean
 ) {
     const e = await getTranslations('Error');
     try {
@@ -194,6 +194,7 @@ export async function withAuthorizationPermission(
         if (permissions.status !== 200 || !permissions.data) {
             return { status: 401, data: { message: e("unauthorized") } };
         }
+        
         if (!requiredPermission.every((permission) => permissions.data.includes(permission))) {
             return { status: 403, data: { message: e("forbidden") } };
         }

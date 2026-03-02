@@ -149,6 +149,7 @@ async function updateVehicleRegion(
         });
 }
 
+
 // ============================================================================
 // MAIN FUNCTIONS
 // ============================================================================
@@ -267,6 +268,45 @@ export async function UpdateVehiclesParcMatricule(
             await prisma.vehicle.update({
                 where: { id: vehicle.id },
                 data: { park_id: parkRecord.id },
+            });
+        }));
+
+        return { status: 200, data: { message: s("updatesuccess") } };
+
+    } catch (error) {
+        return { status: 500, data: { message: e("error") } };
+    }
+}
+
+export async function UpdateVehiclesIMEIMatricule(
+    vehicleMatriculesIMEI: { matricule: string; imei: string }[]
+) {
+    const [e, s] = await Promise.all([
+        getTranslations('Error'),
+        getTranslations('System')
+    ]);
+
+    try {
+        // Authentication
+        const session = await verifySession();
+        if (!session?.data?.user) {
+            return { status: 401, data: { message: e("unauthorized") } };
+        }
+
+        // Permission check
+        const hasPermission = await withAuthorizationPermission(['vehicles_update']);
+        if (hasPermission.status !== 200 || !hasPermission.data.hasPermission) {
+            return { status: 403, data: { message: e('forbidden') } };
+        }
+
+        // Process updates
+        await Promise.all(vehicleMatriculesIMEI.map(async ({ matricule, imei }) => {
+            const vehicle = await prisma.vehicle.findFirst({ where: { matricule } });
+            if (!vehicle) return;
+
+            await prisma.vehicle.update({
+                where: { id: vehicle.id },
+                data: { imei: imei? imei.trim() : null },
             });
         }));
 

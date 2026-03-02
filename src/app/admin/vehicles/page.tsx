@@ -13,9 +13,9 @@ const Page = async () => {
   if (!session || session.status !== 200 || !session.data.user || !session.data.user.id) {
     return null;
   }
-  await accessPage(['vehicles_view'],session.data.user.id);
-  const hasPermissionView = await withAuthorizationPermission(['vehicles_view'],session.data.user.id);
-  const hasPermissionAdd = await withAuthorizationPermission(['vehicles_create'],session.data.user.id);
+  await accessPage(['vehicles_view'], session.data.user.id);
+  const hasPermissionView = await withAuthorizationPermission(['vehicles_view'], session.data.user.id);
+  const hasPermissionAdd = await withAuthorizationPermission(['vehicles_create'], session.data.user.id);
 
   return (
     <Card className='p-4 w-full'>

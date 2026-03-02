@@ -127,6 +127,7 @@
         "entreprises": "Companies",
         "entreprise_routes": "Company Routes",
         "courses": "Courses",
+        "global_etat": "Global Etat",
         "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
@@ -152,7 +153,7 @@
         "errorsendcode": "An error occurred while sending the code",
         "errorconfirmation": "An error occurred during confirmation",
         "error2afa": "An error occurred during two factor authentication",
-        "account_blocked": "Account blocked. Please try again in {{minutes}} minutes.",
+        "account_blocked": "Account blocked. Please try again in {minutes} minutes.",
         "too_many_attempts": "Too many attempts. Account blocked for 15 minutes."
     },
     "Settings": {
@@ -527,6 +528,7 @@
         "title": "Vehicle",
         "importvehiclespark": "Import vehicles with his parc",
         "importvehiclesregion": "Import vehicles with his region",
+        "importvehiclesimei": "Import vehicles with his IMEI",
         "addvehicle": "Add Vehicle",
         "updatevehicle": "Update Vehicle",
         "deletevehicle": "Delete Vehicle",
@@ -620,7 +622,45 @@
         "filter_by_status": "Filter by status",
         "all_parks": "All parks",
         "all_dates": "All dates",
-        "all": "All"
+        "all": "All",
+        "regionStatistics": "Region Statistics",
+        "regionStatisticsDescription": "View clocking statistics for each region",
+        "vehicleThresholdStatistics": "Vehicle Threshold Monitor",
+        "vehicleThresholdDescription": "Monitor vehicles exceeding time threshold",
+        "totalClockings": "Total Clockings",
+        "totalVehicles": "Total Vehicles",
+        "exits": "Exits",
+        "entries": "Entries",
+        "vehicles": "vehicles",
+        "noDataAvailable": "No data available for the selected date",
+        "regionClockings": "Region Clockings Details",
+        "regionClockingsFor": "Clockings for",
+        "time": "Time",
+        "park": "Park",
+        "region": "Region",
+        "noClockings": "No clockings found for this region",
+        "threshold": "Threshold",
+        "hours": "hours",
+        "alertTitle": "Attention Required",
+        "alertDescription": "{count} vehicles have exceeded the {threshold} hour threshold",
+        "unknown": "Unknown",
+        "lastClocking": "Last Clocking",
+        "vin": "VIN",
+        "inPark": "In Park",
+        "outOfPark": "Out of Park",
+        "noVehiclesExceeding": "No vehicles exceeding threshold",
+        "allVehiclesWithinThreshold": "All vehicles are within the {threshold} hour threshold",
+        "yesterdayAt": "Yesterday at",
+        "todayAt": "Today at",
+        "at": "at",
+        "filterByType": "Filter by type",
+        "selectType": "Select a type",
+        "allTypes": "All types",
+        "resultsCount": "{count} result(s)",
+        "hoursExceeded": "Hours exceeded",
+        "noVehiclesForType": "No vehicles found for this type",
+        "tryDifferentFilter": "Try a different filter",
+        "actions": "Actions"
     },
     "Conducteur": {
         "title": "Conductors",
@@ -770,6 +810,7 @@
         "manualRefresh": "Refresh now",
         "nextIn": "Next auto refresh in",
         "updatedAt": "Updated at",
+        "noParks": "No parks available",
         "metrics": {
             "clockings": "Scans (Today)",
             "exitPark": "Exits Park",
@@ -1065,6 +1106,59 @@
             "region": "Region",
             "clockings": "Clockings",
             "courses": "Courses"
+        }
+    },
+    "GlobalEtat": {
+        "title": "Vehicle Management",
+        "tabs": {
+            "confirmVehicles": "Confirmed Vehicles",
+            "confirmVehiclesNotPark": "Vehicles in Wrong Park",
+            "qrRequest": "QR Code Requests",
+            "creationRequest": "Creation Requests",
+            "editRequest": "Edit Requests"
+        },
+        "filters": {
+            "dateRange": "Date Range",
+            "startDate": "Start Date",
+            "endDate": "End Date",
+            "park": "Park",
+            "allParks": "All Parks",
+            "filter": "Filter",
+            "reset": "Reset",
+            "GlobalEtat": "Global Etat",
+            "markAsRead": "Mark as read",
+            "all": "All",
+            "read": "Read",
+            "unread": "Unread",
+            "filtered": "Filtered",
+            "search": "Search..."
+        },
+        "table": {
+            "matricule": "Matricule",
+            "brand": "Brand",
+            "model": "Model",
+            "year": "Year",
+            "parkName": "Park",
+            "date": "Date",
+            "actions": "Actions",
+            "noResults": "No vehicles found",
+            "loading": "Loading...",
+            "view": "View",
+            "edit": "Edit",
+            "approve": "Approve",
+            "confirm": "Confirm"
+        },
+        "pagination": {
+            "previous": "Previous",
+            "next": "Next",
+            "page": "Page",
+            "of": "of",
+            "rowsPerPage": "Rows per page",
+            "total": "Total {count} vehicles"
+        },
+        "status": {
+            "success": "Operation completed successfully",
+            "error": "An error occurred"
         }
     }
 }

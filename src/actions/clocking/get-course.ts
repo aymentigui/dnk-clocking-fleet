@@ -217,7 +217,7 @@ export async function getCourse(page: number = 1, pageSize: number = 20, vehicle
                 }
             }));
 
-            return { status: 200, data: courseFiltred, count, totalCompleted: totalCompleted, totalWaiting: totalWaiting, totalInProgress: totalInProgress};
+            return { status: 200, data: courseFiltred, count, totalCompleted: totalCompleted, totalWaiting: totalWaiting, totalInProgress: totalInProgress };
         }
     }
     catch (error) {

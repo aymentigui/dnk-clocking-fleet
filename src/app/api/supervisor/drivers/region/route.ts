@@ -1,10 +1,29 @@
 // Get drivers with clockings in a region
+import { verifySession } from "@/actions/permissions";
 import { withAuth } from "@/actions/util/with-auth";
 import { prisma } from "@/lib/db";
 import { NextResponse, NextRequest } from "next/server";
 
 export const GET = withAuth(async (request, { user }) => {
     try {
+
+        const session = await verifySession()
+        if (!session || session.status != 200) {
+            return NextResponse.json(
+                { message: "Not authorized" },
+                { status: 401 }
+            );
+        }
+
+        const device = await prisma.device.findFirst({ where: { user_id: session.data.user.id } })
+        if (!device || device.type !== 5) {
+            return NextResponse.json(
+                { message: "Not authorized" },
+                { status: 401 }
+            );
+        }
+
+
         const { searchParams } = new URL(request.url);
         const regionId = searchParams.get("regionId");
         const date = searchParams.get("date") || new Date().toISOString().split("T")[0];

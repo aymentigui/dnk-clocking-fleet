@@ -10,10 +10,19 @@ export const GET = withAuth(async (request, { user }) => {
         const session = await verifySession()
         if (!session || session.status != 200) {
             return NextResponse.json(
-                { message: "Failed to fetch vehicles auth" },
-                { status: 500 }
+                { message: "Not authorized" },
+                { status: 401 }
             );
         }
+
+        const device = await prisma.device.findFirst({ where: { user_id: session.data.user.id } })
+        if (!device || device.type !== 5) {
+            return NextResponse.json(
+                { message: "Not authorized" },
+                { status: 401 }
+            );
+        }
+
 
         const { searchParams } = new URL(request.url);
         const regionId = searchParams.get("regionId");

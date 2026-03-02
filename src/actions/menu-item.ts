@@ -114,19 +114,26 @@ const itemsMenu = async () => {
             admin: false,
             permissions: ["clocking_view"],
         },
-        {
-            title: Menu("clockings_statistics"),
-            url: "/admin/clockings-statistics",
-            icon: CalendarCheck,
-            admin: false,
-            permissions: ["clocking_view"],
-        },
+        // {
+        //     title: Menu("clockings_statistics"),
+        //     url: "/admin/clockings-statistics",
+        //     icon: CalendarCheck,
+        //     admin: false,
+        //     permissions: ["clocking_view"],
+        // },
         {
             title: Menu("courses"),
             url: "/admin/courses",
             icon: Redo,
             admin: false,
             permissions: ["course_view"],
+        },
+        {
+            title: Menu("global_etat"),
+            url: "/admin/global-etat",
+            icon: CircleEllipsis,
+            admin: false,
+            permissions: ["vehicles_view"],
         },
         {
             title: Menu("notifications"),

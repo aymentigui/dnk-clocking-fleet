@@ -128,6 +128,7 @@
         "entreprises": "الشركات",
         "entreprise_routes": "طرق الشركات",
         "courses": "المسارات",
+        "global_etat": "الحالة العامة",
         "footer": "الجامعية للنقل و الخدمات"
     },
     "Error": {
@@ -153,7 +154,7 @@
         "errorsendcode": "خطأ في ارسال الكود",
         "errorconfirmation": "خطأ في التأكيد",
         "error2afa": "خطأ في التوثيق بخطوتين",
-        "account_blocked": "تم حظر الحساب. يرجى المحاولة مرة أخرى بعد {{minutes}} دقيقة.",
+        "account_blocked": "تم حظر الحساب. يرجى المحاولة مرة أخرى بعد {minutes} دقيقة.",
         "too_many_attempts": "محاولات كثيرة جدًا. تم حظر الحساب لمدة 15 دقيقة."
     },
     "Settings": {
@@ -525,6 +526,7 @@
         "title": "المركبة",
         "importvehiclespark": "استيراد المركبات مع حظيرته",
         "importvehiclesregion": "استيراد المركبات مع منطقته",
+        "importvehiclesimei": "استيراد المركبات مع IMEI الجهاز",
         "addvehicle": "إضافة مركبة",
         "updatevehicle": "تحديث مركبة",
         "deletevehicle": "حذف مركبة",
@@ -618,7 +620,45 @@
         "all_dates": "جميع التواريخ",
         "all_parks": "جميع الحظائر",
         "all": "الكل",
-        "vehiclenotfound": "المركبة غير موجودة"
+        "vehiclenotfound": "المركبة غير موجودة",
+        "regionStatistics": "إحصائيات المناطق",
+        "regionStatisticsDescription": "عرض إحصائيات الدخول والخروج لكل منطقة",
+        "vehicleThresholdStatistics": "مراقبة حدود مدة المركبات",
+        "vehicleThresholdDescription": "مراقبة المركبات التي تجاوزت الحد الزمني",
+        "totalClockings": "إجمالي عمليات التسجيل",
+        "totalVehicles": "إجمالي المركبات",
+        "exits": "خروج",
+        "entries": "دخول",
+        "vehicles": "المركبات",
+        "noDataAvailable": "لا توجد بيانات للتاريخ المحدد",
+        "regionClockings": "تفاصيل تسجيلات المنطقة",
+        "regionClockingsFor": "التسجيلات لمنطقة",
+        "time": "الوقت",
+        "park": "الحديقة / الموقف",
+        "region": "المنطقة",
+        "noClockings": "لا توجد تسجيلات لهذه المنطقة",
+        "threshold": "الحد",
+        "hours": "ساعات",
+        "alertTitle": "تنبيه هام",
+        "alertDescription": "{count} مركبة تجاوزت حد {threshold} ساعة",
+        "unknown": "غير معروف",
+        "lastClocking": "آخر تسجيل",
+        "vin": "رقم تعريف المركبة (VIN)",
+        "inPark": "داخل الموقف",
+        "outOfPark": "خارج الموقف",
+        "noVehiclesExceeding": "لا توجد مركبات تجاوزت الحد",
+        "allVehiclesWithinThreshold": "جميع المركبات ضمن حد {threshold} ساعة",
+        "yesterdayAt": "أمس على الساعة",
+        "todayAt": "اليوم على الساعة",
+        "at": "على الساعة",
+        "filterByType": "تصفية حسب النوع",
+        "selectType": "اختر نوعًا",
+        "allTypes": "جميع الأنواع",
+        "resultsCount": "{count} نتيجة",
+        "hoursExceeded": "الساعات المتجاوزة",
+        "noVehiclesForType": "لم يتم العثور على مركبات لهذا النوع",
+        "tryDifferentFilter": "حاول استخدام عامل تصفية آخر",
+        "actions": "الإجراءات"
     },
     "Conducteur": {
         "title": "السائقون",
@@ -768,6 +808,7 @@
         "manualRefresh": "تحديث الآن",
         "nextIn": "التحديث التالي بعد",
         "updatedAt": "آخر تحديث",
+        "noParks": "لا توجد حظائر متاحة",
         "metrics": {
             "clockings": "المسحات (اليوم)",
             "exitPark": "خروج من الحظيرة",
@@ -1064,5 +1105,58 @@
             "clockings": "التسجيلات",
             "courses": "الرحلات"
         }
+    },
+    "GlobalEtat": {
+        "title": "إدارة المركبات",
+        "tabs": {
+            "confirmVehicles": "المركبات المؤكدة",
+            "confirmVehiclesNotPark": "المركبات في حظيرة خاطئة",
+            "qrRequest": "طلبات رمز QR",
+            "creationRequest": "طلبات الإنشاء",
+            "editRequest": "طلبات التعديل"
+        },
+        "filters": {
+            "dateRange": "الفترة",
+            "startDate": "تاريخ البداية",
+            "endDate": "تاريخ النهاية",
+            "park": "الحظيرة",
+            "allParks": "جميع الحظائر",
+            "filter": "تصفية",
+            "reset": "إعادة تعيين",
+            "markAsRead": "وضع كمقروء",
+            "all": "الكل",
+            "read": "مقروء",
+            "unread": "غير مقروء",
+            "filtered": "مُفلتر",
+            "search": "بحث..."
+        },
+        "table": {
+            "matricule": "الرقم التسلسلي",
+            "brand": "العلامة التجارية",
+            "model": "الطراز",
+            "year": "السنة",
+            "parkName": "اسم الحظيرة",
+            "date": "التاريخ",
+            "actions": "الإجراءات",
+            "noResults": "لم يتم العثور على مركبات",
+            "loading": "جاري التحميل...",
+            "view": "عرض",
+            "approve": "الموافقة",
+            "edit": "تعديل",
+            "confirm": "تأكيد"
+        },
+        "pagination": {
+            "previous": "السابق",
+            "next": "التالي",
+            "page": "صفحة",
+            "of": "من",
+            "rowsPerPage": "صفوف في الصفحة",
+            "total": "إجمالي {count} مركبة"
+        },
+        "status": {
+            "success": "تمت العملية بنجاح",
+            "error": "حدث خطأ"
+        }
     }
+
 }

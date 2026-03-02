@@ -54,3 +54,40 @@ export const generateQRCodeAndDownload = async (matricules: string[]) => {
     console.error('Erreur lors de la génération des QR codes', error);
   }
 };
+
+export const generateQRCodeAndDownloadSingleWithoutZip = async (matricule: string) => {
+  try {
+    // Génère le QR code dans un canvas
+    const canvas = document.createElement('canvas');
+    await QRCode.toCanvas(canvas, matricule, { width: 300 });
+
+    // Crée un second canvas plus grand pour ajouter le texte
+    const finalCanvas = document.createElement('canvas');
+    const ctx = finalCanvas.getContext('2d')!;
+    const qrWidth = canvas.width;
+    const qrHeight = canvas.height;
+    const textHeight = 40;
+    finalCanvas.width = qrWidth;
+    finalCanvas.height = qrHeight + textHeight;
+
+    // Fond blanc pour toute l'image
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+    // Dessine le QR code
+    ctx.drawImage(canvas, 0, 0);
+    // Ajoute le texte du matricule en noir sur fond blanc
+    ctx.fillStyle = '#000000';
+    ctx.font = '20px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(matricule, qrWidth / 2, qrHeight + textHeight / 2);
+    // Convertit en blob et le télécharge
+    finalCanvas.toBlob((blob) => {
+      if (blob) {
+        saveAs(blob, `${matricule}.jpeg`);
+      }
+    }, 'image/jpeg');
+  } catch (error) {
+    console.error('Erreur lors de la génération du QR code', error);
+  }
+};

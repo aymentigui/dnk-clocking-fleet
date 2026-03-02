@@ -9,16 +9,17 @@ export const GET = withAuth(async (request, { user }) => {
         const session = await verifySession()
         if (!session || session.status != 200) {
             return NextResponse.json(
-                { message: "Failed to fetch vehicles auth" },
-                { status: 500 }
+                { message: "Not authorized" },
+                { status: 401 }
             );
         }
+
         // Get supervisor's device with all_region
         const device = await prisma.device.findFirst({
             where: { user_id: session.data.user.id },
         });
 
-        if (!device || !device.all_region) {
+        if (!device || !device.all_region || device.type !== 5) {
             return NextResponse.json(
                 { message: "No regions found for this supervisor" },
                 { status: 404 }

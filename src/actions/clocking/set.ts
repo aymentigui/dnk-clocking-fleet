@@ -288,7 +288,7 @@ export async function createClocking(data: any) {
                     type: "1"
                 }
             })
-        } else if (!existingVehicle.region_id2 && (data.type === 3 || data.type === 4)) {
+        } else if (!existingVehicle.region_id2 && (data.type === 3 || data.type === 4) && existingVehicle.region_id!==existingDevice.region_id) {
             await prisma.vehicle.update({
                 data: {
                     region_id2: existingDevice.region_id

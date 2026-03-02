@@ -12,7 +12,7 @@ export async function deleteConducteur(ids: string[]): Promise<{ status: number,
         if (!session?.data?.user) {
             return { status: 401, data: { message: e("unauthorized") } };
         }
-        const hasPermissionAdd = await withAuthorizationPermission(['conducteur_delete'],session.data.user.id);
+        const hasPermissionAdd = await withAuthorizationPermission(['conducteur_delete'], session.data.user.id);
 
         if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
             return { status: 403, data: { message: e('forbidden') } };
