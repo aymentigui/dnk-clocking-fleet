@@ -83,7 +83,7 @@ export const GET = withAuth(async (request, { user }) => {
                 vehicle_id: clocking.vehicle_id,
                 region: clocking.region?.name,
                 park: clocking.park?.name,
-                status: clocking.type===0?"خرجت من الحظيرة": clocking.type===1?"دخلت الحظيرة": clocking.type===2? "خرجت من المنطقة": clocking.type===3? "دخلت المنطقة": clocking.type===4? "في الصيانة": "في الحظيرة",
+                status: clocking.type===0?"خرجت من الحظيرة": clocking.type===1?"دخلت الحظيرة": clocking.type===3? "خرجت من المنطقة": clocking.type===4? "دخلت المنطقة": clocking.type===5? "في الصيانة": "في الحظيرة",
                 conducteur: clocking.conducteur_name,
                 created_at: clocking.created_at,
             }

@@ -42,6 +42,7 @@ export const GET = withAuth(async (request, { user }) => {
                 matricule: true,
                 brand: true,
                 model: true,
+                year:true,
                 status: true,
                 last_region: true,
             },
@@ -50,30 +51,36 @@ export const GET = withAuth(async (request, { user }) => {
             },
             distinct: ["id"],
         });
-        
-        const filtredVehicles = vehicles.filter((vehicle) => {
+
+        const filtredVehicles = await Promise.all(vehicles.map(async (vehicle) => {
 
             let status = "في الحظيرة"
             if(vehicle.status ==="exit_from_park"){
                 status = "خرجت من الحظيرة"
-            }else if(vehicle.status ==="enter_to_park"){
+            }else if(vehicle.status ==="entry_to_park"){
                 status = "دخلت الحظيرة"
             }else if(vehicle.status ==="maintenance"){
                 status = "في الصيانة"
-            }else if(vehicle.status ==="enter_to_region"){
+            }else if(vehicle.status ==="entry_to_region"){
                 status= "دخلت المنطقة"
             }else if(vehicle.status ==="exit_from_region"){
                 status= "خرجت من المنطقة"
             }
 
+            const region = vehicle.last_region? await prisma.region.findFirst({
+                where: { id: vehicle.last_region },
+            }): null;
+
             return {
                 id: vehicle.id,
                 matricule: vehicle.matricule,
                 brand: vehicle.brand,
+                year: vehicle.year,
                 model: vehicle.model,
                 status: status,
+                last_region: region?.name,
             }
-        });
+        }));
 
         return NextResponse.json(
             {

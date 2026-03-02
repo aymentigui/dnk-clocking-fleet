@@ -183,14 +183,13 @@ export async function createClocking(data: any) {
                     where: { id: existingConducteur.id },
                     data: { status: "exit_from_region" },
                 });
-                const datee = new Date();
                 course = await prisma.course.findFirst({
                     where: {
                         vehicle_id: existingVehicle.id,
                         end_date: null,
                         waiting: true,
                         start_date: {
-                            gt: new Date(datee.setHours(0, 0, 0, 0)), // must be today
+                            gt: new Date((new Date()).setHours(0, 0, 0, 0)), // must be today
                             lte: new Date(),
                         },
                     },
