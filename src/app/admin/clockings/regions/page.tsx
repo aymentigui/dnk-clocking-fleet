@@ -124,8 +124,8 @@ export default function RegionStatisticsPage() {
                                     <tr className="border-b bg-muted/50">
                                         <th className="h-12 px-4 text-left align-middle font-medium">{t("Clocking.region")}</th>
                                         {/* <th className="h-12 px-4 text-left align-middle font-medium">{t("Clocking.description")}</th> */}
-                                        <th className="h-12 px-4 text-center align-middle font-medium">{t("Clocking.totalClockings")}</th>
                                         <th className="h-12 px-4 text-center align-middle font-medium">{t("Clocking.totalVehicles")}</th>
+                                        <th className="h-12 px-4 text-center align-middle font-medium">{t("Clocking.totalClockings")}</th>
                                         <th className="h-12 px-4 text-center align-middle font-medium">{t("Clocking.entries")}</th>
                                         <th className="h-12 px-4 text-center align-middle font-medium">{t("Clocking.exits")}</th>
                                         <th className="h-12 px-4 text-center align-middle font-medium">{t("Clocking.actions")}</th>
@@ -141,24 +141,24 @@ export default function RegionStatisticsPage() {
                                                 <p className="text-sm text-muted-foreground">{region.description || "-"}</p>
                                             </td> */}
                                             <td className="p-4 align-middle text-center">
+                                                <p className="text-lg font-bold">{region.uniqueTotalVehicles} {t("Clocking.vehicles")}</p>
+                                            </td>
+                                            <td className="p-4 align-middle text-center">
                                                 <p className="text-lg font-bold">{region.totalClockings}</p>
                                             </td>
                                             <td className="p-4 align-middle text-center">
-                                                <p className="text-lg font-bold">{region.uniqueTotalVehicles}</p>
-                                            </td>
-                                            <td className="p-4 align-middle text-center">
                                                 <div className="flex flex-col items-center gap-1">
-                                                    <Badge variant="default">{region.entryClockings}</Badge>
+                                                    <Badge variant="default">{region.uniqueEntryVehicles} {t("Clocking.vehicles")}</Badge>
                                                     <span className="text-xs text-muted-foreground">
-                                                        {region.uniqueEntryVehicles} {t("Clocking.vehicles")}
+                                                        {region.entryClockings}
                                                     </span>
                                                 </div>
                                             </td>
                                             <td className="p-4 align-middle text-center">
                                                 <div className="flex flex-col items-center gap-1">
-                                                    <Badge variant="destructive">{region.exitClockings}</Badge>
+                                                    <Badge variant="destructive">{region.uniqueExitVehicles} {t("Clocking.vehicles")}</Badge>
                                                     <span className="text-xs text-muted-foreground">
-                                                        {region.uniqueExitVehicles} {t("Clocking.vehicles")}
+                                                        {region.exitClockings}
                                                     </span>
                                                 </div>
                                             </td>

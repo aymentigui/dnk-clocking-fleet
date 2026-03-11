@@ -1,28 +1,32 @@
 
-import { accessPage, withAuthorizationPermission, verifySession } from '@/actions/permissions'
-import AddModalButton from '@/components/my/button/add-modal-button'
+"use client"
 import { Card } from '@/components/ui/card'
-import React from 'react'
-import { useAddUpdateVehicleDialog } from '@/context/add-update-dialog-context-vehicle';
+import React, { useEffect } from 'react'
 import ListVehicles from './_component/list-vehicles';
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { useSession } from '@/hooks/use-session';
 
-const Page = async () => {
+const Page = () => {
 
-  const session = await verifySession()
+  const translate = useTranslations("Vehicle")
+  const { session } = useSession()
 
-  if (!session || session.status !== 200 || !session.data.user || !session.data.user.id) {
-    return null;
-  }
-  await accessPage(['vehicles_view'], session.data.user.id);
-  const hasPermissionView = await withAuthorizationPermission(['vehicles_view'], session.data.user.id);
-  const hasPermissionAdd = await withAuthorizationPermission(['vehicles_create'], session.data.user.id);
+
+  const hasPermissionAdd = session?.user?.permissions?.includes("vehicles_create") || session?.user?.is_admin
 
   return (
     <Card className='p-4 w-full'>
       <div className='flex flex-col gap-2'>
-        {hasPermissionAdd.data.hasPermission && <AddModalButton translationName="Vehicle" translationButton="addvehicle" useModal={useAddUpdateVehicleDialog} />}
-        {/* <ListUsers /> */}
-        {hasPermissionView.data.hasPermission && <ListVehicles />}
+        {hasPermissionAdd && (
+          <Link href="/admin/vehicles/add">
+            <Button>
+              {translate("addvehicle")}
+            </Button>
+          </Link>
+        )}
+        <ListVehicles />
       </div>
     </Card>
   )

@@ -16,18 +16,14 @@ export const GET = withAuth(async (request, { user }) => {
         { status: 500 },
       );
     }
-    // Get supervisor's regions
-    const device = await prisma.device.findFirst({
-      where: { user_id: session.data.user.id },
-    });
 
     const hasPermissionAdd = await withAuthorizationPermission([
       "vehicles_view",
     ]);
 
     if (
-      (!device?.park_id || device.type !== 2) &&
-      (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission)
+      hasPermissionAdd.status != 200 ||
+      !hasPermissionAdd.data.hasPermission
     ) {
       return NextResponse.json(
         { message: "No regions found for this supervisor" },
@@ -35,16 +31,21 @@ export const GET = withAuth(async (request, { user }) => {
       );
     }
 
-    let whereClause;
-    if (device?.park_id) {
-      whereClause = {
-        park_id: device.park_id,
-      };
+    const { searchParams } = new URL(request.url);
+    const park_id = searchParams.get("park_id");
+
+    if (!park_id) {
+      return NextResponse.json(
+        { message: "Park ID is required" },
+        { status: 400 },
+      );
     }
 
     // Get vehicles
     const vehicles = await prisma.vehicle.findMany({
-      where: whereClause,
+      where: {
+        park_id: park_id,
+      },
       select: {
         id: true,
         matricule: true,

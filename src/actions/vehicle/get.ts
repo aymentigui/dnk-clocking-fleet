@@ -1,551 +1,705 @@
-"use server"
+"use server";
 
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { withAuthorizationPermission, verifySession } from "../permissions";
 
-
-export async function getVehicles(page: number = 1, pageSize: number = 10, searchQuery?: string, searchPark?: string, searchRegion?: string, lastRegion?: string, in_park?: boolean): Promise<{ status: number, data: any }> {
-    const e = await getTranslations('Error');
-    try {
-        const session = await verifySession()
-        if (!session || session.status != 200) {
-            return { status: 401, data: { message: e('unauthorized') } }
-        }
-        const hasPermissionAdd = await withAuthorizationPermission(['vehicles_view']);
-
-        if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
-            return { status: 403, data: { message: e('forbidden') } };
-        }
-
-        // Calculer le nombre d'éléments à sauter
-        const skip = (page - 1) * pageSize;
-        const searchConditions = {}
-        if ((searchQuery && searchQuery !== ""))
-            // @ts-ignore
-            searchConditions.OR = [
-                { matricule: { contains: searchQuery } },
-                {
-                    vin: {
-                        contains: searchQuery,
-                    }
-                },
-                {
-                    brand: {
-                        contains: searchQuery,
-                    }
-                },
-                {
-                    model: {
-                        contains: searchQuery,
-                    }
-                },
-            ]
-
-        if ((searchPark && searchPark !== "" && searchPark !== "0"))
-            // @ts-ignore
-            searchConditions.AND = [
-                {
-                    park_id: searchPark
-                }
-            ]
-        if ((searchRegion && searchRegion !== "" && searchRegion !== "0")) {
-            // @ts-ignore
-            if (!searchConditions.AND)
-                // @ts-ignore
-                searchConditions.AND = []
-            // @ts-ignore
-            searchConditions.AND.push(
-                {
-                    region_id: searchRegion
-                }
-            )
-        }
-        if (in_park === true || in_park === false) {
-            // @ts-ignore
-            if (!searchConditions.AND)
-                // @ts-ignore
-                searchConditions.AND = []
-            // @ts-ignore
-            searchConditions.AND.push(
-                {
-                    in_park: in_park
-                }
-            )
-        }
-
-        const vehicles1 = await prisma.vehicle.findMany({
-            skip: skip, // Nombre d'éléments à sauter
-            take: pageSize === 0 ? undefined : pageSize, // Nombre d'éléments à prendre
-            where: searchConditions,
-            include: {
-                region: true,
-                park: true,
-            }
-        });
-
-        const vehicles = lastRegion ? vehicles1.filter((vehicle) => vehicle.last_region === lastRegion) : vehicles1
-
-        // Récupérer toutes les régions nécessaires pour la deuxième région
-        const regionIds2 = vehicles
-            .map(vehicle => vehicle.region_id2)
-            .filter(id => id !== null) as string[];
-
-        let regions2: any[] = [];
-        if (regionIds2.length > 0) {
-            regions2 = await prisma.region.findMany({
-                where: {
-                    id: {
-                        in: regionIds2
-                    }
-                }
-            });
-        }
-
-        // Créer une map pour un accès rapide aux régions par ID
-        const regionMap = new Map();
-        regions2.forEach(region => {
-            regionMap.set(region.id, region);
-        });
-
-        const vehiclesFormatted = vehicles.map((vehicle) => {
-            const region2 = vehicle.region_id2 ? regionMap.get(vehicle.region_id2) : null;
-            return {
-                id: vehicle.id,
-                matricule: vehicle.matricule,
-                vin: vehicle.vin,
-                brand: vehicle.brand,
-                model: vehicle.model,
-                year: vehicle.year,
-                status: vehicle.status,
-                inpark: vehicle.in_park,
-                park: vehicle.park ? vehicle.park.name : "",
-                parkId: vehicle.park ? vehicle.park.id : "",
-                region: vehicle.region ? vehicle.region.name : "",
-                regionId: vehicle.region ? vehicle.region.id : "",
-                region2: region2 ? region2.name : "",
-                regionId2: vehicle.region_id2 ? vehicle.region_id2 : "",
-            }
-        })
-
-        return { status: 200, data: vehiclesFormatted };
-    } catch (error) {
-        return { status: 500, data: null };
+export async function getVehiclesSANSPAGINATION(): Promise<{
+  status: number;
+  data: any;
+}> {
+  const e = await getTranslations("Error");
+  try {
+    const session = await verifySession();
+    if (!session || session.status != 200) {
+      return { status: 401, data: { message: e("unauthorized") } };
     }
+    const hasPermissionAdd = await withAuthorizationPermission([
+      "vehicles_view",
+    ]);
+
+    if (
+      hasPermissionAdd.status != 200 ||
+      !hasPermissionAdd.data.hasPermission
+    ) {
+      return { status: 403, data: { message: e("forbidden") } };
+    }
+
+    const vehicles = await prisma.vehicle.findMany({
+      include: {
+        region: true,
+        park: true,
+      },
+    });
+
+    let regions2: any[] = [];
+    regions2 = await prisma.region.findMany();
+
+    // Créer une map pour un accès rapide aux régions par ID
+    const regionMap = new Map();
+    regions2.forEach((region) => {
+      regionMap.set(region.id, region);
+    });
+
+    const vehiclesFormatted = vehicles.map((vehicle) => {
+      const region2 = vehicle.region_id2
+        ? regionMap.get(vehicle.region_id2)
+        : null;
+      return {
+        id: vehicle.id,
+        matricule: vehicle.matricule,
+        vin: vehicle.vin,
+        brand: vehicle.brand,
+        model: vehicle.model,
+        year: vehicle.year,
+        status: vehicle.status,
+        inpark: vehicle.in_park,
+        park: vehicle.park ? vehicle.park.name : "",
+        parkId: vehicle.park ? vehicle.park.id : "",
+        region: vehicle.region ? vehicle.region.name : "",
+        regionId: vehicle.region ? vehicle.region.id : "",
+        region2: region2 ? region2.name : "",
+        regionId2: vehicle.region_id2 ? vehicle.region_id2 : "",
+      };
+    });
+
+    return { status: 200, data: vehiclesFormatted };
+  } catch (error) {
+    return { status: 500, data: null };
+  }
 }
 
-export async function getCountVehicles(searchQuery?: string, searchPark?: string, searchRegion?: string, lastRegion?: string, in_park?: boolean): Promise<{ status: number, data: any }> {
+export async function getVehicles(
+  page: number = 1,
+  pageSize: number = 10,
+  searchQuery?: string,
+  searchPark?: string,
+  searchRegion?: string,
+  lastRegion?: string,
+  in_park?: boolean,
+): Promise<{ status: number; data: any }> {
+  const e = await getTranslations("Error");
+  try {
+    const session = await verifySession();
+    if (!session || session.status != 200) {
+      return { status: 401, data: { message: e("unauthorized") } };
+    }
+    const hasPermissionAdd = await withAuthorizationPermission([
+      "vehicles_view",
+    ]);
 
-    const searchConditions = {}
-    if ((searchQuery && searchQuery !== ""))
+    if (
+      hasPermissionAdd.status != 200 ||
+      !hasPermissionAdd.data.hasPermission
+    ) {
+      return { status: 403, data: { message: e("forbidden") } };
+    }
+
+    // Calculer le nombre d'éléments à sauter
+    const skip = (page - 1) * pageSize;
+    const searchConditions = {};
+    if (searchQuery && searchQuery !== "")
+      // @ts-ignore
+      searchConditions.OR = [
+        { matricule: { contains: searchQuery } },
+        {
+          vin: {
+            contains: searchQuery,
+          },
+        },
+        {
+          brand: {
+            contains: searchQuery,
+          },
+        },
+        {
+          model: {
+            contains: searchQuery,
+          },
+        },
+      ];
+
+    if (searchPark && searchPark !== "" && searchPark !== "0")
+      // @ts-ignore
+      searchConditions.AND = [
+        {
+          park_id: searchPark,
+        },
+      ];
+    if (searchRegion && searchRegion !== "" && searchRegion !== "0") {
+      // @ts-ignore
+      if (!searchConditions.AND)
         // @ts-ignore
-        searchConditions.OR = [
-            { matricule: { contains: searchQuery } },
-            {
-                vin: {
-                    contains: searchQuery,
-                }
-            },
-            {
-                brand: {
-                    contains: searchQuery
-                }
-            },
-            {
-                model: {
-                    contains: searchQuery
-                }
-            },
-        ]
-    if ((searchPark && searchPark !== "" && searchPark !== "0"))
-        // @ts-ignore
-        searchConditions.AND = [{ park_id: searchPark }]
-    if ((searchRegion && searchRegion !== "" && searchRegion !== "0")) {
-        // @ts-ignore
-        if (!searchConditions.AND)
-            // @ts-ignore
-            searchConditions.AND = []
-        // @ts-ignore
-        searchConditions.AND.push({ region_id: searchRegion })
+        searchConditions.AND = [];
+      // @ts-ignore
+      searchConditions.AND.push({
+        region_id: searchRegion,
+      });
     }
     if (in_park === true || in_park === false) {
+      // @ts-ignore
+      if (!searchConditions.AND)
         // @ts-ignore
-        if (!searchConditions.AND)
-            // @ts-ignore
-            searchConditions.AND = []
-        // @ts-ignore
-        searchConditions.AND.push(
-            {
-                in_park: in_park
-            }
-        )
+        searchConditions.AND = [];
+      // @ts-ignore
+      searchConditions.AND.push({
+        in_park: in_park,
+      });
     }
 
-    const e = await getTranslations('Error');
-    try {
-        const vehicles = await prisma.vehicle.findMany({
-            where: searchConditions,
-            include: {
-                park: true,
-                region: true,
-            }
-        });
+    const vehicles1 = await prisma.vehicle.findMany({
+      skip: skip, // Nombre d'éléments à sauter
+      take: pageSize === 0 ? undefined : pageSize, // Nombre d'éléments à prendre
+      where: searchConditions,
+      include: {
+        region: true,
+        park: true,
+      },
+    });
 
-        const count = lastRegion ? vehicles.filter((vehicle) => vehicle.last_region === lastRegion).length : vehicles.length
+    const vehicles = lastRegion
+      ? vehicles1.filter((vehicle) => vehicle.last_region === lastRegion)
+      : vehicles1;
 
-        return { status: 200, data: count };
-    } catch (error) {
-        return { status: 500, data: null };
+    // Récupérer toutes les régions nécessaires pour la deuxième région
+    const regionIds2 = vehicles
+      .map((vehicle) => vehicle.region_id2)
+      .filter((id) => id !== null) as string[];
+
+    let regions2: any[] = [];
+    if (regionIds2.length > 0) {
+      regions2 = await prisma.region.findMany({
+        where: {
+          id: {
+            in: regionIds2,
+          },
+        },
+      });
     }
+
+    // Créer une map pour un accès rapide aux régions par ID
+    const regionMap = new Map();
+    regions2.forEach((region) => {
+      regionMap.set(region.id, region);
+    });
+
+    const vehiclesFormatted = vehicles.map((vehicle) => {
+      const region2 = vehicle.region_id2
+        ? regionMap.get(vehicle.region_id2)
+        : null;
+      return {
+        id: vehicle.id,
+        matricule: vehicle.matricule,
+        vin: vehicle.vin,
+        brand: vehicle.brand,
+        model: vehicle.model,
+        year: vehicle.year,
+        status: vehicle.status,
+        inpark: vehicle.in_park,
+        park: vehicle.park ? vehicle.park.name : "",
+        parkId: vehicle.park ? vehicle.park.id : "",
+        region: vehicle.region ? vehicle.region.name : "",
+        regionId: vehicle.region ? vehicle.region.id : "",
+        region2: region2 ? region2.name : "",
+        regionId2: vehicle.region_id2 ? vehicle.region_id2 : "",
+      };
+    });
+
+    return { status: 200, data: vehiclesFormatted };
+  } catch (error) {
+    return { status: 500, data: null };
+  }
 }
 
-export async function getVehiclesAll(): Promise<{ status: number, data: any }> {
-    const e = await getTranslations('Error');
-    try {
-        const session = await verifySession();
-        if (!session?.data?.user) {
-            return { status: 401, data: { message: e("unauthorized") } };
-        }
-        const vehicles = await prisma.vehicle.findMany({
-            include: {
-                park: true,
-                region: true,
-            }
-        });
+export async function getCountVehicles(
+  searchQuery?: string,
+  searchPark?: string,
+  searchRegion?: string,
+  lastRegion?: string,
+  in_park?: boolean,
+): Promise<{ status: number; data: any }> {
+  const searchConditions = {};
+  if (searchQuery && searchQuery !== "")
+    // @ts-ignore
+    searchConditions.OR = [
+      { matricule: { contains: searchQuery } },
+      {
+        vin: {
+          contains: searchQuery,
+        },
+      },
+      {
+        brand: {
+          contains: searchQuery,
+        },
+      },
+      {
+        model: {
+          contains: searchQuery,
+        },
+      },
+    ];
+  if (searchPark && searchPark !== "" && searchPark !== "0")
+    // @ts-ignore
+    searchConditions.AND = [{ park_id: searchPark }];
+  if (searchRegion && searchRegion !== "" && searchRegion !== "0") {
+    // @ts-ignore
+    if (!searchConditions.AND)
+      // @ts-ignore
+      searchConditions.AND = [];
+    // @ts-ignore
+    searchConditions.AND.push({ region_id: searchRegion });
+  }
+  if (in_park === true || in_park === false) {
+    // @ts-ignore
+    if (!searchConditions.AND)
+      // @ts-ignore
+      searchConditions.AND = [];
+    // @ts-ignore
+    searchConditions.AND.push({
+      in_park: in_park,
+    });
+  }
 
-        return { status: 200, data: vehicles };
-    } catch (error) {
-        return { status: 500, data: { message: e("error") } };
-    }
+  const e = await getTranslations("Error");
+  try {
+    const vehicles = await prisma.vehicle.findMany({
+      where: searchConditions,
+      include: {
+        park: true,
+        region: true,
+      },
+    });
+
+    const count = lastRegion
+      ? vehicles.filter((vehicle) => vehicle.last_region === lastRegion).length
+      : vehicles.length;
+
+    return { status: 200, data: count };
+  } catch (error) {
+    return { status: 500, data: null };
+  }
 }
 
-export async function getVehiclesAllMatrciule(): Promise<{ status: number, data: any }> {
-    const e = await getTranslations('Error');
-    try {
-        const session = await verifySession();
-        if (!session?.data?.user) return { status: 401, data: { message: e("unauthorized") } };
-
-        const hasPermission = await withAuthorizationPermission(['vehicles_view'], session.data.user.id);
-        if (hasPermission.status != 200 || !hasPermission.data.hasPermission) return { status: 403, data: { message: e('forbidden') } };
-
-        const vehicles = await prisma.vehicle.findMany({ select: { matricule: true } });
-        const vehicleFormatted = vehicles.map((vehicle) => vehicle.matricule)
-
-        return { status: 200, data: vehicleFormatted };
-    } catch (error) {
-        return { status: 500, data: { message: e("error") } };
+export async function getVehiclesAll(): Promise<{ status: number; data: any }> {
+  const e = await getTranslations("Error");
+  try {
+    const session = await verifySession();
+    if (!session?.data?.user) {
+      return { status: 401, data: { message: e("unauthorized") } };
     }
+    const vehicles = await prisma.vehicle.findMany({
+      include: {
+        park: true,
+        region: true,
+      },
+    });
+
+    return { status: 200, data: vehicles };
+  } catch (error) {
+    return { status: 500, data: { message: e("error") } };
+  }
 }
 
-export async function getVehicle(id: string): Promise<{ status: number, data: any }> {
-    const e = await getTranslations('Error');
-    try {
-        const session = await verifySession();
-        if (!session?.data?.user) {
-            return { status: 401, data: { message: e("unauthorized") } };
-        }
-        const hasPermissionAdd = await withAuthorizationPermission(['vehicles_view'], session.data.user.id);
+export async function getVehiclesAllMatrciule(): Promise<{
+  status: number;
+  data: any;
+}> {
+  const e = await getTranslations("Error");
+  try {
+    const session = await verifySession();
+    if (!session?.data?.user)
+      return { status: 401, data: { message: e("unauthorized") } };
 
-        if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
-            return { status: 403, data: { message: e('forbidden') } };
-        }
-        const vehicle = await prisma.vehicle.findUnique({
-            where: { id },
-            select: {
-                id: true,
-                matricule: true,
-                vin: true,
-                brand: true,
-                model: true,
-                year: true,
-                region_id: true,
-                region_id2: true,
-                region: true,
-                park: true
-            }
-        });
+    const hasPermission = await withAuthorizationPermission(
+      ["vehicles_view"],
+      session.data.user.id,
+    );
+    if (hasPermission.status != 200 || !hasPermission.data.hasPermission)
+      return { status: 403, data: { message: e("forbidden") } };
 
+    const vehicles = await prisma.vehicle.findMany({
+      select: { matricule: true },
+    });
+    const vehicleFormatted = vehicles.map((vehicle) => vehicle.matricule);
 
-        const region2 = vehicle && vehicle.region_id2 ? await prisma.region.findUnique({ where: { id: vehicle.region_id2 } }) : null
-
-        const vehicleFormatted = vehicle ? {
-            id: vehicle.id,
-            matricule: vehicle.matricule,
-            vin: vehicle.vin,
-            brand: vehicle.brand,
-            model: vehicle.model,
-            year: vehicle.year,
-            park: vehicle.park ? vehicle.park.name : "",
-            parkId: vehicle.park ? vehicle.park.id : "",
-            region: vehicle.region ? vehicle.region.name : "",
-            regionId: vehicle.region ? vehicle.region.id : "",
-            region2: region2 ? region2.name : "",
-            regionId2: region2 ? region2.id : "",
-        } : null
-
-        return { status: 200, data: vehicleFormatted };
-    } catch (error) {
-        return { status: 500, data: { message: e("error") } };
-    }
+    return { status: 200, data: vehicleFormatted };
+  } catch (error) {
+    return { status: 500, data: { message: e("error") } };
+  }
 }
 
-export async function getVehiclesWithIds(vehicleIds: string[]): Promise<{ status: number, data: any }> {
-
-    const e = await getTranslations('Error');
-    try {
-        const session = await verifySession()
-        if (!session || session.status != 200) return { status: 401, data: { message: e('unauthorized') } }
-
-        const hasPermissionAdd = await withAuthorizationPermission(['vehicles_view']);
-
-        if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) return { status: 403, data: { message: e('forbidden') } };
-
-        const devices = await prisma.vehicle.findMany({
-            where: { id: { in: vehicleIds, } },
-            include: {
-                park: true,
-                region: true,
-            }
-        });
-
-        return { status: 200, data: devices };
-    } catch (error) {
-        return { status: 500, data: null };
+export async function getVehicle(
+  id: string,
+): Promise<{ status: number; data: any }> {
+  const e = await getTranslations("Error");
+  try {
+    const session = await verifySession();
+    if (!session?.data?.user) {
+      return { status: 401, data: { message: e("unauthorized") } };
     }
+    const hasPermissionAdd = await withAuthorizationPermission(
+      ["vehicles_view"],
+      session.data.user.id,
+    );
+
+    if (
+      hasPermissionAdd.status != 200 ||
+      !hasPermissionAdd.data.hasPermission
+    ) {
+      return { status: 403, data: { message: e("forbidden") } };
+    }
+    const vehicle = await prisma.vehicle.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        matricule: true,
+        vin: true,
+        brand: true,
+        model: true,
+        year: true,
+        region_id: true,
+        region_id2: true,
+        region: true,
+        park: true,
+      },
+    });
+
+    const region2 =
+      vehicle && vehicle.region_id2
+        ? await prisma.region.findUnique({ where: { id: vehicle.region_id2 } })
+        : null;
+
+    const vehicleFormatted = vehicle
+      ? {
+          id: vehicle.id,
+          matricule: vehicle.matricule,
+          vin: vehicle.vin,
+          brand: vehicle.brand,
+          model: vehicle.model,
+          year: vehicle.year,
+          park: vehicle.park ? vehicle.park.name : "",
+          parkId: vehicle.park ? vehicle.park.id : "",
+          region: vehicle.region ? vehicle.region.name : "",
+          regionId: vehicle.region ? vehicle.region.id : "",
+          region2: region2 ? region2.name : "",
+          regionId2: region2 ? region2.id : "",
+        }
+      : null;
+
+    return { status: 200, data: vehicleFormatted };
+  } catch (error) {
+    return { status: 500, data: { message: e("error") } };
+  }
 }
 
-export async function getVehiclesMatriculeWithIds(vehicleIds: string[]): Promise<{ status: number, data: any }> {
+export async function getVehiclesWithIds(
+  vehicleIds: string[],
+): Promise<{ status: number; data: any }> {
+  const e = await getTranslations("Error");
+  try {
+    const session = await verifySession();
+    if (!session || session.status != 200)
+      return { status: 401, data: { message: e("unauthorized") } };
 
-    const e = await getTranslations('Error');
-    try {
-        const session = await verifySession()
-        if (!session || session.status != 200) return { status: 401, data: { message: e('unauthorized') } }
+    const hasPermissionAdd = await withAuthorizationPermission([
+      "vehicles_view",
+    ]);
 
-        const hasPermissionAdd = await withAuthorizationPermission(['vehicles_view']);
+    if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission)
+      return { status: 403, data: { message: e("forbidden") } };
 
-        if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) return { status: 403, data: { message: e('forbidden') } };
+    const devices = await prisma.vehicle.findMany({
+      where: { id: { in: vehicleIds } },
+      include: {
+        park: true,
+        region: true,
+      },
+    });
 
-        const vehicles = await prisma.vehicle.findMany({
-            where: { id: { in: vehicleIds, } }, select: { matricule: true }
-        });
-
-        const vehiclesFormatted = vehicles.map((vehicle) => vehicle.matricule)
-
-        return { status: 200, data: vehiclesFormatted };
-    } catch (error) {
-        return { status: 500, data: null };
-    }
+    return { status: 200, data: devices };
+  } catch (error) {
+    return { status: 500, data: null };
+  }
 }
 
-export async function getVehicleParks(id: string, page: number, pageSize: number): Promise<{ status: number, data: any, count: number }> {
-    const e = await getTranslations('Error');
-    try {
-        const session = await verifySession();
-        if (!session?.data?.user) {
-            return { status: 401, data: { message: e("unauthorized") }, count: 0 };
-        }
-        const hasPermissionAdd = await withAuthorizationPermission(['vehicles_park_view'], session.data.user.id);
+export async function getVehiclesMatriculeWithIds(
+  vehicleIds: string[],
+): Promise<{ status: number; data: any }> {
+  const e = await getTranslations("Error");
+  try {
+    const session = await verifySession();
+    if (!session || session.status != 200)
+      return { status: 401, data: { message: e("unauthorized") } };
 
-        if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
-            return { status: 403, data: { message: e('forbidden') }, count: 0 };
-        }
-        const vehicle = await prisma.vehicle.findUnique({ where: { id } });
+    const hasPermissionAdd = await withAuthorizationPermission([
+      "vehicles_view",
+    ]);
 
-        if (!vehicle) {
-            return { status: 404, data: null, count: 0 };
-        }
+    if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission)
+      return { status: 403, data: { message: e("forbidden") } };
 
+    const vehicles = await prisma.vehicle.findMany({
+      where: { id: { in: vehicleIds } },
+      select: { matricule: true },
+    });
 
-        const vehicleParks = await prisma.vehicle_park.findMany({
-            skip: (page - 1) * pageSize,
-            take: 5,
-            orderBy: {
-                added_at: 'desc',
-            },
-            where: {
-                vehicle_id: id,
-            },
-            include: {
-                park: true,
-                user: {
-                    select: {
-                        username: true,
-                        firstname: true,
-                        lastname: true,
-                    }
-                }
-            },
-        });
+    const vehiclesFormatted = vehicles.map((vehicle) => vehicle.matricule);
 
-        const vehicleParksFormatted = vehicleParks.map((vehiclePark) => {
-            return {
-                id: vehiclePark.id,
-                added_at: vehiclePark.added_at.getDate() + "/" + (vehiclePark.added_at.getMonth() + 1) + "/" + vehiclePark.added_at.getFullYear(),
-                added_from: vehiclePark.user ? vehiclePark.user.firstname + " " + vehiclePark.user.lastname : "---",
-                park: vehiclePark.park ? vehiclePark.park.name : "---",
-                parkId: vehiclePark.park ? vehiclePark.park.id : "---",
-            }
-        })
-
-        const vehicleParksCount = await prisma.vehicle_park.count({
-            where: {
-                vehicle_id: id,
-            },
-        });
-
-        return { status: 200, data: vehicleParksFormatted, count: vehicleParksCount };
-    } catch (error) {
-        return { status: 500, data: { message: e("error") }, count: 0 };
-    }
+    return { status: 200, data: vehiclesFormatted };
+  } catch (error) {
+    return { status: 500, data: null };
+  }
 }
 
-export async function getVehicleRegions(id: string, page: number, pageSize: number): Promise<{ status: number, data: any, count: number }> {
-    const e = await getTranslations('Error');
-    try {
-        const session = await verifySession();
-        if (!session?.data?.user) {
-            return { status: 401, data: { message: e("unauthorized") }, count: 0 };
-        }
-        const hasPermissionAdd = await withAuthorizationPermission(['vehicles_region_view'], session.data.user.id);
-
-        if (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission) {
-            return { status: 403, data: { message: e('forbidden') }, count: 0 };
-        }
-        const vehicle = await prisma.vehicle.findUnique({ where: { id } });
-
-        if (!vehicle) {
-            return { status: 404, data: null, count: 0 };
-        }
-
-        const vehicleRegions = await prisma.vehicle_region.findMany({
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-            orderBy: {
-                added_at: 'desc',
-            },
-            where: {
-                vehicle_id: id,
-            },
-            include: {
-                region: true,
-                user: {
-                    select: {
-                        username: true,
-                        firstname: true,
-                        lastname: true,
-                    }
-                }
-            },
-        });
-
-        const vehicleRegionsFormatted = vehicleRegions.map((vehicleRegions) => {
-            return {
-                id: vehicleRegions.id,
-                added_at: vehicleRegions.added_at.getDate() + "/" + (vehicleRegions.added_at.getMonth() + 1) + "/" + vehicleRegions.added_at.getFullYear(),
-                added_from: vehicleRegions.user ? vehicleRegions.user.firstname + " " + vehicleRegions.user.lastname : "---",
-                region: vehicleRegions.region ? vehicleRegions.region.name : "---",
-                regionId: vehicleRegions.region ? vehicleRegions.region.id : "---",
-            }
-        })
-
-        const vehicleRegionCount = await prisma.vehicle_region.count({
-            where: {
-                vehicle_id: id,
-            },
-        });
-
-        return { status: 200, data: vehicleRegionsFormatted, count: vehicleRegionCount };
-    } catch (error) {
-        return { status: 500, data: { message: e("error") }, count: 0 };
+export async function getVehicleParks(
+  id: string,
+  page: number,
+  pageSize: number,
+): Promise<{ status: number; data: any; count: number }> {
+  const e = await getTranslations("Error");
+  try {
+    const session = await verifySession();
+    if (!session?.data?.user) {
+      return { status: 401, data: { message: e("unauthorized") }, count: 0 };
     }
+    const hasPermissionAdd = await withAuthorizationPermission(
+      ["vehicles_park_view"],
+      session.data.user.id,
+    );
+
+    if (
+      hasPermissionAdd.status != 200 ||
+      !hasPermissionAdd.data.hasPermission
+    ) {
+      return { status: 403, data: { message: e("forbidden") }, count: 0 };
+    }
+    const vehicle = await prisma.vehicle.findUnique({ where: { id } });
+
+    if (!vehicle) {
+      return { status: 404, data: null, count: 0 };
+    }
+
+    const vehicleParks = await prisma.vehicle_park.findMany({
+      skip: (page - 1) * pageSize,
+      take: 5,
+      orderBy: {
+        added_at: "desc",
+      },
+      where: {
+        vehicle_id: id,
+      },
+      include: {
+        park: true,
+        user: {
+          select: {
+            username: true,
+            firstname: true,
+            lastname: true,
+          },
+        },
+      },
+    });
+
+    const vehicleParksFormatted = vehicleParks.map((vehiclePark) => {
+      return {
+        id: vehiclePark.id,
+        added_at:
+          vehiclePark.added_at.getDate() +
+          "/" +
+          (vehiclePark.added_at.getMonth() + 1) +
+          "/" +
+          vehiclePark.added_at.getFullYear(),
+        added_from: vehiclePark.user
+          ? vehiclePark.user.firstname + " " + vehiclePark.user.lastname
+          : "---",
+        park: vehiclePark.park ? vehiclePark.park.name : "---",
+        parkId: vehiclePark.park ? vehiclePark.park.id : "---",
+      };
+    });
+
+    const vehicleParksCount = await prisma.vehicle_park.count({
+      where: {
+        vehicle_id: id,
+      },
+    });
+
+    return {
+      status: 200,
+      data: vehicleParksFormatted,
+      count: vehicleParksCount,
+    };
+  } catch (error) {
+    return { status: 500, data: { message: e("error") }, count: 0 };
+  }
 }
 
+export async function getVehicleRegions(
+  id: string,
+  page: number,
+  pageSize: number,
+): Promise<{ status: number; data: any; count: number }> {
+  const e = await getTranslations("Error");
+  try {
+    const session = await verifySession();
+    if (!session?.data?.user) {
+      return { status: 401, data: { message: e("unauthorized") }, count: 0 };
+    }
+    const hasPermissionAdd = await withAuthorizationPermission(
+      ["vehicles_region_view"],
+      session.data.user.id,
+    );
 
+    if (
+      hasPermissionAdd.status != 200 ||
+      !hasPermissionAdd.data.hasPermission
+    ) {
+      return { status: 403, data: { message: e("forbidden") }, count: 0 };
+    }
+    const vehicle = await prisma.vehicle.findUnique({ where: { id } });
 
-export async function getPositionVehicle (id: string) {
-    const e = await getTranslations('Error')
-    try {
-      const session = await verifySession()
-      if (!session?.data?.user) {
-        return { status: 401, data: { message: e('unauthorized') } }
-      }
-      
-      const vehicle = await prisma.vehicle.findUnique({
-        where: { id },
-        select: { imei: true }
-      })
-  
-      if(!vehicle || !vehicle.imei) {
-        return { status: 404, data: { message: e('vehicle_not_found') } }
-      }
-  
-      const imei = vehicle.imei
-      const user = await prisma.user.findUnique({
+    if (!vehicle) {
+      return { status: 404, data: null, count: 0 };
+    }
+
+    const vehicleRegions = await prisma.vehicle_region.findMany({
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      orderBy: {
+        added_at: "desc",
+      },
+      where: {
+        vehicle_id: id,
+      },
+      include: {
+        region: true,
+        user: {
+          select: {
+            username: true,
+            firstname: true,
+            lastname: true,
+          },
+        },
+      },
+    });
+
+    const vehicleRegionsFormatted = vehicleRegions.map((vehicleRegions) => {
+      return {
+        id: vehicleRegions.id,
+        added_at:
+          vehicleRegions.added_at.getDate() +
+          "/" +
+          (vehicleRegions.added_at.getMonth() + 1) +
+          "/" +
+          vehicleRegions.added_at.getFullYear(),
+        added_from: vehicleRegions.user
+          ? vehicleRegions.user.firstname + " " + vehicleRegions.user.lastname
+          : "---",
+        region: vehicleRegions.region ? vehicleRegions.region.name : "---",
+        regionId: vehicleRegions.region ? vehicleRegions.region.id : "---",
+      };
+    });
+
+    const vehicleRegionCount = await prisma.vehicle_region.count({
+      where: {
+        vehicle_id: id,
+      },
+    });
+
+    return {
+      status: 200,
+      data: vehicleRegionsFormatted,
+      count: vehicleRegionCount,
+    };
+  } catch (error) {
+    return { status: 500, data: { message: e("error") }, count: 0 };
+  }
+}
+
+export async function getPositionVehicle(id: string) {
+  const e = await getTranslations("Error");
+  try {
+    const session = await verifySession();
+    if (!session?.data?.user) {
+      return { status: 401, data: { message: e("unauthorized") } };
+    }
+
+    const vehicle = await prisma.vehicle.findUnique({
+      where: { id },
+      select: { imei: true },
+    });
+
+    if (!vehicle || !vehicle.imei) {
+      return { status: 404, data: { message: e("vehicle_not_found") } };
+    }
+
+    const imei = vehicle.imei;
+    const user = await prisma.user.findUnique({
+      where: { id: session.data.user.id },
+      select: { user_api_hash: true },
+    });
+    let user_api_hash = user?.user_api_hash;
+
+    if (!user || !user.user_api_hash) {
+      user_api_hash = await loginDJAZFLEET();
+    }
+
+    const vehicleResponse = await fetch(
+      `https://djazfleet-dz.com/api/get_devices?imei=${imei}&user_api_hash=${user_api_hash}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+
+    if (!vehicleResponse.ok) {
+      if (vehicleResponse.status === 401) {
+        await prisma.user.update({
           where: { id: session.data.user.id },
-          select: { user_api_hash: true }
-        })
-        let user_api_hash = user?.user_api_hash
-        
-        if (!user || !user.user_api_hash) {
-            user_api_hash = await loginDJAZFLEET()
-        }
+          data: { user_api_hash: null },
+        });
+      }
+      return { status: 500, data: { message: e("error") } };
+    }
+    const vehicleData = await vehicleResponse.json();
 
-      const vehicleResponse = await fetch(
-        `https://djazfleet-dz.com/api/get_devices?imei=${imei}&user_api_hash=${user_api_hash}`,
-        {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        }
-      )
-  
-      if (!vehicleResponse.ok) {
-        if (vehicleResponse.status === 401) {
-          await prisma.user.update({
-            where: { id: session.data.user.id },
-            data: { user_api_hash: null }
-          })
-        }
-        return { status: 500, data: { message: e('error') } }
-      }
-      const vehicleData = await vehicleResponse.json()
-  
-      return { status: 200, data: vehicleData[0].items[0] }
-    } catch (error) {
-      return { status: 500, data: { message: e('error') } }
-    }
+    return { status: 200, data: vehicleData[0].items[0] };
+  } catch (error) {
+    return { status: 500, data: { message: e("error") } };
   }
-  
-  async function loginDJAZFLEET () {
-    const e = await getTranslations('Error')
-    try {
-      const session = await verifySession()
-      if (!session?.data?.user) {
-        return { status: 401, data: { message: e('unauthorized') } }
-      }
-  
-      const response = await fetch(`https://djazfleet-dz.com/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'ayman@transtev.com',
-          password: 'Azert@123',
-          lang: 'en'
-        })
-      })
-      if (!response.ok) {
-        return { status: 500, data: { message: e('error') } }
-      }
-  
-      const responseData = await response.json()
-  
-      const user_api_hash = responseData.user_api_hash
-      await prisma.user.update({
-        where: { id: session.data.user.id },
-        data: { user_api_hash }
-      })
-  
-      return user_api_hash
-    } catch (error) {
-      return { status: 500, data: { message: e('error') } }
+}
+
+async function loginDJAZFLEET() {
+  const e = await getTranslations("Error");
+  try {
+    const session = await verifySession();
+    if (!session?.data?.user) {
+      return { status: 401, data: { message: e("unauthorized") } };
     }
+
+    const response = await fetch(`https://djazfleet-dz.com/api/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "ayman@transtev.com",
+        password: "Azert@123",
+        lang: "en",
+      }),
+    });
+    if (!response.ok) {
+      return { status: 500, data: { message: e("error") } };
+    }
+
+    const responseData = await response.json();
+
+    const user_api_hash = responseData.user_api_hash;
+    await prisma.user.update({
+      where: { id: session.data.user.id },
+      data: { user_api_hash },
+    });
+
+    return user_api_hash;
+  } catch (error) {
+    return { status: 500, data: { message: e("error") } };
   }
+}

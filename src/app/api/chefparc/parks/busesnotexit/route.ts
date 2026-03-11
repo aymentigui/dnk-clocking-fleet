@@ -16,18 +16,14 @@ export const GET = withAuth(async (request, { user }) => {
         { status: 500 },
       );
     }
-    // Get supervisor's regions
-    const device = await prisma.device.findFirst({
-      where: { user_id: session.data.user.id },
-    });
 
     const hasPermissionAdd = await withAuthorizationPermission([
       "vehicles_view",
     ]);
 
     if (
-      (!device?.park_id || device.type !== 2) &&
-      (hasPermissionAdd.status != 200 || !hasPermissionAdd.data.hasPermission)
+      hasPermissionAdd.status != 200 ||
+      !hasPermissionAdd.data.hasPermission
     ) {
       return NextResponse.json(
         { message: "No regions found for this supervisor" },
@@ -35,16 +31,21 @@ export const GET = withAuth(async (request, { user }) => {
       );
     }
 
-    let whereClause;
-    if (device?.park_id) {
-      whereClause = {
-        park_id: device.park_id,
-      };
+    const { searchParams } = new URL(request.url);
+    const park_id = searchParams.get("park_id");
+
+    if (!park_id) {
+      return NextResponse.json(
+        { message: "Park ID is required" },
+        { status: 400 },
+      );
     }
 
     // Get vehicles
     const vehicles = await prisma.vehicle.findMany({
-      where: whereClause,
+      where: {
+        park_id: park_id,
+      },
       select: {
         id: true,
         matricule: true,
@@ -62,20 +63,17 @@ export const GET = withAuth(async (request, { user }) => {
 
     const url = new URL(request.url);
     const date = url.searchParams.get("date");
-    const type = url.searchParams.get("type");
-    const filter = url.searchParams.get("filter");
 
     const statDate = date ? new Date(date) : new Date();
     const endDate = date ? new Date(date) : new Date();
     endDate.setHours(23, 59, 59, 999);
     statDate.setHours(0, 0, 0, 0);
 
-    const filtredVehiclesResults = await Promise.all(
+    const notExitVehiclesResults = await Promise.all(
       vehicles.map(async (vehicle) => {
         const haveClocking = await prisma.clocking.findFirst({
           where: {
             vehicle_id: vehicle.id,
-            type: Number(type ?? 0),
             created_at: {
               gte: statDate,
               lte: endDate,
@@ -83,11 +81,11 @@ export const GET = withAuth(async (request, { user }) => {
           },
         });
 
-        return haveClocking ? vehicle : null;
+        return haveClocking ? null : vehicle;
       }),
     );
 
-    let filtredVehicles = filtredVehiclesResults.filter(
+    let filtredVehicles = notExitVehiclesResults.filter(
       (v): v is (typeof vehicles)[number] => v !== null,
     );
 
@@ -98,31 +96,6 @@ export const GET = withAuth(async (request, { user }) => {
         },
         { status: 200 },
       );
-    }
-
-    if (filter) {
-      const newFiltredVehiclesResults = await Promise.all(
-        filtredVehicles.map(async (vehicle) => {
-          const haveClocking = await prisma.clocking.findFirst({
-            where: {
-              vehicle_id: vehicle.id,
-              type: { in: [3, 4] },
-              created_at: {
-                gte: statDate,
-                lte: endDate,
-              },
-            },
-          });
-
-          return haveClocking ? null : vehicle;
-        }),
-      );
-
-      const newFiltredVehicles = newFiltredVehiclesResults.filter(
-        (v): v is (typeof vehicles)[number] => v !== null,
-      );
-
-      filtredVehicles = newFiltredVehicles;
     }
 
     const vehiclesFormatted = filtredVehicles.map((vehicle) => {

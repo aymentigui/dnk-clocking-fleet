@@ -1,11 +1,10 @@
 "use client"
 import { useTranslations } from "next-intl";
 import Loading from "@/components/myui/loading";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useOrigin } from "@/hooks/use-origin";
 import { useRouter, useSearchParams } from "next/navigation";
 import SelectFetch from "@/components/myui/select-fetch";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useImportSheetsStore } from "@/hooks/use-import-csv";
 import toast from "react-hot-toast";
@@ -16,7 +15,12 @@ import ExportButton from "@/components/my/export-button";
 import SelectSearchFetch from "@/components/myui/select-search-fetch";
 import { getParksAdmin } from "@/actions/park/get";
 import { createVehicles } from "@/actions/vehicle/set";
-import { getCountVehicles, getPositionVehicle, getVehicles, getVehiclesAll, getVehiclesAllMatrciule, getVehiclesMatriculeWithIds, getVehiclesWithIds } from "@/actions/vehicle/get";
+import {
+  getPositionVehicle,
+  getVehiclesSANSPAGINATION,
+  getVehiclesAllMatrciule,
+  getVehiclesMatriculeWithIds,
+} from "@/actions/vehicle/get";
 import { deleteVehicles } from "@/actions/vehicle/delete";
 import { getColumns } from "@/actions/util/sheet-columns/vehicle";
 import { getColumns as getColumnsParc } from "@/actions/util/sheet-columns/vehicles-park";
@@ -27,10 +31,9 @@ import { generateQRCodeAndDownload } from "@/actions/util/qrcode";
 import { Eye, MapPinIcon, QrCode, Settings2, Trash } from "lucide-react";
 import { getRegionsAdmin } from "@/actions/region/get";
 import UpdateRegion from "./dialog/update-region";
-import { UpdateVehiclesIMEIMatricule, UpdateVehiclesParc, UpdateVehiclesParcMatricule, UpdateVehiclesRegionMatricules } from "@/actions/vehicle/update";
+import { UpdateVehiclesIMEIMatricule, UpdateVehiclesParcMatricule, UpdateVehiclesRegionMatricules } from "@/actions/vehicle/update";
 import SearchTable from "@/components/myui/table/search-table";
 import TablePagination from "@/components/myui/table/table-pagination";
-import { useAddUpdateVehicleDialog } from "@/context/add-update-dialog-context-vehicle";
 import { LocationMapDialog } from "@/components/dialogs/LocationMapDialog";
 
 const selectors = [
@@ -46,290 +49,299 @@ export default function ListVehicles() {
   const [openMap, setOpenMap] = useState(false);
   const [positionVehicle, setPositionVehicle] = useState<{ lat: number; lng: number }>({ lat: 0, lng: 0 });
 
-  const translate = useTranslations("Vehicle")
+  const translate = useTranslations("Vehicle");
   const translateSystem = useTranslations("System");
-  const translateErrors = useTranslations("Error")
+  const translateErrors = useTranslations("Error");
 
-  const origin = useOrigin()
-  const { session } = useSession()
+  const origin = useOrigin();
+  const { session } = useSession();
   const searchParams = useSearchParams();
   const { data: sheetData, setColumns, setData: setSheetData, typeData, setTypeData } = useImportSheetsStore();
   const router = useRouter();
 
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [page, setPage] = useState(searchParams.get("page") ? Number(searchParams.get("page")) : 1);
   const [pageSize, setPageSize] = useState(10);
-  const [count, setCount] = useState(0);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [searchPark, setSearchPark] = useState("");
   const [searchRegion, setSearchRegion] = useState("");
-  const [parks, setParks] = useState([])
-  const [regions, setRegions] = useState([])
-  const [lastRegion, setLastRegion] = useState<string>("")
-  const [inPark, setInPark] = useState<string>("")
+  const [lastRegion, setLastRegion] = useState<string>("");
+  const [inPark, setInPark] = useState<string>("");
+
+  const [parks, setParks] = useState([]);
+  const [regions, setRegions] = useState([]);
 
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
   const [open3, setOpen3] = useState(false);
   const [open4, setOpen4] = useState(false);
-  const { openDialog } = useAddUpdateVehicleDialog();
 
-  const [userSheetNotCreated, setUserSheetNotCreated] = useState<any>([])
-  const [userSheetCreated, setUserSheetCreated] = useState(false)
+  const [userSheetNotCreated, setUserSheetNotCreated] = useState<any>([]);
+  const [userSheetCreated, setUserSheetCreated] = useState(false);
 
-  const [data, setData] = useState<any[]>([]);
-  const columnsSheet = getColumns()
-  const columnsSheetVehiclesPark = getColumnsParc()
-  const columnsSheetVehiclesRegion = getColumnsRegion()
-  const columnsSheetVehiclesIMEI = getColumnsIMEI()
+  // كل البيانات الأصلية من API
+  const [allData, setAllData] = useState<any[]>([]);
 
-  const handleOpenDialogWithTitle = (vehicle: any) => {
-    openDialog(false, vehicle)
-  };
+  const columnsSheet = getColumns();
+  const columnsSheetVehiclesPark = getColumnsParc();
+  const columnsSheetVehiclesRegion = getColumnsRegion();
+  const columnsSheetVehiclesIMEI = getColumnsIMEI();
+
+  // ============================================================
+  // FRONTEND FILTERING + PAGINATION avec useMemo
+  // ============================================================
+  const filteredData = useMemo(() => {
+    let result = [...allData];
+
+    // Filter by search query
+    if (debouncedSearchQuery && debouncedSearchQuery !== "") {
+      const q = debouncedSearchQuery.toLowerCase();
+      result = result.filter(
+        (v) =>
+          v.matricule?.toLowerCase().includes(q) ||
+          v.vin?.toLowerCase().includes(q) ||
+          v.brand?.toLowerCase().includes(q) ||
+          v.model?.toLowerCase().includes(q)
+      );
+    }
+
+    // Filter by park
+    if (searchPark && searchPark !== "" && searchPark !== "0") {
+      result = result.filter((v) => v.parkId === searchPark);
+    }
+
+    // Filter by region
+    if (searchRegion && searchRegion !== "" && searchRegion !== "0") {
+      result = result.filter((v) => v.regionId === searchRegion);
+    }
+
+    // Filter by last region
+    if (lastRegion && lastRegion !== "" && lastRegion !== "0") {
+      result = result.filter((v) => v.last_region === lastRegion);
+    }
+
+    // Filter by in_park
+    if (inPark === "true") {
+      result = result.filter((v) => v.inpark === true);
+    } else if (inPark === "false") {
+      result = result.filter((v) => v.inpark === false);
+    }
+
+    return result;
+  }, [allData, debouncedSearchQuery, searchPark, searchRegion, lastRegion, inPark]);
+
+  const count = filteredData.length;
+
+  // Pagination sur les données filtrées
+  const paginatedData = useMemo(() => {
+    const skip = (page - 1) * pageSize;
+    return filteredData.slice(skip, skip + pageSize);
+  }, [filteredData, page, pageSize]);
+
+  // Reset page à 1 quand les filtres changent
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearchQuery, searchPark, searchRegion, lastRegion, inPark, pageSize]);
+
+  // ============================================================
 
   const generateQRAll = () => {
     getVehiclesAllMatrciule().then((res) => {
       if (res && res.status === 200) {
-        generateQRCodeAndDownload(res.data)
+        generateQRCodeAndDownload(res.data);
       }
-    })
+    });
   };
 
   const generateQRAllSelected = () => {
     getVehiclesMatriculeWithIds(selectedIds).then((res) => {
       if (res && res.status === 200) {
-        generateQRCodeAndDownload(res.data)
+        generateQRCodeAndDownload(res.data);
       }
-    })
+    });
   };
 
   const importvehicles = () => {
     setColumns(columnsSheet);
-    setTypeData("Vehicle")
-    router.push("/admin/sheetimport")
-  }
+    setTypeData("Vehicle");
+    router.push("/admin/sheetimport");
+  };
 
   const importvehiclespark = () => {
     setColumns(columnsSheetVehiclesPark);
-    setTypeData("Parc")
-    router.push("/admin/sheetimport")
-  }
+    setTypeData("Parc");
+    router.push("/admin/sheetimport");
+  };
 
   const importvehiclesregion = () => {
     setColumns(columnsSheetVehiclesRegion);
-    setTypeData("Region")
-    router.push("/admin/sheetimport")
-  }
+    setTypeData("Region");
+    router.push("/admin/sheetimport");
+  };
 
   const importvehiclesIMEI = () => {
     setColumns(columnsSheetVehiclesIMEI);
-    setTypeData("IMEI")
-    router.push("/admin/sheetimport")
-  }
+    setTypeData("IMEI");
+    router.push("/admin/sheetimport");
+  };
 
   useEffect(() => {
     setMounted(true);
     getParksAdmin().then((res) => {
-      if (res && res.status === 200) {
-        setParks(res.data)
-      }
+      if (res && res.status === 200) setParks(res.data);
     });
     getRegionsAdmin().then((res) => {
-      if (res && res.status === 200) {
-        setRegions(res.data)
-      }
+      if (res && res.status === 200) setRegions(res.data);
     });
   }, []);
 
   useEffect(() => {
     if (sheetData && sheetData.length > 0) {
       if (typeData === "Vehicle") {
-        createVehicles(sheetData).then((res) => {
-          if (res.status === 200) {
-            if (res.data.vehicles) {
-              res.data.vehicles.forEach((vehicle) => {
-                if (vehicle.status !== 200) {
-                  setUserSheetNotCreated((prev: any) => [...prev, vehicle.data])
-                } else {
-                  setUserSheetCreated(true)
-                }
-              })
+        createVehicles(sheetData)
+          .then((res) => {
+            if (res.status === 200) {
+              if (res.data.vehicles) {
+                res.data.vehicles.forEach((vehicle: any) => {
+                  if (vehicle.status !== 200) {
+                    setUserSheetNotCreated((prev: any) => [...prev, vehicle.data]);
+                  } else {
+                    setUserSheetCreated(true);
+                  }
+                });
+              }
+            } else {
+              toast.error(res.data.message);
             }
-          } else {
-            toast.error(res.data.message);
-          }
-        }).catch((error) => {
-          toast.error(translateSystem("errorcreate"));
-        }).finally(() => {
-          setSheetData([]);
-        });
+          })
+          .catch(() => toast.error(translateSystem("errorcreate")))
+          .finally(() => setSheetData([]));
       } else if (typeData === "Parc") {
-        UpdateVehiclesParcMatricule(sheetData).then((res) => {
-          if (res.status === 200) {
-            toast.success(res.data.message);
-            window.location.reload()
-          } else {
-            toast.error(res.data.message);
-          }
-        }).catch((error) => {
-          toast.error(translateSystem("errorcreate"));
-        }).finally(() => {
-          setSheetData([]);
-        });
+        UpdateVehiclesParcMatricule(sheetData)
+          .then((res) => {
+            if (res.status === 200) { toast.success(res.data.message); window.location.reload(); }
+            else toast.error(res.data.message);
+          })
+          .catch(() => toast.error(translateSystem("errorcreate")))
+          .finally(() => setSheetData([]));
       } else if (typeData === "Region") {
-        UpdateVehiclesRegionMatricules(sheetData, "1").then((res) => {
-          if (res.status === 200) {
-            toast.success(res.data.message);
-            window.location.reload()
-          } else {
-            toast.error(res.data.message);
-            setColumns(columnsSheet);
-          }
-        }).catch((error) => {
-          toast.error(translateSystem("errorcreate"));
-        }).finally(() => {
-          setSheetData([]);
-        });
-      }
-      else if (typeData === "Region2") {
-        UpdateVehiclesRegionMatricules(sheetData, "2").then((res) => {
-          if (res.status === 200) {
-            toast.success(res.data.message);
-            window.location.reload()
-          } else {
-            toast.error(res.data.message);
-            setColumns(columnsSheet);
-          }
-        }).catch((error) => {
-          toast.error(translateSystem("errorcreate"));
-        }).finally(() => {
-          setSheetData([]);
-        });
-      }
-      else if (typeData === "IMEI") {
-        UpdateVehiclesIMEIMatricule(sheetData).then((res) => {
-          if (res.status === 200) {
-            toast.success(res.data.message);
-            window.location.reload()
-          } else {
-            toast.error(res.data.message);
-            setColumns(columnsSheet);
-          }
-        }).catch((error) => {
-          toast.error(translateSystem("errorcreate"));
-        }).finally(() => {
-          setSheetData([]);
-        });
+        UpdateVehiclesRegionMatricules(sheetData, "1")
+          .then((res) => {
+            if (res.status === 200) { toast.success(res.data.message); window.location.reload(); }
+            else { toast.error(res.data.message); setColumns(columnsSheet); }
+          })
+          .catch(() => toast.error(translateSystem("errorcreate")))
+          .finally(() => setSheetData([]));
+      } else if (typeData === "Region2") {
+        UpdateVehiclesRegionMatricules(sheetData, "2")
+          .then((res) => {
+            if (res.status === 200) { toast.success(res.data.message); window.location.reload(); }
+            else { toast.error(res.data.message); setColumns(columnsSheet); }
+          })
+          .catch(() => toast.error(translateSystem("errorcreate")))
+          .finally(() => setSheetData([]));
+      } else if (typeData === "IMEI") {
+        UpdateVehiclesIMEIMatricule(sheetData)
+          .then((res) => {
+            if (res.status === 200) { toast.success(res.data.message); window.location.reload(); }
+            else { toast.error(res.data.message); setColumns(columnsSheet); }
+          })
+          .catch(() => toast.error(translateSystem("errorcreate")))
+          .finally(() => setSheetData([]));
       }
     }
   }, [sheetData]);
 
+  // جيب كل البيانات مرة واحدة فقط
   useEffect(() => {
-    fetchVehicles();
-  }, [page, debouncedSearchQuery, mounted, pageSize, searchPark, searchRegion, lastRegion,inPark]);
+    if (!mounted) return;
+    fetchAllVehicles();
+  }, [mounted]);
 
-  const fetchVehicles = async () => {
-    setData([]);
-    setIsLoading(false)
+  const fetchAllVehicles = async () => {
+    if (!origin) return;
+    setIsLoading(true);
     try {
-      if (!origin) return
-      setIsLoading(true);
-      const response = await getVehicles(page, pageSize, debouncedSearchQuery, searchPark, searchRegion, lastRegion === "0" ? undefined : lastRegion, inPark === "true" ? true : inPark === "false" ? false : undefined);
+      const response = await getVehiclesSANSPAGINATION();
       if (response.status === 200) {
-        setData(response.data);
+        setAllData(response.data);
       }
-
-      const countResponse = await getCountVehicles(debouncedSearchQuery, searchPark, searchRegion, lastRegion === "0" ? undefined : lastRegion, inPark === "true" ? true : inPark === "false" ? false : undefined);
-      if (countResponse.status === 200) {
-        setCount(countResponse.data);
-      }
-      setIsLoading(false);
     } catch (error) {
+      toast.error(translateSystem("errorcreate"));
     } finally {
       setIsLoading(false);
     }
   };
 
   const exportSelected = async (type: number = 1) => {
-    const res = await getVehiclesWithIds(selectedIds)
-    if (res.status !== 200) {
-      toast.error(translateErrors("badrequest"))
-      return
-    }
-
-    const data = res.data.map((vehicle: any) => ({
+    const selected = allData.filter((v) => selectedIds.includes(v.id));
+    const exportData = selected.map((vehicle: any) => ({
       matricule: vehicle.matricule,
       vin: vehicle.vin,
       brand: vehicle.brand,
       model: vehicle.model,
       year: vehicle.year,
-      park: vehicle.park ? vehicle.park.name : "",
-    }))
-
-    generateFileClient(selectors, data, type);
+      park: vehicle.park ?? "",
+    }));
+    generateFileClient(selectors, exportData, type);
   };
 
   const exportAll = async (type: number = 1) => {
-    const res = await getVehiclesAll()
-    if (res.status !== 200) {
-      toast.error(translateErrors("badrequest"))
-      return
-    }
-
-    const data = res.data.map((vehicle: any) => ({
+    const exportData = allData.map((vehicle: any) => ({
       matricule: vehicle.matricule,
       vin: vehicle.vin,
       brand: vehicle.brand,
       model: vehicle.model,
       year: vehicle.year,
-      park: vehicle.park ? vehicle.park.name : "",
-    }))
-
-    generateFileClient(selectors, data, type);
+      park: vehicle.park ?? "",
+    }));
+    generateFileClient(selectors, exportData, type);
   };
 
   const handleSelectAll = (checked: boolean) => {
-    if (checked && data) {
-      setSelectedIds(data.map((c: any) => c.id))
+    if (checked && paginatedData) {
+      setSelectedIds(paginatedData.map((c: any) => c.id));
     } else {
-      setSelectedIds([])
+      setSelectedIds([]);
     }
-  }
+  };
 
   const handleSelectOne = (id: string, checked: boolean) => {
     if (checked) {
-      setSelectedIds([...selectedIds, id])
+      setSelectedIds([...selectedIds, id]);
     } else {
-      setSelectedIds(selectedIds.filter((sid) => sid !== id))
+      setSelectedIds(selectedIds.filter((sid) => sid !== id));
     }
-  }
+  };
 
   const deleteVehiclesHandler = async (ids: string[]) => {
     if (!origin) return;
     const response = await deleteVehicles(ids);
     if (response.status === 200) {
       toast.success(response.data.message);
-      window.location.reload();
+      // بعد الحذف، حدث البيانات محلياً بدون reload
+      setAllData((prev) => prev.filter((v) => !ids.includes(v.id)));
+      setSelectedIds([]);
     } else {
       toast.error(response.data.message);
     }
   };
 
   const handleOpenMap = async (id: string) => {
-    const response = await getPositionVehicle(id)
-    if(response.status!==200){
-      toast.error("Error getting position")
-      return
+    const response = await getPositionVehicle(id);
+    if (response.status !== 200) {
+      toast.error("Error getting position");
+      return;
     }
-    const position = response.data
-    setPositionVehicle({lat:position.lat,lng:position.lng})    
-    setOpenMap(true)
-  }
+    const position = response.data;
+    setPositionVehicle({ lat: position.lat, lng: position.lng });
+    setOpenMap(true);
+  };
 
-  const isAllSelected = data.length > 0 && selectedIds.length === data.length
-  const isIndeterminate = selectedIds.length > 0 && selectedIds.length < data.length
+  const isAllSelected = paginatedData.length > 0 && selectedIds.length === paginatedData.length;
+  const isIndeterminate = selectedIds.length > 0 && selectedIds.length < paginatedData.length;
 
   if (!mounted) {
     return (
@@ -352,7 +364,7 @@ export default function ListVehicles() {
       <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
         {translate("title")}
       </h1>
-      {/* Alertes */}
+
       {userSheetCreated && (
         <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-6 flex items-center">
           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -362,7 +374,6 @@ export default function ListVehicles() {
         </div>
       )}
 
-      {/* Erreurs */}
       {userSheetNotCreated && userSheetNotCreated.length > 0 && (
         <div className="max-h-48 overflow-auto mb-6">
           {userSheetNotCreated.map((data: any, index: any) => (
@@ -384,132 +395,75 @@ export default function ListVehicles() {
       {/* Barre d'actions */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 mb-6">
         <div className="flex flex-wrap gap-3 items-center">
-          <Button
-            onClick={importvehicles}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            {translateSystem('import')}
+          <Button onClick={importvehicles} className="bg-blue-600 hover:bg-blue-700 text-white">
+            {translateSystem("import")}
           </Button>
 
-          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_park_update") ?? false) || session?.user?.is_admin ? (
-            <Button
-              onClick={importvehiclespark}
-              variant="outline"
-              className="border-gray-300 hover:bg-gray-50"
-            >
-              {translate('importvehiclespark')}
+          {(session?.user?.permissions.find((p: string) => p === "vehicles_park_update") ?? false) || session?.user?.is_admin ? (
+            <Button onClick={importvehiclespark} variant="outline" className="border-gray-300 hover:bg-gray-50">
+              {translate("importvehiclespark")}
             </Button>
           ) : null}
 
-          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_park_region") ?? false) || session?.user?.is_admin ? (
-            <Button
-              onClick={importvehiclesregion}
-              variant="outline"
-              className="border-gray-300 hover:bg-gray-50"
-            >
-              {translate('importvehiclesregion')}
+          {(session?.user?.permissions.find((p: string) => p === "vehicles_park_region") ?? false) || session?.user?.is_admin ? (
+            <Button onClick={importvehiclesregion} variant="outline" className="border-gray-300 hover:bg-gray-50">
+              {translate("importvehiclesregion")}
             </Button>
           ) : null}
 
-          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_update") ?? false) || session?.user?.is_admin ? (
-            <Button
-              onClick={importvehiclesIMEI}
-              variant="outline"
-              className="border-gray-300 hover:bg-gray-50"
-            >
-              {translate('importvehiclesimei')}
+          {(session?.user?.permissions.find((p: string) => p === "vehicles_update") ?? false) || session?.user?.is_admin ? (
+            <Button onClick={importvehiclesIMEI} variant="outline" className="border-gray-300 hover:bg-gray-50">
+              {translate("importvehiclesimei")}
             </Button>
           ) : null}
 
-          <Button
-            onClick={generateQRAll}
-            variant="outline"
-            className="border-gray-300 hover:bg-gray-50"
-          >
+          <Button onClick={generateQRAll} variant="outline" className="border-gray-300 hover:bg-gray-50">
             <QrCode size={20} className="mr-2" />
           </Button>
 
           {selectedIds.length > 0 && (
-            <Button
-              onClick={generateQRAllSelected}
-              variant="outline"
-              className="border-green-300 hover:bg-green-50 text-green-700"
-            >
+            <Button onClick={generateQRAllSelected} variant="outline" className="border-green-300 hover:bg-green-50 text-green-700">
               <QrCode size={20} className="mr-2" />
               {translateSystem("downloadjustselected")}
             </Button>
           )}
 
-          <ExportButton
-            all={true}
-            handleExportCSV={() => exportAll(1)}
-            handleExportXLSX={() => exportAll(2)}
-          />
+          <ExportButton all={true} handleExportCSV={() => exportAll(1)} handleExportXLSX={() => exportAll(2)} />
 
           {selectedIds.length > 0 && (
-            <ExportButton
-              all={false}
-              handleExportCSV={() => exportSelected(1)}
-              handleExportXLSX={() => exportSelected(2)}
-            />
+            <ExportButton all={false} handleExportCSV={() => exportSelected(1)} handleExportXLSX={() => exportSelected(2)} />
           )}
 
-          {/* Boutons d'action avec permissions */}
           <div className="flex flex-wrap gap-2 border-l border-gray-300 pl-3 ml-3">
-            {(session?.user?.permissions.find((permission: string) => permission === "vehicles_delete") ?? false) || session?.user?.is_admin ? (
-              selectedIds.length > 0 && (
-                <ConfirmDialogDelete
-                  open={open}
-                  setOpen={setOpen}
-                  selectedIds={selectedIds}
-                  textToastSelect={translate("selectvehicles")}
-                  triggerText={translate("deletevehicles")}
-                  titleText={translate("confermationdelete")}
-                  descriptionText={translate("confermationdeletemessage")}
-                  deleteAction={deleteVehicles}
-                />
-              )
-            ) : null}
+            {((session?.user?.permissions.find((p: string) => p === "vehicles_delete") ?? false) || session?.user?.is_admin) && selectedIds.length > 0 && (
+              <ConfirmDialogDelete
+                open={open}
+                setOpen={setOpen}
+                selectedIds={selectedIds}
+                textToastSelect={translate("selectvehicles")}
+                triggerText={translate("deletevehicles")}
+                titleText={translate("confermationdelete")}
+                descriptionText={translate("confermationdeletemessage")}
+                deleteAction={deleteVehicles}
+              />
+            )}
 
-            {(session?.user?.permissions.find((permission: string) => permission === "vehicles_park_update") ?? false) || session?.user?.is_admin ? (
-              selectedIds.length > 0 && (
-                <UpdateParcs
-                  open={open2}
-                  setOpen={setOpen2}
-                  selectedIds={selectedIds}
-                  parcs={parks}
-                />
-              )
-            ) : null}
+            {((session?.user?.permissions.find((p: string) => p === "vehicles_park_update") ?? false) || session?.user?.is_admin) && selectedIds.length > 0 && (
+              <UpdateParcs open={open2} setOpen={setOpen2} selectedIds={selectedIds} parcs={parks} />
+            )}
 
-            {(session?.user?.permissions.find((permission: string) => permission === "vehicles_region_update") ?? false) || session?.user?.is_admin ? (
-              selectedIds.length > 0 && (
-                <UpdateRegion
-                  type="1"
-                  open={open3}
-                  setOpen={setOpen3}
-                  selectedIds={selectedIds}
-                  parcs={regions}
-                />
-              )
-            ) : null}
+            {((session?.user?.permissions.find((p: string) => p === "vehicles_region_update") ?? false) || session?.user?.is_admin) && selectedIds.length > 0 && (
+              <UpdateRegion type="1" open={open3} setOpen={setOpen3} selectedIds={selectedIds} parcs={regions} />
+            )}
 
-            {(session?.user?.permissions.find((permission: string) => permission === "vehicles_region_update") ?? false) || session?.user?.is_admin ? (
-              selectedIds.length > 0 && (
-                <UpdateRegion
-                  type="2"
-                  open={open4}
-                  setOpen={setOpen4}
-                  selectedIds={selectedIds}
-                  parcs={regions}
-                />
-              )
-            ) : null}
+            {((session?.user?.permissions.find((p: string) => p === "vehicles_region_update") ?? false) || session?.user?.is_admin) && selectedIds.length > 0 && (
+              <UpdateRegion type="2" open={open4} setOpen={setOpen4} selectedIds={selectedIds} parcs={regions} />
+            )}
           </div>
         </div>
       </div>
 
-      {/* Filtres et contrôles */}
+      {/* Filtres */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 mb-6">
         <div className="flex flex-wrap gap-4 items-center justify-between">
           <div className="flex flex-wrap gap-4 items-center">
@@ -531,72 +485,47 @@ export default function ListVehicles() {
             <div className="w-48">
               <SelectSearchFetch
                 value={searchPark}
-                onChange={(val) => { setSearchPark(val) }}
+                onChange={(val) => setSearchPark(val)}
                 label={translate("selectpark")}
                 placeholder={translate("selectpark")}
-                options={
-                  parks.map((park: any) => ({
-                    value: park.id,
-                    label: park.name
-                  }))
-                }
+                options={parks.map((park: any) => ({ value: park.id, label: park.name }))}
               />
             </div>
 
             <div className="w-48">
               <SelectSearchFetch
                 value={searchRegion}
-                onChange={(val) => { setSearchRegion(val) }}
+                onChange={(val) => setSearchRegion(val)}
                 label={translate("selectregion")}
                 placeholder={translate("selectregion")}
-                options={
-                  regions.map((region: any) => ({
-                    value: region.id,
-                    label: region.name
-                  }))
-                }
+                options={regions.map((region: any) => ({ value: region.id, label: region.name }))}
               />
             </div>
 
             <div className="w-48">
               <SelectSearchFetch
                 value={inPark}
-                onChange={(val) => { setInPark(val) }}
+                onChange={(val) => setInPark(val)}
                 label={translate("in_park")}
                 placeholder={translate("in_park")}
-                options={
-                  [
-                    {
-                      value: "true",
-                      label: "Yes"
-                    },
-                    {
-                      value: "false",
-                      label: "Flase"
-                    }
-                  ]
-                }
+                options={[
+                  { value: "true", label: "Yes" },
+                  { value: "false", label: "No" },
+                ]}
               />
             </div>
 
             <div className="w-48">
               <SelectSearchFetch
                 value={lastRegion}
-                onChange={(val) => { setLastRegion(val) }}
+                onChange={(val) => setLastRegion(val)}
                 label={translate("selectlastregion")}
                 placeholder={translate("selectlastregion")}
-                options={
-                  regions.map((region: any) => ({
-                    value: region.id,
-                    label: region.name
-                  }))
-                }
+                options={regions.map((region: any) => ({ value: region.id, label: region.name }))}
               />
             </div>
-
           </div>
 
-          {/* Composant de recherche */}
           <div className="min-w-60 max-w-md">
             <SearchTable
               page={page}
@@ -626,48 +555,23 @@ export default function ListVehicles() {
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                     />
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    {translate("matricule")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    {translate("model")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    {translate("year")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    {translate("brand")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    {translate("vin")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    {translate("park")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    {translate("region")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    {translate("region")} 2
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    {translate("in_park")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    {translate("status")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    {translateSystem("actions")}
-                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">{translate("matricule")}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">{translate("model")}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">{translate("year")}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">{translate("brand")}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">{translate("vin")}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">{translate("park")}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">{translate("region")}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">{translate("region")} 2</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">{translate("in_park")}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">{translate("status")}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">{translateSystem("actions")}</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {data.length > 0 ? (
-                  data.map((vehicle) => (
-                    <tr
-                      key={vehicle.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
-                    >
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((vehicle) => (
+                    <tr key={vehicle.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <input
                           type="checkbox"
@@ -676,77 +580,34 @@ export default function ListVehicles() {
                           className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                         />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                        {vehicle.matricule}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {vehicle.model}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {vehicle.year}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {vehicle.brand}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {vehicle.vin}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {vehicle.park}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {vehicle.region}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {vehicle.region2}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {vehicle.inpark === true ? "Yes" : "No"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {vehicle.status}
-                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{vehicle.matricule}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{vehicle.model}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{vehicle.year}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{vehicle.brand}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{vehicle.vin}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{vehicle.park}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{vehicle.region}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{vehicle.region2}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{vehicle.inpark === true ? "Yes" : "No"}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{vehicle.status}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="flex gap-2">
-                          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_delete") ?? false) || session?.user?.is_admin ? (
-                            <Button
-                              onClick={() => deleteVehiclesHandler([vehicle.id])}
-                              variant="destructive"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                            >
+                          {((session?.user?.permissions.find((p: string) => p === "vehicles_delete") ?? false) || session?.user?.is_admin) && (
+                            <Button onClick={() => deleteVehiclesHandler([vehicle.id])} variant="destructive" size="sm" className="h-8 w-8 p-0">
                               <Trash size={14} />
                             </Button>
-                          ) : null}
-
-                          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_update") ?? false) || session?.user?.is_admin ? (
-                            <Button
-                              onClick={() => handleOpenMap(vehicle.id)}
-                              variant="default"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                            >
+                          )}
+                          {((session?.user?.permissions.find((p: string) => p === "vehicles_update") ?? false) || session?.user?.is_admin) && (
+                            <Button onClick={() => handleOpenMap(vehicle.id)} variant="default" size="sm" className="h-8 w-8 p-0">
                               <MapPinIcon size={14} />
                             </Button>
-                          ) : null}
-
-                          {(session?.user?.permissions.find((permission: string) => permission === "vehicles_update") ?? false) || session?.user?.is_admin ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleOpenDialogWithTitle(vehicle)}
-                              className="h-8 w-8 p-0 border-gray-300"
-                            >
+                          )}
+                          {((session?.user?.permissions.find((p: string) => p === "vehicles_update") ?? false) || session?.user?.is_admin) && (
+                            <Button variant="outline" size="sm" onClick={() => router.push(`/admin/vehicles/${vehicle.id}/edit`)} className="h-8 w-8 p-0 border-gray-300">
                               <Settings2 size={14} />
                             </Button>
-                          ) : null}
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => router.push(`${window.location.pathname}/${vehicle.id}`)}
-                            className="h-8 w-8 p-0 border-gray-300"
-                          >
+                          )}
+                          <Button variant="outline" size="sm" onClick={() => router.push(`${window.location.pathname}/${vehicle.id}`)} className="h-8 w-8 p-0 border-gray-300">
                             <Eye size={14} />
                           </Button>
                         </div>
@@ -755,13 +616,12 @@ export default function ListVehicles() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={10} className="px-6 py-12 text-center">
+                    <td colSpan={12} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
                         <svg className="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <p className="text-lg font-medium">{translateSystem("noresults")}</p>
-                        {/* <p className="text-sm mt-1">{translateSystem("trychangingfilters")}</p> */}
                       </div>
                     </td>
                   </tr>
@@ -772,7 +632,6 @@ export default function ListVehicles() {
         </div>
       )}
 
-      {/* Pagination et total */}
       {!isLoading && (
         <div className="mt-6">
           <TablePagination
@@ -783,7 +642,6 @@ export default function ListVehicles() {
             isLoading={isLoading}
             debouncedSearchQuery={debouncedSearchQuery}
           />
-
           <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-3 mt-4">
             <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
               {translateSystem("total")}: <span className="font-bold">{count}</span>
