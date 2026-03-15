@@ -7,24 +7,18 @@ import { NextResponse } from "next/server";
 export const GET = withAuth(async (request, { user }) => {
   try {
     const session = await verifySession();
-    if (!session || session.status != 200) {
+    if (session?.status != 200) {
       return NextResponse.json({ message: "Not authorized" }, { status: 401 });
     }
 
-    // Get supervisor's device with all_region
-    const device = await prisma.device.findFirst({
-      where: { user_id: session.data.user.id },
+    const regionsRes = await prisma.region.findMany({
+      select: {
+        id: true,
+      },
     });
 
-    if (!device || !device.all_region || device.type !== 5) {
-      return NextResponse.json(
-        { message: "No regions found for this supervisor" },
-        { status: 404 },
-      );
-    }
-
     // Parse region IDs from comma-separated string
-    const regionIds = device.all_region.split(",").map((id) => id.trim());
+    const regionIds = regionsRes.map((region) => region.id);
     const { searchParams } = new URL(request.url);
     const date =
       searchParams.get("date") || new Date().toISOString().split("T")[0];
@@ -87,6 +81,7 @@ export const GET = withAuth(async (request, { user }) => {
         uniqueExitVehicles: exitVehicles.size,
         uniqueEntryVehicles: entryVehicles.size,
         uniqueTotalVehicles: allVehicles.size,
+        nbrVehicles: 0,
       };
     });
 
