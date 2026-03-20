@@ -81,7 +81,7 @@ export const GET = withAuth(async (request, { user }) => {
         uniqueExitVehicles: exitVehicles.size,
         uniqueEntryVehicles: entryVehicles.size,
         uniqueTotalVehicles: allVehicles.size,
-        nbrVehicles: 0,
+        nbrVehicles: region.nbr_buses ?? 0,
       };
     });
 

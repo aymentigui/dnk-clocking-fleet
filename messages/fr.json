@@ -468,6 +468,7 @@
         "name": "Nom",
         "description": "Description",
         "address": "Adresse",
+        "nbr_buses" : "Nombre de buses",
         "regionsvehcilescount": "Nombre de véhicules dans la région"
     },
     "Device": {

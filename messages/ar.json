@@ -467,6 +467,7 @@
         "name": "إسم",
         "description": "الوصف",
         "address": "العنوان",
+        "nbr_buses": "عدد الحافلات",
         "regionsvehcilescount": "عدد السيارات في المنطقة"
     },
     "Device": {

@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from "@/components/ui/badge";
 import { getRegionStatistics, getRegionClockings } from "@/actions/clocking/get";
 import { useTranslations } from "next-intl";
-import { getAllRegions } from "@/actions/clocking/get-statistics-courses";
 import StatisticsContent from "../_component/statistic-content";
 import { getAllRegions as getAllRegions2, getRegionStatistics as getRegionStatistics2 } from '@/actions/clocking/get-statistics-courses';
 
@@ -124,7 +123,8 @@ export default function RegionStatisticsPage() {
                                     <tr className="border-b bg-muted/50">
                                         <th className="h-12 px-4 text-left align-middle font-medium">{t("Clocking.region")}</th>
                                         {/* <th className="h-12 px-4 text-left align-middle font-medium">{t("Clocking.description")}</th> */}
-                                        <th className="h-12 px-4 text-center align-middle font-medium">{t("Clocking.totalVehicles")}</th>
+                                        <th className="h-12 px-4 text-center align-middle font-medium">{t("Region.nbr_buses")}</th>
+                                        <th className="h-12 px-4 text-center align-middle font-medium">{t("Clocking.vehicles")}</th>
                                         <th className="h-12 px-4 text-center align-middle font-medium">{t("Clocking.totalClockings")}</th>
                                         <th className="h-12 px-4 text-center align-middle font-medium">{t("Clocking.entries")}</th>
                                         <th className="h-12 px-4 text-center align-middle font-medium">{t("Clocking.exits")}</th>
@@ -136,6 +136,9 @@ export default function RegionStatisticsPage() {
                                         <tr key={region.id} className="border-b transition-colors hover:bg-muted/50">
                                             <td className="p-4 align-middle">
                                                 <p className="font-medium">{region.name}</p>
+                                            </td>
+                                            <td className="p-4 align-middle text-center">
+                                                <p className="text-lg font-bold">{region.nbrVehicles}</p>
                                             </td>
                                             {/* <td className="p-4 align-middle">
                                                 <p className="text-sm text-muted-foreground">{region.description || "-"}</p>

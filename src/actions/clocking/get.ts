@@ -533,6 +533,7 @@ export async function getRegionStatistics(date?: Date) {
         uniqueExitVehicles: exitVehicles.size,
         uniqueEntryVehicles: entryVehicles.size,
         uniqueTotalVehicles: allVehicles.size,
+        nbrVehicles: region.nbr_buses ?? 0,
       };
     });
 

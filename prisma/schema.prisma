@@ -205,6 +205,7 @@ model region {
   id           String           @id @default(cuid())
   name         String           @unique
   description  String?
+  nbr_buses    Int?             @default(0)
   address      String?
   created_at   DateTime         @default(now())
   deleted_at   DateTime?
@@ -354,14 +355,14 @@ model vehicle {
 }
 
 model vehicle_park {
-  id          String        @id @default(cuid())
-  vehicle_id  String
-  vehicle     vehicle       @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
-  park_id     String?
-  park        park?         @relation(fields: [park_id], references: [id])
-  added_from  String
-  user        user          @relation(fields: [added_from], references: [id])
-  added_at    DateTime      @default(now())
+  id         String   @id @default(cuid())
+  vehicle_id String
+  vehicle    vehicle  @relation(fields: [vehicle_id], references: [id], onDelete: Cascade)
+  park_id    String?
+  park       park?    @relation(fields: [park_id], references: [id])
+  added_from String
+  user       user     @relation(fields: [added_from], references: [id])
+  added_at   DateTime @default(now())
 }
 
 model vehicle_region {
